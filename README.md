@@ -1,4 +1,6 @@
-# ![PAW-sitive Care Logo](./img/pawsitive_logo.png)
+<p align="center">
+  <img src="./img/pawsitive_logo.png" alt="PAW-sitive Care Logo">
+</p>
 
 # PAW-sitive Care
 ### (A Pet Clinic Management System)
