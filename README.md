@@ -2,8 +2,49 @@
   <img src="./img/pawsitive_logo.png" alt="PAW-sitive Care Logo">
 </p>
 
-# PAW-sitive Care
+# PAWsitive Care
 ### (A Pet Clinic Management System)
+
+# Table of Contents
+- [Project Overview](#project-overview)
+- [Problem Statement](#problem-statement)
+- [Project Objectives](#project-objectives)
+  - [Develop a Secure, Role-Based Management System](#develop-a-secure-role-based-management-system)
+  - [Implement Modular System Architecture](#implement-modular-system-architecture)
+  - [Incorporate Advanced Design Patterns](#incorporate-advanced-design-patterns)
+  - [Enhance Operational Efficiency](#enhance-operational-efficiency)
+  - [Provide Comprehensive Features](#provide-comprehensive-features)
+- [End Users](#end-users)
+  - [System Administrators](#system-administrators)
+  - [Veterinarians](#veterinarians)
+  - [Clinic Staff](#clinic-staff)
+  - [Pet Owners](#pet-owners)
+- [Functional Requirements](#functional-requirements)
+  - [Core System Functions](#core-system-functions)
+  - [Pet Profile Management](#pet-profile-management)
+  - [Appointment Management System](#appointment-management-system)
+  - [Medical Records Management](#medical-records-management)
+  - [Billing and Financial Management](#billing-and-financial-management)
+  - [Inventory Management](#inventory-management)
+  - [Communication System](#communication-system)
+- [Future Development / Optional Features](#future-development-optional-features)
+  - [Grooming and Boarding Services](#grooming-and-boarding-services)
+  - [Loyalty Program](#loyalty-program)
+  - [PetMedia Social Platform](#petmedia-social-platform)
+  - [Telemedicine Platform](#telemedicine-platform)
+- [Non-Functional Requirements](#non-functional-requirements)
+  - [Performance Requirements](#performance-requirements)
+  - [Security Requirements](#security-requirements)
+  - [Reliability Requirements](#reliability-requirements)
+  - [Usability Requirements](#usability-requirements)
+  - [Compatibility Requirements](#compatibility-requirements)
+  - [Maintainability Requirements](#maintainability-requirements)
+- [System Diagrams](#system-diagrams)
+- [Tools & Technologies](#tools-technologies)
+- [Expected Outcomes](#expected-outcomes)
+- [Conclusion](#conclusion)
+
+---
 
 ## Project Overview
 The **Pet Clinic Management System** is a comprehensive web-based application built using the **Django framework** to modernize veterinary clinic operations. The system provides a centralized platform for managing pet profiles, appointments, medical records, billing, inventory, and communication between clinic staff and pet owners. 
