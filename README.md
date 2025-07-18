@@ -1,2 +1,4 @@
-# pawsitive_care
-A Pet Clinic Management System
+# ![PAW-sitive Care Logo](./img/pawsitive_logo.png)
+
+# PAW-sitive Care
+## (A Pet Clinic Management System)
