@@ -246,7 +246,6 @@ The **Pet Clinic Management System** is designed to serve four distinct user cat
 ---
 
 ## 7. System Diagrams
-[The following diagrams will be created separately and inserted into the final report]
 
 ### 7.1 Entity Relationship Diagram (ERD)
 # ![ERD](./img/ERDiagram.png)
