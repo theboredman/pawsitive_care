@@ -1,0 +1,258 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}User Management - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2><i class="fas fa-users text-primary"></i> User Management</h2>
+        <p class="text-muted">Manage all system users and their roles</p>
+      </div>
+      <div>
+        <div class="btn-group" role="group">
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New User
+          </a>
+          <a href="{% url 'accounts:promote_clients' %}" class="btn btn-success">
+            <i class="fas fa-user-plus"></i> Promote Staff
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User Statistics -->
+<div class="row mb-4">
+  <!-- Total Users - Full width on mobile, half width on tablet+ -->
+  <div class="col-12 col-md-6 col-lg-12 mb-3">
+    <div class="card border-primary">
+      <div class="card-body text-center">
+        <h3 class="text-primary">
+          {{ stats.total_users }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-users"></i> Total Users</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Role Statistics -->
+<div class="row mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card border-danger">
+      <div class="card-body text-center">
+        <h3 class="text-danger">
+          {{ stats.admin_count }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-user-shield"></i> Administrators</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card border-success">
+      <div class="card-body text-center">
+        <h3 class="text-success">
+          {{ stats.vet_count }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-user-md"></i> Veterinarians</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card border-warning">
+      <div class="card-body text-center">
+        <h3 class="text-warning">
+          {{ stats.staff_count }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-user-tie"></i> Staff Members</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card border-info">
+      <div class="card-body text-center">
+        <h3 class="text-info">
+          {{ stats.client_count }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-user"></i> Clients</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Users Table -->
+<div class="card shadow">
+  <div class="card-header">
+    <div class="row align-items-center">
+      <div class="col">
+        <h5 class="mb-0"><i class="fas fa-list"></i> All Users</h5>
+      </div>
+      <div class="col-auto">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" id="usersTable">
+        <thead class="bg-light">
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="bg-{{ user.role|default:'secondary' }} rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
+                  {% if user.is_admin %}
+                  <i class="fas fa-user-shield text-white"></i>
+                  {% elif user.is_vet %}
+                  <i class="fas fa-stethoscope text-white"></i>
+                  {% elif user.is_staff_member %}
+                  <i class="fas fa-user-tie text-white"></i>
+                  {% else %}
+                  <i class="fas fa-user text-white"></i>
+                  {% endif %}
+                </div>
+                <div>
+                  <strong>
+                    {{ user.get_full_name|default:user.username }}</strong>
+                  {% if not user.get_full_name %}
+                  <br><small class="text-muted">@
+                    {{ user.username }}</small>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>
+              {{ user.email|default:"<span class='text-muted'>Not provided</span>" }}
+            </td>
+            <td>
+              {{ user.phone|default:"<span class='text-muted'>Not provided</span>" }}
+            </td>
+            <td>
+              <span class="badge bg-{{ user.role|default:'secondary' }}">
+                {{ user.get_role_display }}
+              </span>
+            </td>
+            <td>
+              {% if user.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <small>
+                {{ user.date_joined|date:'M d, Y' }}</small>
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-primary" title="View Details">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button type="button" class="btn btn-outline-warning" title="Edit User">
+                  <i class="fas fa-edit"></i>
+                </button>
+                {% if user != request.user %}
+                <button type="button" class="btn btn-outline-danger" title="Delete User">
+                  <i class="fas fa-trash"></i>
+                </button>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-4">
+              <i class="fas fa-users fa-2x text-muted mb-2"></i>
+              <p class="text-muted">No users found.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Role Legend -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header bg-info text-white">
+        <h6 class="mb-0"><i class="fas fa-info-circle"></i> Role Permissions</h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <h6><span class="badge bg-danger">Admin</span></h6>
+            <ul class="small">
+              <li>Full system access</li>
+              <li>User management</li>
+              <li>System configuration</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6><span class="badge bg-success">Veterinarian</span></h6>
+            <ul class="small">
+              <li>Patient management</li>
+              <li>Medical records</li>
+              <li>Prescriptions</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6><span class="badge bg-warning">Staff</span></h6>
+            <ul class="small">
+              <li>Appointment scheduling</li>
+              <li>Client management</li>
+              <li>Basic reception</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h6><span class="badge bg-info">Client</span></h6>
+            <ul class="small">
+              <li>Book appointments</li>
+              <li>View pet records</li>
+              <li>Manage profile</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('userSearch').addEventListener('keyup', function() {
+    var input = this.value.toLowerCase();
+    var table = document.getElementById('usersTable');
+    var rows = table.getElementsByTagName('tr');
+
+    for (var i = 1; i < rows.length; i++) {
+      var row = rows[i];
+      var text = row.textContent.toLowerCase();
+
+      if (text.includes(input)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    }
+  });
+</script>
+{% endblock %}

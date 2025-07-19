@@ -1,0 +1,187 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Profile - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-header bg-success text-white">
+        <h4 class="mb-0"><i class="fas fa-user-edit"></i> My Profile</h4>
+      </div>
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-md-3 text-center">
+            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+              <i class="fas fa-user fa-2x text-white"></i>
+            </div>
+            <h5>
+              {{ user.get_full_name|default:user.username }}
+            </h5>
+            <span class="badge bg-{{ user.role|default:'secondary' }} fs-6">
+              {{ user.get_role_display }}
+            </span>
+          </div>
+
+          <div class="col-md-9">
+            <form method="post">
+              {% csrf_token %}
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                    <i class="fas fa-user"></i> First Name
+                  </label>
+                  {{ form.first_name.as_widget }}
+                  {% if form.first_name.errors %}
+                  <div class="text-danger small">
+                    {{ form.first_name.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                    <i class="fas fa-user"></i> Last Name
+                  </label>
+                  {{ form.last_name.as_widget }}
+                  {% if form.last_name.errors %}
+                  <div class="text-danger small">
+                    {{ form.last_name.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.email.id_for_label }}" class="form-label">
+                    <i class="fas fa-envelope"></i> Email
+                  </label>
+                  {{ form.email.as_widget }}
+                  {% if form.email.errors %}
+                  <div class="text-danger small">
+                    {{ form.email.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.phone.id_for_label }}" class="form-label">
+                    <i class="fas fa-phone"></i> Phone Number
+                  </label>
+                  {{ form.phone.as_widget }}
+                  {% if form.phone.errors %}
+                  <div class="text-danger small">
+                    {{ form.phone.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.address.id_for_label }}" class="form-label">
+                  <i class="fas fa-map-marker-alt"></i> Address
+                </label>
+                {{ form.address.as_widget }}
+                {% if form.address.errors %}
+                <div class="text-danger small">
+                  {{ form.address.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-user-tag"></i> Role
+                </label>
+                <input type="text" class="form-control" value="{{ user.get_role_display }}" readonly>
+                <small class="text-muted">Contact an administrator to change your role.</small>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-calendar"></i> Member Since
+                </label>
+                <input type="text" class="form-control" value="{{ user.date_joined|date:'F d, Y' }}" readonly>
+              </div>
+
+              {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                {{ error }}
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'accounts:client_dashboard' %}" class="btn btn-outline-secondary me-md-2">
+                  <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-save"></i> Update Profile
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Security Section -->
+    <div class="card mt-4 shadow">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Account Security</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="fas fa-key"></i> Password</h6>
+            <p class="text-muted">Keep your account secure by using a strong password.</p>
+            <a href="#" class="btn btn-warning btn-sm">
+              <i class="fas fa-edit"></i> Change Password
+            </a>
+          </div>
+
+          <div class="col-md-6">
+            <h6><i class="fas fa-sign-out-alt"></i> Account Access</h6>
+            <p class="text-muted">Last login:
+              {{ user.last_login|date:'F d, Y g:i A'|default:'Never' }}
+            </p>
+            <div class="small">
+              <strong>Username:</strong>
+              {{ user.username }}<br>
+              <strong>Active:</strong>
+              {% if user.is_active %}
+              <span class="text-success">Yes</span>
+              {% else %}
+              <span class="text-danger">No</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .form-control,
+  .form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  }
+
+  .card {
+    border-radius: 12px;
+    border: none;
+  }
+</style>
+{% endblock %}

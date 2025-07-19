@@ -1,0 +1,233 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Client Dashboard - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2><i class="fas fa-heart text-info"></i> Welcome to Pawsitive Care</h2>
+        <p class="text-muted">Manage your pets' health and appointments</p>
+      </div>
+      <div>
+        <span class="badge bg-info fs-6">
+          {{ user.get_role_display }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Quick Actions -->
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-info">
+      <div class="card-body text-center">
+        <i class="fas fa-calendar-plus fa-2x text-info mb-3"></i>
+        <h5>Book Appointment</h5>
+        <p class="text-muted">Schedule a visit</p>
+        <a href="#" class="btn btn-info btn-sm">
+          <i class="fas fa-plus"></i> New Appointment
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-success">
+      <div class="card-body text-center">
+        <i class="fas fa-paw fa-2x text-success mb-3"></i>
+        <h5>My Pets</h5>
+        <p class="text-muted">Manage pet profiles</p>
+        <a href="#" class="btn btn-success btn-sm">
+          <i class="fas fa-plus"></i> Add Pet
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-warning">
+      <div class="card-body text-center">
+        <i class="fas fa-file-medical fa-2x text-warning mb-3"></i>
+        <h5>Medical Records</h5>
+        <p class="text-muted">View health history</p>
+        <a href="#" class="btn btn-warning btn-sm">
+          <i class="fas fa-eye"></i> View Records
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-primary">
+      <div class="card-body text-center">
+        <i class="fas fa-receipt fa-2x text-primary mb-3"></i>
+        <h5>Billing</h5>
+        <p class="text-muted">View invoices</p>
+        <a href="#" class="btn btn-primary btn-sm">
+          <i class="fas fa-dollar-sign"></i> View Bills
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-calendar-alt"></i> Upcoming Appointments</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>January 25, 2025 - 10:30 AM</strong>
+              <br>Fluffy - Annual Checkup with Dr. Smith
+              <br><small class="text-muted">Regular examination and vaccinations</small>
+            </div>
+            <div>
+              <span class="badge bg-success mb-1">Confirmed</span>
+              <br><small><a href="#" class="text-primary">Reschedule</a></small>
+            </div>
+          </div>
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>February 2, 2025 - 2:00 PM</strong>
+              <br>Max - Follow-up with Dr. Johnson
+              <br><small class="text-muted">Post-surgery check</small>
+            </div>
+            <div>
+              <span class="badge bg-warning mb-1">Pending</span>
+              <br><small><a href="#" class="text-primary">Confirm</a></small>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-3">
+          <a href="#" class="btn btn-outline-info">View All Appointments</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5><i class="fas fa-history"></i> Recent Activity</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="fas fa-stethoscope text-success me-2"></i>
+              Fluffy's checkup completed
+            </div>
+            <small class="text-muted">3 days ago</small>
+          </div>
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="fas fa-syringe text-info me-2"></i>
+              Max received vaccinations
+            </div>
+            <small class="text-muted">1 week ago</small>
+          </div>
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="fas fa-pills text-warning me-2"></i>
+              Prescription refilled for Bella
+            </div>
+            <small class="text-muted">2 weeks ago</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-paw"></i> My Pets</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item d-flex align-items-center">
+            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+              <i class="fas fa-cat text-white"></i>
+            </div>
+            <div>
+              <strong>Fluffy</strong>
+              <br><small class="text-muted">Persian Cat, 3 years</small>
+            </div>
+          </div>
+          <div class="list-group-item d-flex align-items-center">
+            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+              <i class="fas fa-dog text-white"></i>
+            </div>
+            <div>
+              <strong>Max</strong>
+              <br><small class="text-muted">Golden Retriever, 5 years</small>
+            </div>
+          </div>
+          <div class="list-group-item d-flex align-items-center">
+            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+              <i class="fas fa-dog text-white"></i>
+            </div>
+            <div>
+              <strong>Bella</strong>
+              <br><small class="text-muted">Beagle, 2 years</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-3">
+          <a href="#" class="btn btn-outline-success btn-sm">Add New Pet</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header">
+        <h6><i class="fas fa-bell"></i> Reminders</h6>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item px-0">
+            <small class="text-info">
+              <i class="fas fa-syringe"></i> Max's vaccination due next month
+            </small>
+          </div>
+          <div class="list-group-item px-0">
+            <small class="text-warning">
+              <i class="fas fa-pills"></i> Refill Bella's medication
+            </small>
+          </div>
+          <div class="list-group-item px-0">
+            <small class="text-success">
+              <i class="fas fa-calendar"></i> Schedule Fluffy's dental cleaning
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header">
+        <h6><i class="fas fa-phone"></i> Emergency Contact</h6>
+      </div>
+      <div class="card-body text-center">
+        <h4 class="text-danger">(555) 123-PETS</h4>
+        <p class="mb-0"><small>24/7 Emergency Line</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="alert alert-info">
+      <h5><i class="fas fa-info-circle"></i> Welcome to Pawsitive Care!</h5>
+      <p class="mb-0">We're here to provide the best care for your beloved pets. Book appointments, manage your pets' health records, and stay connected with our veterinary team.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

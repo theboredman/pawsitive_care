@@ -1,0 +1,228 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Staff Dashboard - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2><i class="fas fa-user-tie text-warning"></i> Staff Dashboard</h2>
+        <p class="text-muted">Manage appointments and client services</p>
+      </div>
+      <div>
+        <span class="badge bg-warning fs-6">
+          {{ user.get_role_display }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Quick Actions -->
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-warning">
+      <div class="card-body text-center">
+        <i class="fas fa-calendar-check fa-2x text-warning mb-3"></i>
+        <h5>Appointments</h5>
+        <p class="text-muted">Schedule & manage</p>
+        <a href="#" class="btn btn-warning btn-sm">
+          <i class="fas fa-plus"></i> New Appointment
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-info">
+      <div class="card-body text-center">
+        <i class="fas fa-users fa-2x text-info mb-3"></i>
+        <h5>Clients</h5>
+        <p class="text-muted">Manage client info</p>
+        <a href="#" class="btn btn-info btn-sm">
+          <i class="fas fa-search"></i> Find Client
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-success">
+      <div class="card-body text-center">
+        <i class="fas fa-phone fa-2x text-success mb-3"></i>
+        <h5>Reception</h5>
+        <p class="text-muted">Handle calls & walk-ins</p>
+        <a href="#" class="btn btn-success btn-sm">
+          <i class="fas fa-headset"></i> Reception
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-primary">
+      <div class="card-body text-center">
+        <i class="fas fa-cash-register fa-2x text-primary mb-3"></i>
+        <h5>Billing</h5>
+        <p class="text-muted">Process payments</p>
+        <a href="#" class="btn btn-primary btn-sm">
+          <i class="fas fa-dollar-sign"></i> Billing
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-list"></i> Today's Schedule</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Client</th>
+                <th>Pet</th>
+                <th>Veterinarian</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>9:00 AM</strong></td>
+                <td>Sarah Johnson</td>
+                <td>Fluffy (Cat)</td>
+                <td>Dr. Smith</td>
+                <td><span class="badge bg-success">In Progress</span></td>
+              </tr>
+              <tr>
+                <td><strong>10:30 AM</strong></td>
+                <td>Mike Wilson</td>
+                <td>Max (Dog)</td>
+                <td>Dr. Johnson</td>
+                <td><span class="badge bg-warning">Waiting</span></td>
+              </tr>
+              <tr>
+                <td><strong>11:00 AM</strong></td>
+                <td>Emma Davis</td>
+                <td>Bella (Dog)</td>
+                <td>Dr. Smith</td>
+                <td><span class="badge bg-secondary">Scheduled</span></td>
+              </tr>
+              <tr>
+                <td><strong>2:00 PM</strong></td>
+                <td>John Smith</td>
+                <td>Charlie (Cat)</td>
+                <td>Dr. Johnson</td>
+                <td><span class="badge bg-secondary">Scheduled</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-tasks"></i> Daily Tasks</h5>
+      </div>
+      <div class="card-body">
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" checked>
+          <label class="form-check-label">
+            Confirm tomorrow's appointments
+          </label>
+        </div>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox">
+          <label class="form-check-label">
+            Update client contact info
+          </label>
+        </div>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox">
+          <label class="form-check-label">
+            Process payment receipts
+          </label>
+        </div>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" checked>
+          <label class="form-check-label">
+            Inventory supply check
+          </label>
+        </div>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox">
+          <label class="form-check-label">
+            File medical records
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5><i class="fas fa-bell"></i> Notifications</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item px-0">
+            <small class="text-info">
+              <i class="fas fa-info-circle"></i> New client registration pending
+            </small>
+          </div>
+          <div class="list-group-item px-0">
+            <small class="text-warning">
+              <i class="fas fa-exclamation-triangle"></i> Payment overdue: Invoice #1234
+            </small>
+          </div>
+          <div class="list-group-item px-0">
+            <small class="text-success">
+              <i class="fas fa-check-circle"></i> Lab results ready for Fluffy
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h6><i class="fas fa-chart-line"></i> This Week's Stats</h6>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-4">
+            <h4 class="text-primary">42</h4>
+            <small>Appointments</small>
+          </div>
+          <div class="col-4">
+            <h4 class="text-success">38</h4>
+            <small>Completed</small>
+          </div>
+          <div class="col-4">
+            <h4 class="text-info">12</h4>
+            <small>New Clients</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="alert alert-warning">
+      <h6><i class="fas fa-user-cog"></i> Staff Access</h6>
+      <p class="mb-0">You have access to appointment management, client information, reception duties, and billing. Contact your supervisor for additional permissions.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

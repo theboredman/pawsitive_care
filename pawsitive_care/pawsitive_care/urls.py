@@ -16,9 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
+
+def home_redirect(request):
+    if request.user.is_authenticated:
+        if request.user.is_admin():
+            return redirect('accounts:admin_dashboard')
+        elif request.user.is_vet():
+            return redirect('accounts:vet_dashboard')
+        elif request.user.is_staff_member():
+            return redirect('accounts:staff_dashboard')
+        else:
+            return redirect('accounts:client_dashboard')
+    return redirect('accounts:login')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
-
+    path('', home_redirect, name='home'),  # Root URL redirect
 ]

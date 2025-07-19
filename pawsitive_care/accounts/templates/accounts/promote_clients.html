@@ -1,0 +1,395 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Promote Clients - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2><i class="fas fa-user-plus text-primary"></i> Staff Promotion</h2>
+        <p class="text-muted">Promote clients to staff members and veterinarians</p>
+      </div>
+      <div>
+        <a href="{% url 'accounts:user_management' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-users"></i> All Users
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card border-info">
+      <div class="card-body text-center">
+        <h3 class="text-info">
+          {{ stats.client_count }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-user"></i> Clients</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-warning">
+      <div class="card-body text-center">
+        <h3 class="text-warning">
+          {{ stats.staff_count }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-user-tie"></i> Staff Members</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-success">
+      <div class="card-body text-center">
+        <h3 class="text-success">
+          {{ stats.vet_count }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-user-md"></i> Veterinarians</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-primary">
+      <div class="card-body text-center">
+        <h3 class="text-primary">
+          {{ stats.total_promotable }}
+        </h3>
+        <p class="mb-0"><i class="fas fa-arrow-up"></i> Available to Promote</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Promotion Tabs -->
+<ul class="nav nav-tabs" id="promotionTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="clients-tab" data-bs-toggle="tab" data-bs-target="#clients-pane" type="button" role="tab" aria-controls="clients-pane" aria-selected="true">
+      <i class="fas fa-user"></i> Clients (
+      {{ stats.client_count }})
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-pane" type="button" role="tab" aria-controls="staff-pane" aria-selected="false">
+      <i class="fas fa-user-tie"></i> Staff (
+      {{ stats.staff_count }})
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="vets-tab" data-bs-toggle="tab" data-bs-target="#vets-pane" type="button" role="tab" aria-controls="vets-pane" aria-selected="false">
+      <i class="fas fa-user-md"></i> Veterinarians (
+      {{ stats.vet_count }})
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="promotionTabContent">
+
+  <!-- Clients Tab -->
+  <div class="tab-pane fade show active" id="clients-pane" role="tabpanel" aria-labelledby="clients-tab">
+    <div class="card shadow">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-user"></i> Clients Available for Promotion</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if clients %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th>Client</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for client in clients %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
+                      <i class="fas fa-user text-white"></i>
+                    </div>
+                    <div>
+                      <strong>
+                        {{ client.get_full_name|default:client.username }}</strong>
+                      {% if not client.get_full_name %}
+                      <br><small class="text-muted">@
+                        {{ client.username }}</small>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {{ client.email|default:"<span class='text-muted'>Not provided</span>" }}
+                </td>
+                <td>
+                  {{ client.phone|default:"<span class='text-muted'>Not provided</span>" }}
+                </td>
+                <td>
+                  {{ client.date_joined|date:'M d, Y' }}
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <form method="post" class="d-inline promotion-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="user_id" value="{{ client.id }}">
+                      <input type="hidden" name="action" value="promote_to_staff">
+                      <button type="submit" class="btn btn-warning" title="Promote to Staff">
+                        <i class="fas fa-arrow-up"></i> Staff
+                      </button>
+                    </form>
+                    <form method="post" class="d-inline promotion-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="user_id" value="{{ client.id }}">
+                      <input type="hidden" name="action" value="promote_to_vet">
+                      <button type="submit" class="btn btn-success" title="Promote to Veterinarian">
+                        <i class="fas fa-user-md"></i> Vet
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-user fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No clients available for promotion</h5>
+          <p class="text-muted">All users have been assigned appropriate roles.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Staff Tab -->
+  <div class="tab-pane fade" id="staff-pane" role="tabpanel" aria-labelledby="staff-tab">
+    <div class="card shadow">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-user-tie"></i> Current Staff Members</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if staff_members %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th>Staff Member</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Promoted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for staff in staff_members %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
+                      <i class="fas fa-user-tie text-white"></i>
+                    </div>
+                    <div>
+                      <strong>
+                        {{ staff.get_full_name|default:staff.username }}</strong>
+                      {% if not staff.get_full_name %}
+                      <br><small class="text-muted">@
+                        {{ staff.username }}</small>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {{ staff.email|default:"<span class='text-muted'>Not provided</span>" }}
+                </td>
+                <td>
+                  {{ staff.phone|default:"<span class='text-muted'>Not provided</span>" }}
+                </td>
+                <td>
+                  {{ staff.date_joined|date:'M d, Y' }}
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <form method="post" class="d-inline promotion-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="user_id" value="{{ staff.id }}">
+                      <input type="hidden" name="action" value="promote_to_vet">
+                      <button type="submit" class="btn btn-success" title="Promote to Veterinarian">
+                        <i class="fas fa-arrow-up"></i> Vet
+                      </button>
+                    </form>
+                    <form method="post" class="d-inline promotion-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="user_id" value="{{ staff.id }}">
+                      <input type="hidden" name="action" value="demote_to_client">
+                      <button type="submit" class="btn btn-outline-secondary" title="Demote to Client">
+                        <i class="fas fa-arrow-down"></i> Client
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No staff members</h5>
+          <p class="text-muted">Promote clients to create staff members.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Veterinarians Tab -->
+  <div class="tab-pane fade" id="vets-pane" role="tabpanel" aria-labelledby="vets-tab">
+    <div class="card shadow">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-user-md"></i> Current Veterinarians</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if vets %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th>Veterinarian</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for vet in vets %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
+                      <i class="fas fa-user-md text-white"></i>
+                    </div>
+                    <div>
+                      <strong>
+                        {{ vet.get_full_name|default:vet.username }}</strong>
+                      {% if not vet.get_full_name %}
+                      <br><small class="text-muted">@
+                        {{ vet.username }}</small>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {{ vet.email|default:"<span class='text-muted'>Not provided</span>" }}
+                </td>
+                <td>
+                  {{ vet.phone|default:"<span class='text-muted'>Not provided</span>" }}
+                </td>
+                <td>
+                  {{ vet.date_joined|date:'M d, Y' }}
+                </td>
+                <td>
+                  <form method="post" class="d-inline promotion-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ vet.id }}">
+                    <input type="hidden" name="action" value="demote_to_client">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Demote to Client">
+                      <i class="fas fa-arrow-down"></i> Demote
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No veterinarians</h5>
+          <p class="text-muted">Promote clients to create veterinarians.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Promotion Guidelines -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header bg-info text-white">
+        <h6 class="mb-0"><i class="fas fa-info-circle"></i> Promotion Guidelines</h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <h6><strong>Staff Members</strong></h6>
+            <ul class="small">
+              <li>Handle appointment scheduling</li>
+              <li>Manage client communications</li>
+              <li>Basic reception duties</li>
+              <li>Access to client management tools</li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h6><strong>Veterinarians</strong></h6>
+            <ul class="small">
+              <li>Full medical record access</li>
+              <li>Prescription management</li>
+              <li>Treatment planning</li>
+              <li>Advanced diagnostic tools</li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h6><strong>Important Notes</strong></h6>
+            <ul class="small">
+              <li>Role changes are immediate</li>
+              <li>Users are notified of promotions</li>
+              <li>Access permissions update automatically</li>
+              <li>Changes are logged for audit</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add confirmation for role changes
+  document.querySelectorAll('.promotion-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const action = this.querySelector('input[name="action"]').value;
+      const userName = this.closest('tr').querySelector('strong').textContent;
+
+      let message = '';
+      switch (action) {
+        case 'promote_to_staff':
+          message = `Promote ${userName} to Staff Member?`;
+          break;
+        case 'promote_to_vet':
+          message = `Promote ${userName} to Veterinarian?`;
+          break;
+        case 'demote_to_client':
+          message = `Demote ${userName} to Client?`;
+          break;
+      }
+
+      if (!confirm(message)) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>
+{% endblock %}
