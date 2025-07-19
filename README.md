@@ -26,13 +26,18 @@
 
 ## 👥 Team Django Guys
 
+<div align="center">
+
 | Name                     | Student ID  |
 |--------------------------|-------------|
 | Asadullah Hil Galib      | 2231820642  |
 | Arittro Saha Dhrubo      | 2231394642  |
 | Md. Shahadat Hossain     | 2232195042  |
 
-**GitHub Repository:** [https://github.com/theboredman/pawsitive_care](https://github.com/theboredman/pawsitive_care/)  
+**GitHub Repository:**  
+[https://github.com/theboredman/pawsitive_care](https://github.com/theboredman/pawsitive_care/)
+
+</div>
 
 
 ## 🐶 About
