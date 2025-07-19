@@ -24,6 +24,17 @@
 
 ---
 
+## 👥 Team Django Guys
+
+| Name                     | Student ID  |
+|--------------------------|-------------|
+| Asadullah Hil Galib      | 2231820642  |
+| Arittro Saha Dhrubo      | 2231394642  |
+| Md. Shahadat Hossain     | 2232195042  |
+
+**GitHub Repository:** [https://github.com/theboredman/pawsitive_care](https://github.com/theboredman/pawsitive_care/)  
+
+
 ## 🐶 About
 
 PAWsitive Care is a full‑featured web application for veterinary clinics to manage:
