@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Medication Guide - PetMedia{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header bg-warning text-dark">
+          <h3 class="mb-0"><i class="fas fa-pills me-2"></i>Create Medication Guide</h3>
+          <small>Share detailed medication information for the pet community</small>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning" role="alert">
+            <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Medication Guide Requirements</h6>
+            <ul class="mb-0">
+              <li>Provide accurate medication information only</li>
+              <li>Include proper dosage guidelines and safety warnings</li>
+              <li>Always emphasize the need for veterinary supervision</li>
+              <li>Do not provide specific dosing without examination</li>
+            </ul>
+          </div>
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Title -->
+            <div class="mb-3">
+              <label for="{{ form.title.id_for_label }}" class="form-label">
+                Medication Guide Title <span class="text-danger">*</span>
+              </label>
+              {{ form.title }}
+              {% if form.title.errors %}
+              <div class="text-danger small">
+                {{ form.title.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Medication Name (Required) -->
+            <div class="mb-3">
+              <label for="{{ form.medication_name.id_for_label }}" class="form-label">
+                Medication Name <span class="text-danger">*</span>
+              </label>
+              {{ form.medication_name }}
+              <small class="form-text text-muted">Include generic name and common brand names</small>
+              {% if form.medication_name.errors %}
+              <div class="text-danger small">
+                {{ form.medication_name.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+              <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+              {{ form.category }}
+              {% if form.category.errors %}
+              <div class="text-danger small">
+                {{ form.category.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Related Pet -->
+            <div class="mb-3">
+              <label for="{{ form.related_pet.id_for_label }}" class="form-label">Related Pet</label>
+              {{ form.related_pet }}
+              <small class="form-text text-muted">Optional: If this guide relates to a specific patient case</small>
+              {% if form.related_pet.errors %}
+              <div class="text-danger small">
+                {{ form.related_pet.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Medication Details Section -->
+            <div class="card mb-3 border-warning">
+              <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-prescription-bottle me-2"></i>Medication Details</h5>
+              </div>
+              <div class="card-body">
+                <!-- Dosage Info -->
+                <div class="mb-3">
+                  <label for="{{ form.dosage_info.id_for_label }}" class="form-label">
+                    Dosage Information <span class="text-danger">*</span>
+                  </label>
+                  {{ form.dosage_info }}
+                  <small class="form-text text-muted">General dosage guidelines - always specify that veterinary consultation is required</small>
+                  {% if form.dosage_info.errors %}
+                  <div class="text-danger small">
+                    {{ form.dosage_info.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- Side Effects -->
+                <div class="mb-3">
+                  <label for="{{ form.side_effects.id_for_label }}" class="form-label">
+                    Side Effects & Warnings <span class="text-danger">*</span>
+                  </label>
+                  {{ form.side_effects }}
+                  <small class="form-text text-muted">Known side effects, contraindications, and warning signs</small>
+                  {% if form.side_effects.errors %}
+                  <div class="text-danger small">
+                    {{ form.side_effects.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- Medical Disclaimer -->
+                <div class="mb-0">
+                  <label for="{{ form.medical_disclaimer.id_for_label }}" class="form-label">Medical Disclaimer</label>
+                  {{ form.medical_disclaimer }}
+                  <small class="form-text text-muted">Custom disclaimer (a medication-specific default will be used if left empty)</small>
+                  {% if form.medical_disclaimer.errors %}
+                  <div class="text-danger small">
+                    {{ form.medical_disclaimer.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Excerpt -->
+            <div class="mb-3">
+              <label for="{{ form.excerpt.id_for_label }}" class="form-label">Excerpt</label>
+              {{ form.excerpt }}
+              <small class="form-text text-muted">Brief summary of the medication guide</small>
+              {% if form.excerpt.errors %}
+              <div class="text-danger small">
+                {{ form.excerpt.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Content -->
+            <div class="mb-3">
+              <label for="{{ form.content.id_for_label }}" class="form-label">
+                Medication Guide Content <span class="text-danger">*</span>
+              </label>
+              {{ form.content }}
+              <small class="form-text text-muted">Comprehensive information about the medication, its uses, administration, and monitoring</small>
+              {% if form.content.errors %}
+              <div class="text-danger small">
+                {{ form.content.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Featured Image -->
+            <div class="mb-3">
+              <label for="{{ form.featured_image.id_for_label }}" class="form-label">Featured Image</label>
+              {{ form.featured_image }}
+              <small class="form-text text-muted">Optional: Add a relevant medication or educational image</small>
+              {% if form.featured_image.errors %}
+              <div class="text-danger small">
+                {{ form.featured_image.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- SEO Meta Description -->
+            <div class="mb-4">
+              <label for="{{ form.meta_description.id_for_label }}" class="form-label">Meta Description</label>
+              {{ form.meta_description }}
+              <small class="form-text text-muted">SEO description for search engines</small>
+              {% if form.meta_description.errors %}
+              <div class="text-danger small">
+                {{ form.meta_description.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-secondary">Cancel</a>
+              <div>
+                <button type="submit" class="btn btn-warning">
+                  <i class="fas fa-pills me-1"></i> Publish Medication Guide
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Medication Guide Tips Card -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Medication Guide Best Practices</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Include Information About:</h6>
+              <ul>
+                <li>How the medication works</li>
+                <li>Common uses and conditions treated</li>
+                <li>Administration instructions</li>
+                <li>Storage requirements</li>
+                <li>Monitoring requirements</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6>Safety Reminders:</h6>
+              <ul>
+                <li>Always include contraindications</li>
+                <li>List all known side effects</li>
+                <li>Emphasize veterinary supervision</li>
+                <li>Include emergency contact information</li>
+                <li>Mention drug interactions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Auto-resize textarea
+  document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.querySelector('#id_content');
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+
+      textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+      });
+    }
+  });
+</script>
+{% endblock %}

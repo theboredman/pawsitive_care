@@ -70,8 +70,14 @@ def profile_view(request):
 def admin_dashboard(request):
     """Admin-only dashboard"""
     from django.contrib.auth import get_user_model
+    from petmedia.models import BlogPost, BlogComment, BlogLike, BlogCategory
+    from django.db.models import Count
+    from django.utils import timezone
+    from datetime import timedelta
+    
     User = get_user_model()
     
+    # User statistics
     total_users = User.objects.count()
     admin_count = User.objects.filter(role='admin').count()
     vet_count = User.objects.filter(role='vet').count()
@@ -79,6 +85,31 @@ def admin_dashboard(request):
     client_count = User.objects.filter(role='client').count()
     
     recent_users = User.objects.order_by('-date_joined')[:5]
+    
+    # Blog statistics
+    total_posts = BlogPost.objects.count()
+    published_posts = BlogPost.objects.filter(is_published=True).count()
+    unpublished_posts = BlogPost.objects.filter(is_published=False).count()
+    featured_posts = BlogPost.objects.filter(is_featured=True).count()
+    professional_posts = BlogPost.objects.filter(is_professional_advice=True).count()
+    
+    # Recent blog activity
+    today = timezone.now().date()
+    week_ago = today - timedelta(days=7)
+    recent_posts = BlogPost.objects.order_by('-created_at')[:5]
+    posts_this_week = BlogPost.objects.filter(created_at__gte=week_ago).count()
+    
+    # Comment statistics
+    total_comments = BlogComment.objects.count()
+    pending_comments = BlogComment.objects.filter(is_approved=False).count()
+    
+    # Engagement statistics
+    total_likes = BlogLike.objects.count()
+    
+    # Category statistics
+    categories_with_counts = BlogCategory.objects.annotate(
+        post_count=Count('blogpost')
+    ).order_by('-post_count')[:5]
     
     context = {
         'title': 'Admin Dashboard',
@@ -90,7 +121,20 @@ def admin_dashboard(request):
             'staff_count': staff_count,
             'client_count': client_count,
         },
+        'blog_stats': {
+            'total_posts': total_posts,
+            'published_posts': published_posts,
+            'unpublished_posts': unpublished_posts,
+            'featured_posts': featured_posts,
+            'professional_posts': professional_posts,
+            'posts_this_week': posts_this_week,
+            'total_comments': total_comments,
+            'pending_comments': pending_comments,
+            'total_likes': total_likes,
+        },
         'recent_users': recent_users,
+        'recent_posts': recent_posts,
+        'top_categories': categories_with_counts,
     }
     return render(request, 'accounts/admin_dashboard.html', context)
 

@@ -78,6 +78,92 @@
   </div>
 </div>
 
+<!-- PetMedia Blog Section -->
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="card dashboard-card h-100 border-info">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-blog me-2"></i>PetMedia Blog</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted">Share your pet experiences and learn from others</p>
+        {% if user_blog_posts_count > 0 %}
+        <div class="alert alert-success small mb-3">
+          <i class="fas fa-check-circle me-1"></i>
+          You have <strong>
+            {{ user_blog_posts_count }}</strong> published post
+          {{ user_blog_posts_count|pluralize }}
+        </div>
+        {% endif %}
+        <div class="d-grid gap-2">
+          <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-info btn-sm">
+            <i class="fas fa-list me-1"></i> Browse Posts
+          </a>
+          <a href="{% url 'petmedia:create_post' %}" class="btn btn-info btn-sm">
+            <i class="fas fa-plus me-1"></i> Share Your Story
+          </a>
+        </div>
+        <hr>
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'petmedia:professional_advice' %}" class="btn btn-outline-success btn-sm">
+            <i class="fas fa-user-md"></i> Vet Advice
+          </a>
+          <a href="{% url 'petmedia:medications' %}" class="btn btn-outline-warning btn-sm">
+            <i class="fas fa-pills"></i> Medications
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-4">
+    <div class="card dashboard-card h-100">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-star text-warning me-2"></i>Recent Community Posts</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          {% for post in recent_blog_posts %}
+          <div class="list-group-item border-0 px-0">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-1">
+                  <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none">
+                    {{ post.title|truncatechars:50 }}
+                  </a>
+                </h6>
+                <p class="mb-1 small text-muted">
+                  {{ post.excerpt|truncatechars:80 }}
+                </p>
+                <small class="text-muted">
+                  by
+                  {{ post.author.get_full_name|default:post.author.username }}
+                  •
+                  {{ post.created_at|timesince }} ago
+                </small>
+              </div>
+              {% if post.is_professional_advice %}
+              <span class="badge bg-success">Professional</span>
+              {% endif %}
+            </div>
+          </div>
+          {% empty %}
+          <div class="list-group-item border-0 px-0">
+            <h6 class="mb-1">No recent posts yet</h6>
+            <small class="text-muted">Be the first to share your pet story!</small>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+          <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-primary btn-sm">
+            View All Posts <i class="fas fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-md-8">
     <div class="card">

@@ -46,6 +46,12 @@ INSTALLED_APPS = [
     # Local apps
     'accounts',
     'pets',
+    'petmedia',
+    'appoinments',
+    'billing',
+    'communication',
+    'inventory',
+    'records',
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -78,6 +84,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'petmedia.context_processors.recent_blog_posts',
+                'petmedia.context_processors.blog_stats',
             ],
         },
     },

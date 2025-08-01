@@ -72,8 +72,101 @@
   </div>
 </div>
 
+<!-- Blog Management Section -->
+<div class="row mt-4">
+  <div class="col-12">
+    <h4><i class="fas fa-blog text-primary"></i> Blog Management</h4>
+    <p class="text-muted">Manage all blog posts, comments, and content</p>
+  </div>
+</div>
+
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-primary">
+      <div class="card-body text-center">
+        <i class="fas fa-edit fa-2x text-primary mb-3"></i>
+        <h5>All Posts</h5>
+        <div class="row text-center mb-3">
+          <div class="col-6">
+            <strong class="text-success">
+              {{ blog_stats.published_posts }}</strong>
+            <small class="d-block text-muted">Published</small>
+          </div>
+          <div class="col-6">
+            <strong class="text-warning">
+              {{ blog_stats.unpublished_posts }}</strong>
+            <small class="d-block text-muted">Drafts</small>
+          </div>
+        </div>
+        <a href="/admin/petmedia/blogpost/" class="btn btn-primary btn-sm">
+          <i class="fas fa-cog"></i> Manage Posts
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-success">
+      <div class="card-body text-center">
+        <i class="fas fa-comments fa-2x text-success mb-3"></i>
+        <h5>Comments</h5>
+        <div class="text-center mb-3">
+          <strong class="text-primary fs-4">
+            {{ blog_stats.total_comments }}</strong>
+          <small class="d-block text-muted">Total Comments</small>
+          {% if blog_stats.pending_comments > 0 %}
+          <span class="badge bg-warning">
+            {{ blog_stats.pending_comments }} pending</span>
+          {% endif %}
+        </div>
+        <a href="/admin/petmedia/blogcomment/" class="btn btn-success btn-sm">
+          <i class="fas fa-eye"></i> Review Comments
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-warning">
+      <div class="card-body text-center">
+        <i class="fas fa-star fa-2x text-warning mb-3"></i>
+        <h5>Featured Content</h5>
+        <div class="text-center mb-3">
+          <strong class="text-primary fs-4">
+            {{ blog_stats.featured_posts }}</strong>
+          <small class="d-block text-muted">Featured Posts</small>
+          <small class="text-muted">
+            {{ blog_stats.professional_posts }} Professional</small>
+        </div>
+        <a href="/admin/petmedia/blogpost/?is_featured__exact=1" class="btn btn-warning btn-sm">
+          <i class="fas fa-crown"></i> Manage Featured
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-danger">
+      <div class="card-body text-center">
+        <i class="fas fa-heart fa-2x text-danger mb-3"></i>
+        <h5>Engagement</h5>
+        <div class="text-center mb-3">
+          <strong class="text-primary fs-4">
+            {{ blog_stats.total_likes }}</strong>
+          <small class="d-block text-muted">Total Likes</small>
+          <small class="text-success">
+            {{ blog_stats.posts_this_week }} posts this week</small>
+        </div>
+        <a href="/admin/petmedia/bloglike/" class="btn btn-danger btn-sm">
+          <i class="fas fa-thumbs-up"></i> View Likes
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
     <div class="card">
       <div class="card-header">
         <h5><i class="fas fa-activity"></i> Recent System Activity</h5>
@@ -103,34 +196,119 @@
     </div>
   </div>
 
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-blog"></i> Recent Blog Activity</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          {% for post in recent_posts %}
+          <div class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center">
+                {% if post.is_professional_advice %}
+                <i class="fas fa-user-md text-success me-2"></i>
+                {% else %}
+                <i class="fas fa-edit text-primary me-2"></i>
+                {% endif %}
+                <div>
+                  <a href="/admin/petmedia/blogpost/{{ post.id }}/change/" class="text-decoration-none">
+                    {{ post.title|truncatechars:40 }}
+                  </a>
+                  <small class="d-block text-muted">
+                    by
+                    {{ post.author.get_full_name|default:post.author.username }}
+                  </small>
+                </div>
+              </div>
+            </div>
+            <div class="text-end">
+              {% if post.is_published %}
+              <span class="badge bg-success">Published</span>
+              {% else %}
+              <span class="badge bg-warning">Draft</span>
+              {% endif %}
+              <small class="d-block text-muted">
+                {{ post.created_at|timesince }} ago
+              </small>
+            </div>
+          </div>
+          {% empty %}
+          <div class="list-group-item text-center text-muted">
+            <i class="fas fa-info-circle me-2"></i>
+            No recent blog posts
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-8">
+    <!-- Quick Actions Card -->
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <a href="/admin/petmedia/blogpost/add/" class="btn btn-outline-primary w-100">
+              <i class="fas fa-plus me-2"></i>Create New Post
+            </a>
+          </div>
+          <div class="col-md-6 mb-3">
+            <a href="/admin/petmedia/blogpost/?is_published__exact=0" class="btn btn-outline-warning w-100">
+              <i class="fas fa-eye me-2"></i>Review Drafts
+            </a>
+          </div>
+          <div class="col-md-6 mb-3">
+            <a href="/admin/petmedia/blogcomment/?is_approved__exact=0" class="btn btn-outline-info w-100">
+              <i class="fas fa-comments me-2"></i>Pending Comments
+            </a>
+          </div>
+          <div class="col-md-6 mb-3">
+            <a href="/admin/petmedia/blogcategory/" class="btn btn-outline-success w-100">
+              <i class="fas fa-tags me-2"></i>Manage Categories
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="col-md-4">
     <div class="card">
       <div class="card-header">
         <h5><i class="fas fa-tachometer-alt"></i> System Stats</h5>
       </div>
       <div class="card-body">
-        <div class="mb-3">
+        <h6 class="text-muted mb-3">User Statistics</h6>
+        <div class="mb-2">
           <div class="d-flex justify-content-between">
             <span>Total Users</span>
             <strong>
               {{ stats.total_users }}</strong>
           </div>
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <div class="d-flex justify-content-between">
             <span>Administrators</span>
             <strong>
               {{ stats.admin_count }}</strong>
           </div>
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <div class="d-flex justify-content-between">
             <span>Veterinarians</span>
             <strong>
               {{ stats.vet_count }}</strong>
           </div>
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <div class="d-flex justify-content-between">
             <span>Staff Members</span>
             <strong>
@@ -144,6 +322,47 @@
               {{ stats.client_count }}</strong>
           </div>
         </div>
+
+        <hr>
+
+        <h6 class="text-muted mb-3">Content Statistics</h6>
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
+            <span>Total Posts</span>
+            <strong>
+              {{ blog_stats.total_posts }}</strong>
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
+            <span>Total Comments</span>
+            <strong>
+              {{ blog_stats.total_comments }}</strong>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="d-flex justify-content-between">
+            <span>Total Likes</span>
+            <strong>
+              {{ blog_stats.total_likes }}</strong>
+          </div>
+        </div>
+
+        {% if top_categories %}
+        <hr>
+        <h6 class="text-muted mb-3">Top Categories</h6>
+        {% for category in top_categories %}
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
+            <span>
+              {{ category.get_name_display|truncatechars:15 }}</span>
+            <strong>
+              {{ category.post_count }}</strong>
+          </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
         <hr>
         <div class="d-flex justify-content-between">
           <span><strong>System Health</strong></span>

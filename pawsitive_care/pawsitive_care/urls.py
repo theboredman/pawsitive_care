@@ -36,6 +36,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('pets/', include('pets.urls', namespace='pets')),
+    path('blog/', include('petmedia.urls', namespace='petmedia')),
+    path('appointments/', include('appoinments.urls', namespace='appointments')),
+    path('billing/', include('billing.urls', namespace='billing')),
+    path('communication/', include('communication.urls', namespace='communication')),
+    path('inventory/', include('inventory.urls', namespace='inventory')),
+    path('records/', include('records.urls', namespace='records')),
     path('', home_redirect, name='home'),  # Root URL redirect
 ]
 

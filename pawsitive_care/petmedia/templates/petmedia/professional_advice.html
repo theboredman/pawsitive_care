@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Professional Veterinary Advice - PetMedia{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <!-- Header Section -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h2">Professional Veterinary Advice</h1>
+          <p class="text-muted">Expert guidance from licensed veterinarians and veterinary professionals</p>
+        </div>
+        {% if user.is_authenticated and user.is_vet %}
+        <div class="dropdown">
+          <button class="btn btn-success dropdown-toggle" type="button" id="createPostDropdown" data-bs-toggle="dropdown">
+            Create Professional Post
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'petmedia:create_professional_post' %}">Professional Advice</a></li>
+            <li><a class="dropdown-item" href="{% url 'petmedia:create_medication_post' %}">Medication Guide</a></li>
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Medical Disclaimer -->
+      <div class="alert alert-warning" role="alert">
+        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Medical Disclaimer</h6>
+        The information provided here is for educational purposes only and should not replace professional veterinary consultation. Always consult with your veterinarian for specific medical advice regarding your pet's health.
+      </div>
+
+      <!-- Professional Posts -->
+      <div class="professional-posts">
+        {% if posts %}
+        {% for post in posts %}
+        <article class="card mb-4 border-success">
+          <div class="card-header bg-success text-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="mb-0">
+                  <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-white text-decoration-none">
+                    {{ post.title }}
+                  </a>
+                </h5>
+                <small class="text-light">
+                  By Dr.
+                  {{ post.author.get_full_name|default:post.author.username }}
+                  {% if post.category %}
+                  in
+                  {{ post.category }}
+                  {% endif %}
+                </small>
+              </div>
+              <div>
+                {% if post.medication_name %}
+                <span class="badge bg-light text-dark">
+                  <i class="fas fa-pills me-1"></i>
+                  {{ post.medication_name }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="row">
+              {% if post.featured_image %}
+              <div class="col-md-3">
+                <img src="{{ post.featured_image.url }}" class="img-fluid rounded" alt="{{ post.title }}" style="height: 150px; width: 100%; object-fit: cover;">
+              </div>
+              <div class="col-md-9">
+                {% else %}
+                <div class="col-12">
+                  {% endif %}
+                  <p class="card-text">
+                    {{ post.excerpt|default:post.content|truncatechars:250 }}
+                  </p>
+
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                      <i class="far fa-calendar me-1"></i>
+                      {{ post.created_at|date:"M d, Y" }}
+                      <i class="far fa-eye ms-3 me-1"></i>
+                      {{ post.views_count }} views
+                      <i class="far fa-comment ms-3 me-1"></i>
+                      {{ post.comments.count }} comments
+                      <i class="far fa-heart ms-3 me-1"></i>
+                      {{ post.likes.count }} likes
+                    </div>
+                    <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="btn btn-outline-success btn-sm">
+                      Read Professional Advice
+                    </a>
+                  </div>
+
+                  {% if post.medical_disclaimer %}
+                  <div class="mt-3">
+                    <small class="text-warning">
+                      <i class="fas fa-info-circle me-1"></i>
+                      Medical guidance - consult your veterinarian
+                    </small>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+        </article>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Professional advice pagination">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">
+                {{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}">
+                {{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+          <h4>No Professional Advice Available</h4>
+          <p class="text-muted">Check back later for expert veterinary guidance and professional advice.</p>
+          {% if user.is_authenticated and user.is_vet %}
+          <a href="{% url 'petmedia:create_professional_post' %}" class="btn btn-success">
+            Share Your Professional Expertise
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- About Professional Advice -->
+      <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>About Professional Advice</h5>
+        </div>
+        <div class="card-body">
+          <p class="small">
+            This section contains professional veterinary advice from licensed veterinarians and veterinary professionals. All content is reviewed for accuracy and educational value.
+          </p>
+          <hr>
+          <h6>What You'll Find:</h6>
+          <ul class="small">
+            <li>Medication guidelines and administration</li>
+            <li>Health condition explanations</li>
+            <li>Emergency first aid procedures</li>
+            <li>Preventive care recommendations</li>
+            <li>Professional treatment insights</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Professional Categories</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'petmedia:medications' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-pills me-2 text-info"></i>Medication Guides
+          </a>
+          <a href="{% url 'petmedia:category' name='HEALTH_TIPS' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-heartbeat me-2 text-danger"></i>Health Tips
+          </a>
+          <a href="{% url 'petmedia:category' name='EMERGENCY' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-ambulance me-2 text-warning"></i>Emergency Care
+          </a>
+          <a href="{% url 'petmedia:category' name='NUTRITION' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-apple-alt me-2 text-success"></i>Nutrition
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Quick Links</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'petmedia:blog_list' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-list me-2"></i>All Blog Posts
+          </a>
+          {% if user.is_authenticated %}
+          <a href="{% url 'petmedia:user_posts' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-user me-2"></i>My Posts
+          </a>
+          {% if user.is_vet %}
+          <a href="{% url 'petmedia:create_professional_post' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-plus me-2"></i>Create Professional Post
+          </a>
+          {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .card.border-success {
+    border-left: 4px solid #198754 !important;
+  }
+
+  .professional-posts .card-header {
+    background: linear-gradient(135deg, #198754 0%, #20c997 100%) !important;
+  }
+
+  .badge.bg-light {
+    border: 1px solid #dee2e6;
+  }
+</style>
+{% endblock %}

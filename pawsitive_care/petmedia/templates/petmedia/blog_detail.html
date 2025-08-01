@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+
+{{ post.title }} - PetMedia{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <article class="blog-post">
+        <!-- Post Header -->
+        <header class="mb-4">
+          <h1 class="display-5">
+            {{ post.title }}
+          </h1>
+
+          <!-- Post Meta -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="text-muted">
+              By <strong>
+                {{ post.author.get_full_name|default:post.author.username }}</strong>
+              {% if post.category %}
+              in <a href="{% url 'petmedia:category' name=post.category.name %}" class="text-decoration-none">
+                {{ post.category }}</a>
+              {% endif %}
+              •
+              {{ post.created_at|date:"F d, Y" }}
+              •
+              {{ post.views_count }} views
+            </div>
+
+            <!-- Badges -->
+            <div>
+              {% if post.is_professional_advice %}
+              <span class="badge bg-success">Professional Advice</span>
+              {% endif %}
+              {% if post.medication_name %}
+              <span class="badge bg-info">
+                {{ post.medication_name }}</span>
+              {% endif %}
+              {% if post.is_featured %}
+              <span class="badge bg-warning">Featured</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Featured Image -->
+          {% if post.featured_image %}
+          <div class="mb-4">
+            <img src="{{ post.featured_image.url }}" class="img-fluid rounded" alt="{{ post.title }}" style="max-height: 400px; width: 100%; object-fit: cover;">
+          </div>
+          {% endif %}
+        </header>
+
+        <!-- Medical Disclaimer -->
+        {% if post.is_professional_advice and post.medical_disclaimer %}
+        <div class="alert alert-info" role="alert">
+          <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Medical Disclaimer</h6>
+          {{ post.medical_disclaimer }}
+        </div>
+        {% endif %}
+
+        <!-- Post Content -->
+        <div class="post-content mb-5">
+          {{ post.content|linebreaks }}
+        </div>
+
+        <!-- Medication Information -->
+        {% if post.medication_name %}
+        <div class="medication-info bg-light p-4 rounded mb-4">
+          <h5 class="mb-3"><i class="fas fa-pills me-2"></i>Medication Information</h5>
+
+          <div class="row">
+            <div class="col-md-4">
+              <strong>Medication:</strong><br>
+              <span class="text-primary">
+                {{ post.medication_name }}</span>
+            </div>
+
+            {% if post.dosage_info %}
+            <div class="col-md-4">
+              <strong>Dosage Information:</strong><br>
+              {{ post.dosage_info|linebreaks }}
+            </div>
+            {% endif %}
+
+            {% if post.side_effects %}
+            <div class="col-md-4">
+              <strong>Potential Side Effects:</strong><br>
+              {{ post.side_effects|linebreaks }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Related Pet -->
+        {% if post.related_pet %}
+        <div class="related-pet bg-light p-3 rounded mb-4">
+          <h6><i class="fas fa-paw me-2"></i>Related Pet</h6>
+          <p class="mb-0">
+            <strong>
+              {{ post.related_pet.name }}</strong>
+            (
+            {{ post.related_pet.species }} -
+            {{ post.related_pet.breed }})
+          </p>
+        </div>
+        {% endif %}
+
+        <!-- Post Actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="post-actions">
+            {% if user.is_authenticated %}
+            <!-- Like Button -->
+            <button id="like-btn" class="btn btn-outline-danger btn-sm me-2" data-post-id="{{ post.id }}">
+              <i id="like-icon" class="{% if user_has_liked %}fas{% else %}far{% endif %} fa-heart me-1"></i>
+              <span id="like-count">
+                {{ like_count }}</span>
+              <span id="like-text">{% if like_count == 1 %}Like{% else %}Likes{% endif %}</span>
+            </button>
+            {% else %}
+            <span class="text-muted">
+              <i class="far fa-heart me-1"></i>
+              {{ like_count }}
+              {% if like_count == 1 %}Like{% else %}Likes{% endif %}
+            </span>
+            {% endif %}
+
+            <!-- Comment Count -->
+            <span class="text-muted">
+              <i class="far fa-comment me-1"></i>
+              {{ comments.count }}
+              {% if comments.count == 1 %}Comment{% else %}Comments{% endif %}
+            </span>
+          </div>
+
+          <!-- Share Buttons -->
+          <div class="share-buttons">
+            <small class="text-muted me-2">Share:</small>
+            <a href="#" class="btn btn-outline-primary btn-sm me-1" onclick="sharePost('facebook')">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="btn btn-outline-info btn-sm me-1" onclick="sharePost('twitter')">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <button class="btn btn-outline-secondary btn-sm" onclick="copyLink()">
+              <i class="fas fa-link"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Comments Section -->
+        <section class="comments-section">
+          <h4 class="mb-4">Comments (
+            {{ comments.count }})
+          </h4>
+
+          <!-- Add Comment Form -->
+          {% if user.is_authenticated %}
+          <div class="add-comment mb-4">
+            <h5>Leave a Comment</h5>
+            <form method="post" action="{% url 'petmedia:add_comment' pk=post.id %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                {{ comment_form.content }}
+              </div>
+              <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+          </div>
+          {% else %}
+          <div class="text-center p-4 bg-light rounded mb-4">
+            <p class="mb-2">Please <a href="{% url 'accounts:login' %}">login</a> to leave a comment.</p>
+          </div>
+          {% endif %}
+
+          <!-- Comments List -->
+          <div class="comments-list">
+            {% for comment in comments %}
+            <div class="comment mb-3 p-3 border rounded">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <strong>
+                    {{ comment.author.get_full_name|default:comment.author.username }}</strong>
+                  <small class="text-muted">•
+                    {{ comment.created_at|date:"M d, Y g:i A" }}</small>
+                </div>
+              </div>
+              <p class="mb-0">
+                {{ comment.content|linebreaks }}
+              </p>
+            </div>
+            {% empty %}
+            <div class="text-center p-4 text-muted">
+              <p>No comments yet. Be the first to comment!</p>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+      </article>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Author Info -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">About the Author</h5>
+        </div>
+        <div class="card-body">
+          <h6>
+            {{ post.author.get_full_name|default:post.author.username }}
+          </h6>
+          {% if post.author.is_vet %}
+          <span class="badge bg-success mb-2">Veterinarian</span>
+          {% endif %}
+          <p class="small text-muted">
+            {% if post.author.profile.bio %}
+            {{ post.author.profile.bio|truncatechars:150 }}
+            {% else %}
+            Pet lover and community member.
+            {% endif %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Related Posts -->
+      {% if related_posts %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Related Posts</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for related_post in related_posts %}
+          <a href="{% url 'petmedia:blog_detail' slug=related_post.slug %}" class="list-group-item list-group-item-action">
+            <h6 class="mb-1">
+              {{ related_post.title|truncatechars:50 }}
+            </h6>
+            <small class="text-muted">
+              {{ related_post.created_at|date:"M d, Y" }}</small>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Quick Links -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Browse More</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'petmedia:blog_list' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-list me-2"></i>All Posts
+          </a>
+          <a href="{% url 'petmedia:professional_advice' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-user-md me-2"></i>Professional Advice
+          </a>
+          <a href="{% url 'petmedia:medications' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-pills me-2"></i>Medication Guides
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Like functionality
+  document.getElementById('like-btn')?.addEventListener('click', function() {
+    const postId = this.dataset.postId;
+    const likeIcon = document.getElementById('like-icon');
+    const likeCount = document.getElementById('like-count');
+    const likeText = document.getElementById('like-text');
+
+    fetch(`/blog/post/${postId}/like/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        likeCount.textContent = data.total_likes;
+        likeText.textContent = data.total_likes === 1 ? 'Like' : 'Likes';
+
+        if (data.is_liked) {
+          likeIcon.className = 'fas fa-heart me-1';
+        } else {
+          likeIcon.className = 'far fa-heart me-1';
+        }
+      });
+  });
+
+  // Share functionality
+  function sharePost(platform) {
+    const url = window.location.href;
+    const title = document.title;
+
+    let shareUrl;
+    if (platform === 'facebook') {
+      shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    } else if (platform === 'twitter') {
+      shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('Link copied to clipboard!');
+    });
+  }
+</script>
+{% endblock %}

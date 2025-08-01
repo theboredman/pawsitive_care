@@ -1,0 +1,53 @@
+{% load static %}
+<div class="image-upload-widget">
+  {% if widget.value %}
+  <div class="current-image mb-3">
+    <img src="{{ widget.value.url }}" alt="Current image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+    <p class="small text-muted mt-1">Current image</p>
+  </div>
+  {% endif %}
+
+  <div class="upload-input">
+    {{ widget.tag }}
+    {% if widget.is_required %}
+    <div class="form-text text-danger">This field is required.</div>
+    {% endif %}
+    <div class="form-text">
+      <i class="fas fa-info-circle"></i>
+      Supported formats: JPG, PNG, GIF. Max size: 5MB
+    </div>
+  </div>
+
+  {% if widget.value %}
+  <div class="form-check mt-2">
+    {{ widget.checkbox_tag }}
+    <label for="{{ widget.checkbox_id }}" class="form-check-label text-danger">
+      Remove current image
+    </label>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .image-upload-widget {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    background-color: #f8f9fa;
+  }
+
+  .image-upload-widget:hover {
+    border-color: #007bff;
+    background-color: #e3f2fd;
+  }
+
+  .current-image img {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .upload-input input[type="file"] {
+    margin-bottom: 10px;
+  }
+</style>

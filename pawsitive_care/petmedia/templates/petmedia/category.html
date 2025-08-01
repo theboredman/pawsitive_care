@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+
+{{ category.get_name_display }} - PetMedia{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <!-- Header Section -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h2">
+            <i class="fas fa-{{ category.icon|default:'folder' }} me-2"></i>
+            {{ category.get_name_display }}
+          </h1>
+          {% if category.description %}
+          <p class="text-muted">
+            {{ category.description }}
+          </p>
+          {% endif %}
+        </div>
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" id="createPostDropdown" data-bs-toggle="dropdown">
+            Create Post
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'petmedia:create_post' %}">Standard Post</a></li>
+            {% if user.is_vet %}
+            <li><a class="dropdown-item" href="{% url 'petmedia:create_professional_post' %}">Professional Advice</a></li>
+            <li><a class="dropdown-item" href="{% url 'petmedia:create_medication_post' %}">Medication Guide</a></li>
+            {% endif %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'petmedia:blog_list' %}">Blog</a></li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ category.get_name_display }}
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Category Posts -->
+      <div class="category-posts">
+        {% if posts %}
+        {% for post in posts %}
+        <article class="card mb-4">
+          <div class="card-body">
+            <div class="row">
+              {% if post.featured_image %}
+              <div class="col-md-3">
+                <img src="{{ post.featured_image.url }}" class="img-fluid rounded" alt="{{ post.title }}" style="height: 150px; width: 100%; object-fit: cover;">
+              </div>
+              <div class="col-md-9">
+                {% else %}
+                <div class="col-12">
+                  {% endif %}
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h4 class="card-title">
+                      <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none">
+                        {{ post.title }}
+                      </a>
+                    </h4>
+                    <div>
+                      {% if post.is_professional_advice %}
+                      <span class="badge bg-success">Professional</span>
+                      {% endif %}
+                      {% if post.medication_name %}
+                      <span class="badge bg-info">
+                        <i class="fas fa-pills me-1"></i>
+                        {{ post.medication_name }}
+                      </span>
+                      {% endif %}
+                      {% if post.is_featured %}
+                      <span class="badge bg-warning">Featured</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <p class="card-text">
+                    {{ post.excerpt|default:post.content|truncatechars:200 }}
+                  </p>
+
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                      By <strong>
+                        {{ post.author.get_full_name|default:post.author.username }}</strong>
+                      •
+                      {{ post.created_at|date:"M d, Y" }}
+                      •
+                      {{ post.views_count }} views
+                      •
+                      {{ post.comments.count }} comments
+                      •
+                      {{ post.likes.count }} likes
+                    </div>
+                    <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="btn btn-outline-primary btn-sm">
+                      Read More
+                    </a>
+                  </div>
+
+                  {% if post.is_professional_advice and post.medical_disclaimer %}
+                  <div class="mt-2">
+                    <small class="text-warning">
+                      <i class="fas fa-info-circle me-1"></i>
+                      Professional veterinary advice - consult your veterinarian
+                    </small>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+        </article>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Category posts pagination">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">
+                {{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}">
+                {{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+          <h4>No Posts in This Category</h4>
+          <p class="text-muted">Be the first to create a post in the
+            {{ category.get_name_display }} category!
+          </p>
+          {% if user.is_authenticated %}
+          <a href="{% url 'petmedia:create_post' %}" class="btn btn-primary">
+            Create First Post
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Category Info -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-{{ category.icon|default:'info-circle' }} me-2"></i>
+            Category Information
+          </h5>
+        </div>
+        <div class="card-body">
+          <h6>
+            {{ category.get_name_display }}
+          </h6>
+          {% if category.description %}
+          <p class="small">
+            {{ category.description }}
+          </p>
+          {% endif %}
+          <hr>
+          <div class="row text-center">
+            <div class="col-6">
+              <strong>
+                {{ posts|length }}</strong><br>
+              <small class="text-muted">Posts</small>
+            </div>
+            <div class="col-6">
+              <strong>
+                {{ posts.count }}</strong><br>
+              <small class="text-muted">Total</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Other Categories -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Other Categories</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'petmedia:category' name='MEDICATION' %}" class="list-group-item list-group-item-action {% if category.name == 'MEDICATION' %}active{% endif %}">
+            <i class="fas fa-pills me-2"></i>Medications & Treatments
+          </a>
+          <a href="{% url 'petmedia:category' name='HEALTH_TIPS' %}" class="list-group-item list-group-item-action {% if category.name == 'HEALTH_TIPS' %}active{% endif %}">
+            <i class="fas fa-heartbeat me-2"></i>Health Tips
+          </a>
+          <a href="{% url 'petmedia:category' name='NUTRITION' %}" class="list-group-item list-group-item-action {% if category.name == 'NUTRITION' %}active{% endif %}">
+            <i class="fas fa-apple-alt me-2"></i>Nutrition & Diet
+          </a>
+          <a href="{% url 'petmedia:category' name='TRAINING' %}" class="list-group-item list-group-item-action {% if category.name == 'TRAINING' %}active{% endif %}">
+            <i class="fas fa-graduation-cap me-2"></i>Training & Behavior
+          </a>
+          <a href="{% url 'petmedia:category' name='GROOMING' %}" class="list-group-item list-group-item-action {% if category.name == 'GROOMING' %}active{% endif %}">
+            <i class="fas fa-cut me-2"></i>Grooming & Care
+          </a>
+          <a href="{% url 'petmedia:category' name='EMERGENCY' %}" class="list-group-item list-group-item-action {% if category.name == 'EMERGENCY' %}active{% endif %}">
+            <i class="fas fa-ambulance me-2"></i>Emergency Care
+          </a>
+          <a href="{% url 'petmedia:category' name='EXPERIENCE' %}" class="list-group-item list-group-item-action {% if category.name == 'EXPERIENCE' %}active{% endif %}">
+            <i class="fas fa-users me-2"></i>Owner Experiences
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Quick Links</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'petmedia:blog_list' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-list me-2"></i>All Blog Posts
+          </a>
+          <a href="{% url 'petmedia:professional_advice' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-user-md me-2"></i>Professional Advice
+          </a>
+          <a href="{% url 'petmedia:medications' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-pills me-2"></i>Medication Guides
+          </a>
+          {% if user.is_authenticated %}
+          <a href="{% url 'petmedia:user_posts' %}" class="list-group-item list-group-item-action">
+            <i class="fas fa-user me-2"></i>My Posts
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
