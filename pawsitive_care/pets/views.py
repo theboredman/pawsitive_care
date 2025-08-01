@@ -10,32 +10,36 @@ from django.db import transaction
 from django.core.files.storage import default_storage
 from django.utils.text import slugify
 from .models import Pet, MedicalRecord, PetDocument, PetPhoto
+from .forms import PetForm, MedicalRecordForm, PetDocumentForm, PetPhotoForm, PetSearchForm
 import json
 from datetime import datetime
 
 @login_required
 def pet_list(request):
-    """Enhanced pet listing with advanced search"""
+    """Enhanced pet listing with advanced search using forms"""
     # Get base queryset
     if request.user.is_staff:
         pets = Pet.objects.active()
     else:
         pets = Pet.objects.active().by_owner(request.user)
 
-    # Advanced search functionality
-    search_query = request.GET.get('search', '').strip()
-    species_filter = request.GET.get('species', '')
-    sort_by = request.GET.get('sort', '-created_at')
-
-    if search_query:
-        pets = pets.search(search_query)
-    if species_filter:
-        pets = pets.by_species(species_filter)
+    # Use form for search handling
+    search_form = PetSearchForm(request.GET)
     
-    # Sorting
-    valid_sort_fields = ['name', '-name', 'created_at', '-created_at', 'species', '-species']
-    if sort_by in valid_sort_fields:
-        pets = pets.order_by(sort_by)
+    if search_form.is_valid():
+        search_query = search_form.cleaned_data.get('search', '').strip()
+        species_filter = search_form.cleaned_data.get('species', '')
+        sort_by = search_form.cleaned_data.get('sort_by', '-created_at')
+
+        if search_query:
+            pets = pets.search(search_query)
+        if species_filter:
+            pets = pets.by_species(species_filter)
+        
+        # Sorting with validation
+        valid_sort_fields = ['name', '-name', 'created_at', '-created_at', 'species', '-species']
+        if sort_by in valid_sort_fields:
+            pets = pets.order_by(sort_by)
 
     # Pagination with larger page size
     paginator = Paginator(pets, 12)  # Show 12 pets per page
@@ -44,9 +48,7 @@ def pet_list(request):
 
     context = {
         'pets': pets,
-        'search_query': search_query,
-        'species_filter': species_filter,
-        'sort_by': sort_by,
+        'search_form': search_form,
         'species_choices': Pet.SPECIES_CHOICES,
     }
 
@@ -64,83 +66,53 @@ def pet_list(request):
 @login_required
 @require_http_methods(['GET', 'POST'])
 def pet_create(request):
-    """Enhanced pet creation with validation"""
+    """Enhanced pet creation using forms"""
     if request.method == 'POST':
+        form = PetForm(request.POST, user=request.user)
+        photo_form = PetPhotoForm(request.POST, request.FILES) if 'pet_photo' in request.FILES else None
+        
         try:
             with transaction.atomic():
-                # Process basic pet information
-                pet_data = {
-                    'name': request.POST.get('name'),
-                    'species': request.POST.get('species'),
-                    'breed': request.POST.get('breed', ''),
-                    'gender': request.POST.get('gender'),
-                    'owner': request.user,
-                    'color': request.POST.get('color', ''),
-                    'medical_conditions': request.POST.get('medical_conditions', ''),
-                    'special_notes': request.POST.get('special_notes', ''),
-                    'vaccination_status': request.POST.get('vaccination_status', 'UNKNOWN')
-                }
+                if form.is_valid():
+                    # Create the pet
+                    pet = form.save(commit=False)
+                    pet.owner = request.user
+                    pet.save()
 
-                # Handle age field
-                age = request.POST.get('age')
-                if age:
-                    try:
-                        pet_data['age'] = int(age)
-                        if pet_data['age'] < 0:
-                            raise ValidationError('Age cannot be negative')
-                    except ValueError:
-                        raise ValidationError('Invalid age value')
-
-                weight = request.POST.get('weight')
-                if weight:
-                    try:
-                        pet_data['weight'] = float(weight)
-                    except ValueError:
-                        raise ValidationError('Invalid weight value')
-
-                microchip_id = request.POST.get('microchip_id', '').strip()
-                if microchip_id:
-                    # Check if microchip ID is unique
-                    if Pet.objects.filter(microchip_id=microchip_id).exists():
-                        raise ValidationError('This microchip ID is already registered')
-                    pet_data['microchip_id'] = microchip_id
-
-                # Create the pet
-                pet = Pet.objects.create(**pet_data)
-
-                # Handle photo upload
-                if 'pet_photo' in request.FILES:
-                    try:
-                        photo = PetPhoto(
-                            pet=pet,
-                            image=request.FILES['pet_photo'],
-                            is_primary=True,
-                            caption=request.POST.get('photo_caption', '')
-                        )
-                        photo.full_clean()  # Validate the photo
+                    # Handle photo upload if provided
+                    if photo_form and photo_form.is_valid():
+                        photo = photo_form.save(commit=False)
+                        photo.pet = pet
+                        photo.is_primary = True
                         photo.save()
-                    except ValidationError as e:
-                        raise ValidationError(f'Invalid photo: {str(e)}')
 
-                messages.success(request, f'{pet.name} has been registered successfully!')
-                
-                # Handle AJAX requests
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'status': 'success',
-                        'message': f'{pet.name} has been registered successfully!',
-                        'redirect_url': reverse('pets:pet_detail', kwargs={'pk': pet.pk})
-                    })
-                
-                return redirect('pets:pet_detail', pk=pet.pk)
+                    messages.success(request, f'{pet.name} has been registered successfully!')
+                    
+                    # Handle AJAX requests
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'status': 'success',
+                            'message': f'{pet.name} has been registered successfully!',
+                            'redirect_url': reverse('pets:pet_detail', kwargs={'pk': pet.pk})
+                        })
+                    
+                    return redirect('pets:pet_detail', pk=pet.pk)
+                else:
+                    # Form validation failed
+                    for field, errors in form.errors.items():
+                        for error in errors:
+                            messages.error(request, f'{field}: {error}')
 
-        except ValidationError as e:
-            messages.error(request, str(e))
         except Exception as e:
             messages.error(request, f'Error creating pet: {str(e)}')
+    else:
+        form = PetForm()
+        photo_form = PetPhotoForm()
 
     # GET request - show form
     context = {
+        'form': form,
+        'photo_form': photo_form,
         'species_choices': Pet.SPECIES_CHOICES,
         'gender_choices': Pet.GENDER_CHOICES,
         'max_upload_size': 5 * 1024 * 1024,  # 5MB
@@ -209,99 +181,101 @@ def pet_detail(request, pk):
 
 @login_required
 def pet_update(request, pk):
-    """Update pet information"""
+    """Update pet information using forms"""
     pet = get_object_or_404(Pet.objects.active(), pk=pk)
     
     if not request.user.is_staff and pet.owner != request.user:
         raise PermissionDenied
 
     if request.method == 'POST':
+        form = PetForm(request.POST, instance=pet, user=request.user)
+        
         try:
-            # Update pet information
-            pet.name = request.POST.get('name')
-            pet.breed = request.POST.get('breed')
-            pet.age = int(request.POST.get('age'))
-            pet.gender = request.POST.get('gender')
-            pet.weight = request.POST.get('weight')
-            pet.color = request.POST.get('color')
-            pet.microchip_id = request.POST.get('microchip_id')
-            pet.medical_conditions = request.POST.get('medical_conditions')
-            pet.special_notes = request.POST.get('special_notes')
-            pet.vaccination_status = request.POST.get('vaccination_status', 'UNKNOWN')
-            pet.save()
+            with transaction.atomic():
+                if form.is_valid():
+                    pet = form.save()
+                    messages.success(request, f'{pet.name}\'s information has been updated!')
+                    
+                    # Handle AJAX requests
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'status': 'success',
+                            'message': f'{pet.name}\'s information has been updated!',
+                            'redirect_url': reverse('pets:pet_detail', kwargs={'pk': pet.pk})
+                        })
+                    
+                    return redirect('pets:pet_detail', pk=pet.pk)
+                else:
+                    # Form validation failed
+                    for field, errors in form.errors.items():
+                        for error in errors:
+                            messages.error(request, f'{field}: {error}')
 
-            messages.success(request, f'{pet.name}\'s information has been updated!')
-            return redirect('pets:pet_detail', pk=pet.pk)
         except Exception as e:
             messages.error(request, f'Error updating pet: {str(e)}')
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'error', 'message': str(e)})
+    else:
+        form = PetForm(instance=pet, user=request.user)
 
-    return render(request, 'pets/pet_form.html', {
+    # GET request - show form with current values
+    context = {
+        'form': form,
         'pet': pet,
         'species_choices': Pet.SPECIES_CHOICES,
-        'gender_choices': Pet.GENDER_CHOICES
-    })
+        'gender_choices': Pet.GENDER_CHOICES,
+        'is_update': True,
+    }
+    return render(request, 'pets/pet_form.html', context)
 
 @login_required
 @require_POST
 def add_medical_record(request, pk):
-    """Enhanced medical record addition with validation"""
+    """Enhanced medical record addition using forms"""
     pet = get_object_or_404(Pet.objects.active(), pk=pk)
     
     if not request.user.is_staff:
         raise PermissionDenied
 
+    form = MedicalRecordForm(request.POST)
+    
     try:
         with transaction.atomic():
-            # Validate and parse dates
-            try:
-                record_date = datetime.strptime(request.POST.get('date'), '%Y-%m-%d').date()
-            except (ValueError, TypeError):
-                raise ValidationError('Invalid date format')
+            if form.is_valid():
+                record = form.save(commit=False)
+                record.pet = pet
+                record.save()
 
-            next_visit = request.POST.get('next_visit_date')
-            next_visit_date = None
-            if next_visit:
-                try:
-                    next_visit_date = datetime.strptime(next_visit, '%Y-%m-%d').date()
-                except ValueError:
-                    raise ValidationError('Invalid next visit date format')
+                messages.success(request, 'Medical record added successfully!')
+                
+                # Return detailed JSON response for AJAX requests
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'status': 'success',
+                        'record': {
+                            'id': record.id,
+                            'date': record.date.strftime('%Y-%m-%d'),
+                            'record_type': record.get_record_type_display(),
+                            'description': record.description,
+                            'next_visit_date': record.next_visit_date.strftime('%Y-%m-%d') if record.next_visit_date else None,
+                            'html': render(request, 'pets/includes/medical_record.html', 
+                                        {'record': record}).content.decode('utf-8')
+                        }
+                    })
+                return redirect('pets:pet_detail', pk=pk)
+            else:
+                # Form validation failed
+                error_messages = []
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        error_messages.append(f'{field}: {error}')
+                
+                error_message = '; '.join(error_messages)
+                messages.error(request, error_message)
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'status': 'error', 'message': error_message})
 
-            # Create and validate record
-            record = MedicalRecord(
-                pet=pet,
-                date=record_date,
-                record_type=request.POST.get('record_type'),
-                description=request.POST.get('description'),
-                vet_notes=request.POST.get('vet_notes', ''),
-                next_visit_date=next_visit_date
-            )
-
-            # Full validation
-            record.full_clean()
-            record.save()
-
-            messages.success(request, 'Medical record added successfully!')
-            
-            # Return detailed JSON response for AJAX requests
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'status': 'success',
-                    'record': {
-                        'id': record.id,
-                        'date': record.date.strftime('%Y-%m-%d'),
-                        'record_type': record.get_record_type_display(),
-                        'description': record.description,
-                        'next_visit_date': record.next_visit_date.strftime('%Y-%m-%d') if record.next_visit_date else None,
-                        'html': render(request, 'pets/includes/medical_record.html', 
-                                    {'record': record}).content.decode('utf-8')
-                    }
-                })
-            return redirect('pets:pet_detail', pk=pk)
-
-    except ValidationError as e:
-        messages.error(request, str(e))
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'status': 'error', 'message': str(e)})
     except Exception as e:
         messages.error(request, f'Error adding medical record: {str(e)}')
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -312,20 +286,29 @@ def add_medical_record(request, pk):
 @login_required
 @require_POST
 def pet_photo_add(request, pk):
-    """Add a photo to a pet"""
+    """Add a photo to a pet using forms"""
     pet = get_object_or_404(Pet.objects.active(), pk=pk)
     
     if not request.user.is_staff and pet.owner != request.user:
         raise PermissionDenied
     
+    form = PetPhotoForm(request.POST, request.FILES)
+    
     try:
-        photo = PetPhoto.objects.create(
-            pet=pet,
-            image=request.FILES['image'],
-            caption=request.POST.get('caption', ''),
-            is_primary=request.POST.get('is_primary') == 'on'
-        )
-        messages.success(request, 'Photo uploaded successfully!')
+        if form.is_valid():
+            photo = form.save(commit=False)
+            photo.pet = pet
+            photo.save()
+            messages.success(request, 'Photo uploaded successfully!')
+        else:
+            # Form validation failed
+            error_messages = []
+            for field, errors in form.errors.items():
+                for error in errors:
+                    error_messages.append(f'{field}: {error}')
+            
+            error_message = '; '.join(error_messages)
+            messages.error(request, error_message)
     except Exception as e:
         messages.error(request, f'Error uploading photo: {str(e)}')
     
@@ -352,63 +335,49 @@ def pet_photo_delete(request, photo_id):
 @login_required
 @require_POST
 def upload_document(request, pk):
-    """Enhanced document upload with validation and organization"""
+    """Enhanced document upload using forms"""
     pet = get_object_or_404(Pet.objects.active(), pk=pk)
     
     if not request.user.is_staff and pet.owner != request.user:
         raise PermissionDenied
 
+    form = PetDocumentForm(request.POST, request.FILES)
+
     try:
         with transaction.atomic():
-            # Validate file
-            if 'file' not in request.FILES:
-                raise ValidationError('No file was uploaded')
+            if form.is_valid():
+                document = form.save(commit=False)
+                document.pet = pet
+                document.save()
 
-            file = request.FILES['file']
-            
-            # Validate file size
-            if file.size > 5 * 1024 * 1024:  # 5MB limit
-                raise ValidationError('File size cannot exceed 5MB')
+                # Success response
+                messages.success(request, 'Document uploaded successfully!')
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'status': 'success',
+                        'document': {
+                            'id': document.id,
+                            'url': document.file.url,
+                            'title': document.title,
+                            'type': document.get_document_type_display(),
+                            'uploaded_at': document.uploaded_at.strftime('%Y-%m-%d %H:%M:%S')
+                        }
+                    })
+                return redirect('pets:pet_detail', pk=pk)
+            else:
+                # Form validation failed
+                error_messages = []
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        error_messages.append(f'{field}: {error}')
+                
+                error_message = '; '.join(error_messages)
+                messages.error(request, error_message)
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'status': 'error', 'message': error_message})
 
-            # Validate file type
-            ext = file.name.split('.')[-1].lower()
-            allowed_extensions = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx']
-            if ext not in allowed_extensions:
-                raise ValidationError(f'File type .{ext} is not supported')
-
-            # Create document with sanitized filename
-            document = PetDocument(
-                pet=pet,
-                document_type=request.POST.get('document_type'),
-                file=file,
-                title=request.POST.get('title'),
-                description=request.POST.get('description', '')
-            )
-
-            # Full validation
-            document.full_clean()
-            document.save()
-
-            # Success response
-            messages.success(request, 'Document uploaded successfully!')
-            
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'status': 'success',
-                    'document': {
-                        'id': document.id,
-                        'url': document.file.url,
-                        'title': document.title,
-                        'type': document.get_document_type_display(),
-                        'uploaded_at': document.uploaded_at.strftime('%Y-%m-%d %H:%M:%S')
-                    }
-                })
-            return redirect('pets:pet_detail', pk=pk)
-
-    except ValidationError as e:
-        messages.error(request, str(e))
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'status': 'error', 'message': str(e)})
     except Exception as e:
         messages.error(request, f'Error uploading document: {str(e)}')
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
