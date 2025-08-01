@@ -1,0 +1,425 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ pet.name }} - Pet Details{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">{{ pet.name }}</h3>
+                        {% if pet.photos.exists %}
+                        <img src="{{ pet.photos.first.image.url }}" alt="{{ pet.name }}" 
+                             class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Basic Information</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>Species:</th>
+                                    <td>{{ pet.get_species_display }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Breed:</th>
+                                    <td>{{ pet.breed|default:"Not specified" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Gender:</th>
+                                    <td>{{ pet.get_gender_display }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Age:</th>
+                                    <td>{% if pet.age %}{{ pet.age }} years{% else %}Not specified{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <th>Weight:</th>
+                                    <td>{% if pet.weight %}{{ pet.weight }} kg{% else %}Not recorded{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <th>Color:</th>
+                                    <td>{{ pet.color|default:"Not specified" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Microchip:</th>
+                                    <td>{{ pet.microchip_id|default:"Not microchipped" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Health Information</h5>
+                            <div class="mb-3">
+                                <strong>Medical Conditions:</strong>
+                                <p class="mb-2">{{ pet.medical_conditions|default:"No known medical conditions" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Special Notes:</strong>
+                                <p class="mb-2">{{ pet.special_notes|default:"No special notes" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Vaccination Status:</strong>
+                                <p class="mb-2">{{ pet.get_vaccination_status_display }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="mt-4 border-top pt-4">
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'pets:pet_update' pet.pk %}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Information
+                            </a>
+                            {% if user == pet.owner or user.is_staff %}
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePetModal">
+                                <i class="fas fa-trash"></i> Delete Pet
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Medical Records -->
+                    <div class="mt-4">
+                        <h5 class="mb-3">Medical Records</h5>
+                        {% if medical_records %}
+                            <div class="list-group">
+                                {% for record in medical_records %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ record.record_type }}</h6>
+                                            <small>{{ record.date|date:"F j, Y" }}</small>
+                                        </div>
+                                        <p class="mb-1">{{ record.description }}</p>
+                                        {% if record.next_visit_date %}
+                                            <small class="text-info">
+                                                Next Visit: {{ record.next_visit_date|date:"F j, Y" }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No medical records available.</p>
+                        {% endif %}
+
+                        {% if user.is_staff %}
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addMedicalRecordModal">
+                                    <i class="fas fa-plus"></i> Add Medical Record
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Documents -->
+                    <div class="mt-4">
+                        <h5 class="mb-3">Documents</h5>
+                        {% if documents %}
+                            <div class="list-group">
+                                {% for doc in documents %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ doc.title }}</h6>
+                                            <small>{{ doc.uploaded_at|date:"F j, Y" }}</small>
+                                        </div>
+                                        <p class="mb-1">{{ doc.description }}</p>
+                                        <a href="{{ doc.file.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No documents available.</p>
+                        {% endif %}
+
+                        {% if user.is_staff or user == pet.owner %}
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
+                                    <i class="fas fa-upload"></i> Upload Document
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-md-4">
+            <!-- Pet Photos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Photos</h5>
+                </div>
+                <div class="card-body">
+                    {% if pet.photos.exists %}
+                        <div class="row g-2">
+                            {% for photo in pet.photos.all %}
+                                <div class="col-6">
+                                    <img src="{{ photo.image.url }}" alt="{{ pet.name }}" class="img-fluid rounded">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <!-- Additional Photo Gallery -->
+                        <div class="row mt-4">
+                            {% for photo in pet.petphoto_set.all %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <img src="{{ photo.photo.url }}" class="card-img-top" alt="Pet Photo">
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No photos available.</p>
+                    {% endif %}
+                    
+                    {% if user.is_staff or user == pet.owner %}
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addPhotoModal">
+                                <i class="fas fa-camera"></i> Add Photo
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Owner Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Owner Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ pet.owner.get_full_name }}</p>
+                    <p><strong>Email:</strong> {{ pet.owner.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Pet Modal -->
+<div class="modal fade" id="deletePetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Pet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete {{ pet.name }}? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'pets:pet_delete' pet.pk %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Medical Record Modal -->
+{% if user.is_staff %}
+<div class="modal fade" id="addMedicalRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Medical Record</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'pets:add_medical_record' pet.pk %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="record_type" class="form-label">Record Type</label>
+                        <input type="text" class="form-control" id="record_type" name="record_type" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="vet_notes" class="form-label">Veterinarian Notes</label>
+                        <textarea class="form-control" id="vet_notes" name="vet_notes" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="next_visit_date" class="form-label">Next Visit Date</label>
+                        <input type="date" class="form-control" id="next_visit_date" name="next_visit_date">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Upload Document Modal -->
+<div class="modal fade" id="uploadDocumentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'pets:upload_document' pet.pk %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="document_type" class="form-label">Document Type</label>
+                        <select class="form-select" id="document_type" name="document_type" required>
+                            <option value="MEDICAL">Medical Report</option>
+                            <option value="VACCINATION">Vaccination Record</option>
+                            <option value="LAB">Lab Results</option>
+                            <option value="PRESCRIPTION">Prescription</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file" class="form-label">File</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Photo Modal -->
+<div class="modal fade" id="addPhotoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'pets:pet_photo_add' pet.pk %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Photo</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="caption" class="form-label">Caption</label>
+                        <input type="text" class="form-control" id="caption" name="caption">
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_primary" name="is_primary">
+                            <label class="form-check-label" for="is_primary">
+                                Set as primary photo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Photo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date for new medical record
+    var dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(function(input) {
+        if (input.id === 'date') {
+            input.valueAsDate = new Date();
+        }
+    });
+
+    // Initialize popovers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+
+    // Image preview for photo upload
+    document.getElementById('image').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var preview = document.createElement('img');
+                preview.src = e.target.result;
+                preview.className = 'img-fluid rounded mb-2';
+                preview.style.maxHeight = '200px';
+                var previewContainer = document.querySelector('#addPhotoModal .modal-body');
+                var existingPreview = previewContainer.querySelector('img');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+                previewContainer.insertBefore(preview, previewContainer.firstChild);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Document preview on upload
+    document.getElementById('file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const preview = document.createElement('div');
+            preview.className = 'mt-2';
+            preview.innerHTML = `<strong>Selected file:</strong> ${file.name}`;
+            
+            const previewContainer = document.getElementById('uploadDocumentModal').querySelector('.modal-body');
+            const existingPreview = previewContainer.querySelector('.preview-info');
+            
+            if (existingPreview) {
+                existingPreview.remove();
+            }
+            preview.classList.add('preview-info');
+            previewContainer.insertBefore(preview, previewContainer.querySelector('button'));
+        }
+    });
+});
+</script>
+{% endblock scripts %}
+
+

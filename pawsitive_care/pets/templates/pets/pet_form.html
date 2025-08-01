@@ -1,0 +1,246 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}
+    {% if pet %}Edit Pet{% else %}Add New Pet{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        {% if pet %}Edit Pet{% else %}Add New Pet{% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="pet_photo" class="form-label">Pet Photo</label>
+                            <div class="pet-photo-upload">
+                                <div class="preview-area mb-2 {% if not pet.photos.exists %}d-none{% endif %}">
+                                    {% if pet.photos.exists %}
+                                        <img src="{{ pet.photos.first.image.url }}" alt="Pet preview" class="img-preview rounded" style="max-width: 200px;">
+                                    {% endif %}
+                                </div>
+                                <input type="file" name="pet_photo" id="pet_photo" class="form-control" accept="image/*">
+                                <small class="text-muted">Upload a clear photo of your pet</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name *</label>
+                            <input type="text" name="name" id="name" class="form-control" 
+                                   value="{% if pet %}{{ pet.name }}{% endif %}" required
+                                   maxlength="100">
+                            <div class="invalid-feedback">Please provide your pet's name.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="species" class="form-label">Species *</label>
+                            <select name="species" id="species" class="form-select" required>
+                                <option value="">Select Species</option>
+                                {% for choice in species_choices %}
+                                <option value="{{ choice.0 }}" {% if pet and pet.species == choice.0 %}selected{% endif %}>
+                                    {{ choice.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="breed" class="form-label">Breed</label>
+                            <input type="text" name="breed" id="breed" class="form-control"
+                                   value="{% if pet %}{{ pet.breed }}{% endif %}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select name="gender" id="gender" class="form-select">
+                                {% for choice in gender_choices %}
+                                <option value="{{ choice.0 }}" {% if pet and pet.gender == choice.0 %}selected{% endif %}>
+                                    {{ choice.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="age" class="form-label">Age (years) *</label>
+                            <input type="number" name="age" id="age" class="form-control" min="0" max="100"
+                                   value="{% if pet %}{{ pet.age }}{% endif %}" required>
+                            <div class="invalid-feedback">Please provide your pet's age.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="weight" class="form-label">Weight (kg)</label>
+                            <input type="number" name="weight" id="weight" class="form-control" step="0.01"
+                                   value="{% if pet %}{{ pet.weight }}{% endif %}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="color" class="form-label">Color</label>
+                            <input type="text" name="color" id="color" class="form-control"
+                                   value="{% if pet %}{{ pet.color }}{% endif %}">
+                        </div>
+
+                        {% if user.is_staff %}
+                        <div class="mb-3">
+                            <label for="owner" class="form-label">Owner *</label>
+                            <select name="owner" id="owner" class="form-select" required>
+                                {% for owner in owners %}
+                                <option value="{{ owner.id }}" {% if pet and pet.owner.id == owner.id %}selected{% endif %}>
+                                    {{ owner.get_full_name }} ({{ owner.email }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="microchip_id" class="form-label">Microchip Number</label>
+                            <input type="text" name="microchip_id" id="microchip_id" class="form-control"
+                                   value="{% if pet %}{{ pet.microchip_id }}{% endif %}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="medical_conditions" class="form-label">Medical Conditions</label>
+                            <textarea name="medical_conditions" id="medical_conditions" class="form-control" rows="3">{% if pet %}{{ pet.medical_conditions }}{% endif %}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="vaccination_status" class="form-label">Vaccination Status</label>
+                            <select name="vaccination_status" id="vaccination_status" class="form-select">
+                                <option value="UP_TO_DATE" {% if pet and pet.vaccination_status == 'UP_TO_DATE' %}selected{% endif %}>Up to Date</option>
+                                <option value="DUE_SOON" {% if pet and pet.vaccination_status == 'DUE_SOON' %}selected{% endif %}>Due Soon</option>
+                                <option value="OVERDUE" {% if pet and pet.vaccination_status == 'OVERDUE' %}selected{% endif %}>Overdue</option>
+                                <option value="UNKNOWN" {% if pet and pet.vaccination_status == 'UNKNOWN' %}selected{% endif %}>Unknown</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="special_notes" class="form-label">Special Notes</label>
+                            <textarea name="special_notes" id="special_notes" class="form-control" rows="3">{% if pet %}{{ pet.special_notes }}{% endif %}</textarea>
+                        </div>
+
+                        <div class="text-end">
+                            <a href="{% if pet %}{% url 'pets:pet_detail' pet.pk %}{% else %}{% url 'pets:pet_list' %}{% endif %}" 
+                               class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if pet %}Save Changes{% else %}Add Pet{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const photoInput = document.getElementById('pet_photo');
+    const previewArea = document.querySelector('.preview-area');
+    
+    // Photo preview functionality
+    if (photoInput) {
+        photoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                // Validate file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size cannot exceed 5MB');
+                    this.value = '';
+                    return;
+                }
+
+                // Preview image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewArea.innerHTML = `
+                        <img src="${e.target.result}" alt="Pet preview" 
+                             class="img-preview rounded" style="max-width: 200px;">
+                    `;
+                    previewArea.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewArea.classList.add('d-none');
+            }
+        });
+    }
+
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Find first invalid field and focus it
+            const invalidField = this.querySelector(':invalid');
+            if (invalidField) {
+                invalidField.focus();
+            }
+        }
+        this.classList.add('was-validated');
+    });
+
+    // Weight validation
+    const weightInput = document.getElementById('weight');
+    if (weightInput) {
+        weightInput.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (value && (value < 0 || value > 999.99)) {
+                this.setCustomValidity('Weight must be between 0 and 999.99 kg');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+
+    // Age validation
+    const ageInput = document.getElementById('age');
+    if (ageInput) {
+        ageInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 0) {
+                this.setCustomValidity('Age cannot be negative');
+            } else if (value > 100) {
+                this.setCustomValidity('Please enter a valid age (0-100 years)');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+
+    // Species validation (required)
+    const speciesSelect = document.getElementById('species');
+    if (speciesSelect) {
+        speciesSelect.addEventListener('change', function() {
+            if (!this.value) {
+                this.setCustomValidity('Please select a species');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% endblock %}

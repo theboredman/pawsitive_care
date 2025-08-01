@@ -1,0 +1,73 @@
+{% if primary_photo or other_photos %}
+<div class="photo-gallery">
+    {% if primary_photo %}
+    <div class="primary-photo mb-4">
+        <h6 class="text-muted mb-3">Primary Photo</h6>
+        <div class="position-relative">
+            <img src="{{ primary_photo.image.url }}" alt="{{ pet.name }}" 
+                 class="img-fluid rounded" style="max-height: 300px; width: 100%; object-fit: cover;">
+            {% if primary_photo.caption %}
+            <div class="photo-caption mt-2">
+                <small class="text-muted">{{ primary_photo.caption }}</small>
+            </div>
+            {% endif %}
+            {% if user.is_staff or user == pet.owner %}
+            <div class="photo-actions position-absolute top-0 end-0 m-2">
+                <button type="button" class="btn btn-danger btn-sm" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deletePhotoModal{{ primary_photo.id }}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if other_photos %}
+    <div class="other-photos">
+        <h6 class="text-muted mb-3">Other Photos</h6>
+        <div class="row g-3">
+            {% for photo in other_photos %}
+            <div class="col-6 col-md-4">
+                <div class="position-relative">
+                    <img src="{{ photo.image.url }}" alt="{{ pet.name }}" 
+                         class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;">
+                    {% if photo.caption %}
+                    <div class="photo-caption mt-2">
+                        <small class="text-muted">{{ photo.caption }}</small>
+                    </div>
+                    {% endif %}
+                    {% if user.is_staff or user == pet.owner %}
+                    <div class="photo-actions position-absolute top-0 end-0 m-2">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary btn-sm set-primary-photo" 
+                                    data-photo-id="{{ photo.id }}">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deletePhotoModal{{ photo.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<p class="text-muted">No photos uploaded yet.</p>
+{% endif %}
+
+{% if user.is_staff or user == pet.owner %}
+<button type="button" class="btn btn-success btn-sm mt-4" 
+        data-bs-toggle="modal" 
+        data-bs-target="#addPhotoModal">
+    <i class="fas fa-camera"></i> Add Photo
+</button>
+{% endif %}

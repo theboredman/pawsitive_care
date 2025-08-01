@@ -1,0 +1,86 @@
+{% for pet in pets %}
+<div class="col">
+    <div class="card h-100">
+        {% if pet.photos.exists %}
+            <img src="{{ pet.photos.first.image.url }}" class="card-img-top" alt="{{ pet.name }}"
+                 style="height: 200px; object-fit: cover;">
+        {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                 style="height: 200px;">
+                <i class="fas fa-paw fa-3x text-muted"></i>
+            </div>
+        {% endif %}
+        
+        <div class="card-body">
+            <h5 class="card-title">{{ pet.name }}</h5>
+            <p class="card-text">
+                <small class="text-muted">
+                    {{ pet.get_species_display }}
+                    {% if pet.breed %} • {{ pet.breed }}{% endif %}
+                </small>
+            </p>
+            <p class="card-text">
+                {% if pet.age %}Age: {{ pet.age }}{% endif %}
+            </p>
+        </div>
+        
+        <div class="card-footer bg-transparent border-top-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'pets:pet_detail' pet.pk %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-info-circle"></i> Details
+                </a>
+                {% if user.is_staff or user == pet.owner %}
+                <div class="btn-group">
+                    <a href="{% url 'pets:pet_update' pet.pk %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#deletePetModal{{ pet.pk }}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user.is_staff or user == pet.owner %}
+<!-- Delete Pet Modal -->
+<div class="modal fade" id="deletePetModal{{ pet.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Pet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete {{ pet.name }}? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'pets:pet_delete' pet.pk %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% empty %}
+<div class="col-12">
+    <div class="alert alert-info" role="alert">
+        {% if search_query or species_filter %}
+            No pets found matching your search criteria.
+            <a href="{% url 'pets:pet_list' %}" class="alert-link">Clear filters</a>
+        {% else %}
+            No pets registered yet.
+            {% if user.is_staff or not user.is_client %}
+                <a href="{% url 'pets:pet_create' %}" class="alert-link">Register a new pet</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endfor %}

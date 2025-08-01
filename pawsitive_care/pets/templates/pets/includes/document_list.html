@@ -1,0 +1,45 @@
+{% for doc_type, docs in documents.items %}
+{% if docs %}
+<div class="document-section mb-4">
+    <h6 class="text-muted mb-3">{{ doc_type.1 }}s</h6>
+    <div class="list-group">
+        {% for doc in docs %}
+        <div class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">{{ doc.title }}</h6>
+                    <small class="text-muted">Uploaded: {{ doc.uploaded_at|date:"F j, Y" }}</small>
+                    {% if doc.description %}
+                    <p class="mb-1 text-muted small">{{ doc.description }}</p>
+                    {% endif %}
+                </div>
+                <div class="btn-group">
+                    <a href="{{ doc.file.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    {% if user.is_staff or user == pet.owner %}
+                    <button type="button" class="btn btn-outline-danger btn-sm delete-document"
+                            data-document-id="{{ doc.id }}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteDocumentModal{{ doc.id }}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% empty %}
+<p class="text-muted">No documents uploaded yet.</p>
+{% endfor %}
+
+{% if user.is_staff or user == pet.owner %}
+<button type="button" class="btn btn-success btn-sm mt-3" 
+        data-bs-toggle="modal" 
+        data-bs-target="#uploadDocumentModal">
+    <i class="fas fa-upload"></i> Upload Document
+</button>
+{% endif %}

@@ -1,0 +1,39 @@
+<div class="medical-record" id="medical-record-{{ record.id }}">
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">{{ record.get_record_type_display }}</h6>
+            <small class="text-muted">{{ record.date|date:"F j, Y" }}</small>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ record.description }}</p>
+            {% if record.vet_notes %}
+            <div class="mt-2">
+                <strong>Vet Notes:</strong>
+                <p class="text-muted mb-2">{{ record.vet_notes }}</p>
+            </div>
+            {% endif %}
+            {% if record.next_visit_date %}
+            <div class="mt-2">
+                <strong>Next Visit:</strong>
+                <span class="text-info">{{ record.next_visit_date|date:"F j, Y" }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% if user.is_staff %}
+        <div class="card-footer bg-transparent">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editMedicalRecordModal{{ record.id }}">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteMedicalRecordModal{{ record.id }}">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>

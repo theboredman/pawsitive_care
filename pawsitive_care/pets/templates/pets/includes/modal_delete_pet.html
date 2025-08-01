@@ -1,0 +1,30 @@
+<!-- Delete Pet Modal -->
+<div class="modal fade" id="deletePetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Pet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete {{ pet.name }}? This action cannot be undone.</p>
+                <div class="alert alert-warning">
+                    <p><strong>Warning:</strong> This will also delete:</p>
+                    <ul class="mb-0">
+                        <li>All medical records</li>
+                        <li>All photos</li>
+                        <li>All documents</li>
+                        <li>All appointments</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'pets:pet_delete' pet.pk %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete Pet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
