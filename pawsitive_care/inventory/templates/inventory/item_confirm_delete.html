@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete
+
+{{ object.name }} - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="h3 mb-0">
+        <i class="fas fa-trash text-danger me-2"></i>
+        Delete Item:
+        {{ object.name }}
+      </h1>
+    </div>
+  </div>
+
+  <!-- Warning Card -->
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Confirm Deletion
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+            <div>
+              <h5 class="alert-heading">Warning!</h5>
+              <p class="mb-0">This action cannot be undone. All data associated with this item will be permanently deleted.</p>
+            </div>
+          </div>
+
+          <!-- Item Details -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h6 class="card-title mb-0">Item to be deleted:</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <table class="table table-borderless table-sm">
+                    <tr>
+                      <td><strong>Name:</strong></td>
+                      <td>
+                        {{ object.name }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>SKU:</strong></td>
+                      <td><code>
+                          {{ object.sku }}</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Category:</strong></td>
+                      <td>
+                        {{ object.get_category_display }}
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <table class="table table-borderless table-sm">
+                    <tr>
+                      <td><strong>Current Stock:</strong></td>
+                      <td>
+                        {{ object.quantity }}
+                        {{ object.get_unit_display }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>Total Value:</strong></td>
+                      <td>$
+                        {{ object.calculate_total_value|floatformat:2 }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>Supplier:</strong></td>
+                      <td>
+                        {{ object.supplier_name|default:"Not specified" }}
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What will be deleted -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h6 class="card-title mb-0">What will be deleted:</h6>
+            </div>
+            <div class="card-body">
+              <ul class="list-unstyled mb-0">
+                <li><i class="fas fa-check text-danger me-2"></i>Item information and details</li>
+                <li><i class="fas fa-check text-danger me-2"></i>All stock movement history</li>
+                <li><i class="fas fa-check text-danger me-2"></i>Associated purchase order items</li>
+                <li><i class="fas fa-check text-danger me-2"></i>Any related inventory records</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Confirmation Form -->
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+              <label class="form-check-label" for="confirmDelete">
+                I understand that this action cannot be undone and I want to permanently delete this item.
+              </label>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'inventory:item_detail' object.pk %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
+                <i class="fas fa-trash"></i> Delete Item Permanently
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('confirmDelete');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    checkbox.addEventListener('change', function() {
+      deleteBtn.disabled = !this.checked;
+
+      if (this.checked) {
+        deleteBtn.classList.remove('btn-secondary');
+        deleteBtn.classList.add('btn-danger');
+      } else {
+        deleteBtn.classList.remove('btn-danger');
+        deleteBtn.classList.add('btn-secondary');
+      }
+    });
+  });
+</script>
+{% endblock %}

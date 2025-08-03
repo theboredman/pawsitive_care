@@ -72,6 +72,68 @@
   </div>
 </div>
 
+<!-- Inventory Access for Vets -->
+<div class="row mt-4">
+  <div class="col-12">
+    <h4><i class="fas fa-boxes text-info"></i> Inventory & Supplies</h4>
+    <p class="text-muted">Check medication availability and medical supplies</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-info">
+      <div class="card-body text-center">
+        <i class="fas fa-pills fa-2x text-info mb-3"></i>
+        <h5>Medicines</h5>
+        <p class="text-muted">Check availability</p>
+        <a href="{% url 'inventory:item_list' %}?category=MEDICINE" class="btn btn-info btn-sm">
+          <i class="fas fa-prescription-bottle"></i> View
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-primary">
+      <div class="card-body text-center">
+        <i class="fas fa-first-aid fa-2x text-primary mb-3"></i>
+        <h5>Medical Supplies</h5>
+        <p class="text-muted">Check stock levels</p>
+        <a href="{% url 'inventory:item_list' %}?category=SUPPLY" class="btn btn-primary btn-sm">
+          <i class="fas fa-bandage"></i> View
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-warning">
+      <div class="card-body text-center">
+        <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
+        <h5>Low Stock Alert</h5>
+        <p class="text-muted">Items running low</p>
+        <a href="{% url 'inventory:item_list' %}?low_stock=1" class="btn btn-warning btn-sm">
+          <i class="fas fa-bell"></i> Check
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card dashboard-card h-100 border-success">
+      <div class="card-body text-center">
+        <i class="fas fa-clock fa-2x text-success mb-3"></i>
+        <h5>Expiring Items</h5>
+        <p class="text-muted">Check expiry dates</p>
+        <a href="{% url 'inventory:item_list' %}?expiring=1" class="btn btn-success btn-sm">
+          <i class="fas fa-calendar-times"></i> Check
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- PetMedia Professional Section -->
 <div class="row">
   <div class="col-md-6 mb-4">

@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+
+{{ title }} - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-0">
+          <i class="fas fa-boxes text-primary me-2"></i>
+          {{ title }}
+        </h1>
+        <a href="{% url 'inventory:item_detail' item.pk %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Back to Item
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Current Item Info -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-light">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h5 class="card-title mb-1">
+                {{ item.name }}
+              </h5>
+              <p class="card-text text-muted mb-0">
+                SKU:
+                {{ item.sku }} | Category:
+                {{ item.get_category_display }}
+              </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <div class="d-flex justify-content-md-end align-items-center">
+                <div class="me-3">
+                  <small class="text-muted d-block">Current Stock</small>
+                  <span class="h4 mb-0 {% if item.is_low_stock %}text-warning{% elif item.is_out_of_stock %}text-danger{% else %}text-success{% endif %}">
+                    {{ item.quantity }}
+                    {{ item.get_unit_display }}
+                  </span>
+                </div>
+                {% if item.is_low_stock %}
+                <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                {% elif item.is_out_of_stock %}
+                <i class="fas fa-times-circle fa-2x text-danger"></i>
+                {% else %}
+                <i class="fas fa-check-circle fa-2x text-success"></i>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Update Form -->
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-edit text-primary me-2"></i>
+            Update Stock Quantity
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post" id="stockUpdateForm">
+            {% csrf_token %}
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.quantity_change.id_for_label }}" class="form-label">
+                  {{ form.quantity_change.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.quantity_change }}
+                <div class="form-text">
+                  Use positive numbers to add stock (+50), negative to remove (-10)
+                </div>
+                {% if form.quantity_change.errors %}
+                <div class="text-danger small">
+                  {{ form.quantity_change.errors.0 }}
+                </div>
+                {% endif %}
+
+                <!-- Preview -->
+                <div id="stockPreview" class="mt-2 p-2 bg-light rounded" style="display: none;">
+                  <small class="text-muted">Preview:</small>
+                  <div id="previewText"></div>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.reason.id_for_label }}" class="form-label">
+                  {{ form.reason.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.reason }}
+                {% if form.reason.errors %}
+                <div class="text-danger small">
+                  {{ form.reason.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.notes.id_for_label }}" class="form-label">
+                {{ form.notes.label }}
+              </label>
+              {{ form.notes }}
+              {% if form.notes.errors %}
+              <div class="text-danger small">
+                {{ form.notes.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h6>Quick Actions</h6>
+                <div class="btn-group flex-wrap" role="group">
+                  <button type="button" class="btn btn-outline-success btn-sm" onclick="setQuantityChange(10)">
+                    +10
+                  </button>
+                  <button type="button" class="btn btn-outline-success btn-sm" onclick="setQuantityChange(25)">
+                    +25
+                  </button>
+                  <button type="button" class="btn btn-outline-success btn-sm" onclick="setQuantityChange(50)">
+                    +50
+                  </button>
+                  <button type="button" class="btn btn-outline-success btn-sm" onclick="setQuantityChange(100)">
+                    +100
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm" onclick="setQuantityChange(-1)">
+                    -1
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm" onclick="setQuantityChange(-5)">
+                    -5
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm" onclick="setQuantityChange(-10)">
+                    -10
+                  </button>
+                  <button type="button" class="btn btn-outline-warning btn-sm" onclick="setToThreshold()">
+                    Set to Threshold (
+                    {{ item.low_stock_threshold }})
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'inventory:item_detail' item.pk %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i> Update Stock
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Warning for Low Stock -->
+  {% if item.is_low_stock %}
+  <div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Low Stock Warning:</strong> This item is currently below the low stock threshold of
+        {{ item.low_stock_threshold }}
+        {{ item.get_unit_display }}.
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const quantityInput = document.getElementById('{{ form.quantity_change.id_for_label }}');
+    const previewDiv = document.getElementById('stockPreview');
+    const previewText = document.getElementById('previewText');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const currentStock = {{ item.quantity }};
+    const lowStockThreshold = {{ item.low_stock_threshold }};
+    const unitDisplay = "{{ item.get_unit_display }}";
+
+    function updatePreview() {
+      const change = parseInt(quantityInput.value) || 0;
+      const newStock = currentStock + change;
+
+      if (change === 0) {
+        previewDiv.style.display = 'none';
+        return;
+      }
+
+      previewDiv.style.display = 'block';
+
+      let statusClass = 'text-success';
+      let statusText = 'Good';
+      let statusIcon = 'fas fa-check-circle';
+
+      if (newStock <= 0) {
+        statusClass = 'text-danger';
+        statusText = 'Out of Stock';
+        statusIcon = 'fas fa-times-circle';
+      } else if (newStock <= lowStockThreshold) {
+        statusClass = 'text-warning';
+        statusText = 'Low Stock';
+        statusIcon = 'fas fa-exclamation-triangle';
+      }
+
+      previewText.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>New stock level:</strong> 
+                    <span class="${statusClass}">${newStock} ${unitDisplay}</span>
+                </div>
+                <div class="${statusClass}">
+                    <i class="${statusIcon} me-1"></i>${statusText}
+                </div>
+            </div>
+        `;
+
+      // Update submit button
+      if (newStock < 0) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Cannot have negative stock';
+        submitBtn.className = 'btn btn-danger';
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Stock';
+        submitBtn.className = 'btn btn-primary';
+      }
+    }
+
+    quantityInput.addEventListener('input', updatePreview);
+
+    // Initial preview if value exists
+    updatePreview();
+  });
+
+  function setQuantityChange(value) {
+    document.getElementById('{{ form.quantity_change.id_for_label }}').value = value;
+    document.getElementById('{{ form.quantity_change.id_for_label }}').dispatchEvent(new Event('input'));
+  }
+
+  function setToThreshold() {
+    const currentStock = {{ item.quantity }};
+    const threshold = {{ item.low_stock_threshold }};
+    const change = threshold - currentStock;
+    setQuantityChange(change);
+  }
+</script>
+{% endblock %}

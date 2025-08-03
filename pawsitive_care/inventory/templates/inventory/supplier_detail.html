@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+
+{{ title }} - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-0">
+            <i class="fas fa-truck text-primary me-2"></i>
+            {{ supplier.name }}
+          </h1>
+          <p class="text-muted mb-0">
+            Supplier since
+            {{ supplier.created_at|date:"M Y" }}
+          </p>
+        </div>
+        <div>
+          <button class="btn btn-secondary me-2">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <a href="{% url 'inventory:supplier_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Suppliers
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supplier Information -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            Supplier Information
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <table class="table table-borderless">
+                <tr>
+                  <td><strong>Company Name:</strong></td>
+                  <td>
+                    {{ supplier.name }}
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Contact Person:</strong></td>
+                  <td>
+                    {{ supplier.contact_person|default:"Not provided" }}
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Status:</strong></td>
+                  <td>
+                    {% if supplier.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <table class="table table-borderless">
+                <tr>
+                  <td><strong>Email:</strong></td>
+                  <td>
+                    {% if supplier.email %}
+                    <a href="mailto:{{ supplier.email }}">
+                      {{ supplier.email }}</a>
+                    {% else %}
+                    Not provided
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Phone:</strong></td>
+                  <td>
+                    {% if supplier.phone %}
+                    <a href="tel:{{ supplier.phone }}">
+                      {{ supplier.phone }}</a>
+                    {% else %}
+                    Not provided
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Added:</strong></td>
+                  <td>
+                    {{ supplier.created_at|date:"M d, Y H:i" }}
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          {% if supplier.address %}
+          <div class="mt-3">
+            <strong>Address:</strong>
+            <p class="mt-2">
+              {{ supplier.address }}
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <!-- Quick Actions -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-bolt text-warning me-2"></i>
+            Quick Actions
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            {% if supplier.email %}
+            <a href="mailto:{{ supplier.email }}" class="btn btn-primary">
+              <i class="fas fa-envelope me-2"></i>Send Email
+            </a>
+            {% endif %}
+            {% if supplier.phone %}
+            <a href="tel:{{ supplier.phone }}" class="btn btn-success">
+              <i class="fas fa-phone me-2"></i>Call Supplier
+            </a>
+            {% endif %}
+            <button type="button" class="btn btn-info">
+              <i class="fas fa-plus me-2"></i>Create Purchase Order
+            </button>
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-edit me-2"></i>Edit Supplier
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-chart-bar text-info me-2"></i>
+            Statistics
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center">
+            <div class="row">
+              <div class="col-6">
+                <div class="border-end">
+                  <h4 class="text-primary mb-0">
+                    {{ purchase_orders|length }}
+                  </h4>
+                  <small class="text-muted">Purchase Orders</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <h4 class="text-success mb-0">$0.00</h4>
+                <small class="text-muted">Total Value</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Purchase Orders -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-shopping-cart text-success me-2"></i>
+            Recent Purchase Orders
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if purchase_orders %}
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Order Number</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Expected Delivery</th>
+                  <th>Total Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in purchase_orders %}
+                <tr>
+                  <td>
+                    <strong>PO-
+                      {{ order.order_number }}</strong>
+                  </td>
+                  <td>
+                    {{ order.order_date|date:"M d, Y" }}
+                  </td>
+                  <td>
+                    {% if order.status == 'DRAFT' %}
+                    <span class="badge bg-secondary">
+                      {{ order.get_status_display }}</span>
+                    {% elif order.status == 'PENDING' %}
+                    <span class="badge bg-warning">
+                      {{ order.get_status_display }}</span>
+                    {% elif order.status == 'APPROVED' %}
+                    <span class="badge bg-info">
+                      {{ order.get_status_display }}</span>
+                    {% elif order.status == 'ORDERED' %}
+                    <span class="badge bg-primary">
+                      {{ order.get_status_display }}</span>
+                    {% elif order.status == 'RECEIVED' %}
+                    <span class="badge bg-success">
+                      {{ order.get_status_display }}</span>
+                    {% else %}
+                    <span class="badge bg-danger">
+                      {{ order.get_status_display }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if order.expected_delivery %}
+                    {{ order.expected_delivery|date:"M d, Y" }}
+                    {% else %}
+                    -
+                    {% endif %}
+                  </td>
+                  <td>$
+                    {{ order.total_amount|floatformat:2 }}
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-sm btn-outline-primary" title="View Order">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i class="fas fa-shopping-cart fa-2x text-muted mb-3"></i>
+            <p class="text-muted mb-0">No purchase orders found for this supplier</p>
+            <button class="btn btn-primary mt-2">
+              <i class="fas fa-plus"></i> Create First Purchase Order
+            </button>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
