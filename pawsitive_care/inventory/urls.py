@@ -4,7 +4,6 @@ from . import views
 app_name = 'inventory'
 
 urlpatterns = [
-<<<<<<< HEAD
     # Dashboard
     path('', views.inventory_dashboard, name='dashboard'),
     
@@ -62,8 +61,4 @@ urlpatterns = [
     path('export/csv/', views.export_csv, name='export_csv'),
     path('export/pdf/', views.export_pdf, name='export_pdf'),
     path('export/excel/', views.export_excel, name='export_excel'),
-=======
-    # Add inventory URLs here
-    path('', views.inventory_list, name='inventory_list'),
->>>>>>> 3d3cf23477fae850525bbf35b308265b43c18d54
 ]

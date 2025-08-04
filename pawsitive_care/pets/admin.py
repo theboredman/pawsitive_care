@@ -3,8 +3,6 @@ from django.contrib import messages
 from django.utils.translation import ngettext
 from .models import Pet, MedicalRecord, PetPhoto, PetDocument
 
-#okokok
-
 @admin.register(Pet)
 class PetAdmin(admin.ModelAdmin):
     list_display = ('name', 'species', 'breed', 'owner', 'vaccination_status', 'created_at', 'is_active')

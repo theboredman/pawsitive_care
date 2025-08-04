@@ -1,6 +1,10 @@
 from django.contrib import admin
+from django.utils.html import format_html
+from .models import (
+    InventoryItem, StockMovement, Supplier, PurchaseOrder, PurchaseOrderItem,
+    MedicineItem, SupplyItem, EquipmentItem, FoodItem
+)
 
-<<<<<<< HEAD
 @admin.register(InventoryItem)
 class InventoryItemAdmin(admin.ModelAdmin):
     """Admin interface for inventory items"""
@@ -207,6 +211,3 @@ class FoodItemAdmin(InventoryItemAdmin):
 admin.site.site_header = "Pawsitive Care Inventory Administration"
 admin.site.site_title = "Pawsitive Care Inventory Admin"
 admin.site.index_title = "Welcome to Pawsitive Care Inventory Administration"
-=======
-# Register your models here.
->>>>>>> 3d3cf23477fae850525bbf35b308265b43c18d54
