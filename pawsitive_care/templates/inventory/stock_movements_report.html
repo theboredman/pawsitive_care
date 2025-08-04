@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Stock Movements Report - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-0">
+            <i class="fas fa-exchange-alt text-info me-2"></i>
+            Stock Movements Report
+          </h1>
+          <p class="text-muted mb-0">Track all inventory changes and movement history</p>
+        </div>
+        <div>
+          <a href="{% url 'inventory:reports' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Back to Reports
+          </a>
+          <button class="btn btn-info" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filters
+          </h6>
+        </div>
+        <div class="card-body">
+          <form method="get" class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Movement Type</label>
+              <select name="movement_type" class="form-select">
+                <option value="">All Types</option>
+                <option value="IN">Stock In</option>
+                <option value="OUT">Stock Out</option>
+                <option value="ADJUSTMENT">Adjustment</option>
+                <option value="EXPIRED">Expired</option>
+                <option value="DAMAGED">Damaged</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Date From</label>
+              <input type="date" name="date_from" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Date To</label>
+              <input type="date" name="date_to" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">&nbsp;</label>
+              <div>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-search"></i> Filter
+                </button>
+                <a href="{% url 'inventory:stock_movements_report' %}" class="btn btn-outline-secondary">
+                  <i class="fas fa-refresh"></i> Reset
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Movements Table -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-list text-info me-2"></i>
+            Recent Stock Movements
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if movements %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-info">
+                <tr>
+                  <th>Date/Time</th>
+                  <th>Item</th>
+                  <th>Type</th>
+                  <th>Quantity</th>
+                  <th>Previous Stock</th>
+                  <th>New Stock</th>
+                  <th>Reason</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for movement in movements %}
+                <tr>
+                  <td>
+                    <small>
+                      {{ movement.created_at|date:"M d, Y" }}</small><br>
+                    <small class="text-muted">
+                      {{ movement.created_at|time:"H:i" }}</small>
+                  </td>
+                  <td>
+                    <strong>
+                      {{ movement.item.name }}</strong><br>
+                    <small class="text-muted">
+                      {{ movement.item.sku }}</small>
+                  </td>
+                  <td>
+                    {% if movement.movement_type == 'IN' %}
+                    <span class="badge bg-success">
+                      <i class="fas fa-arrow-up"></i>
+                      {{ movement.get_movement_type_display }}
+                    </span>
+                    {% elif movement.movement_type == 'OUT' %}
+                    <span class="badge bg-warning">
+                      <i class="fas fa-arrow-down"></i>
+                      {{ movement.get_movement_type_display }}
+                    </span>
+                    {% elif movement.movement_type == 'EXPIRED' %}
+                    <span class="badge bg-danger">
+                      <i class="fas fa-ban"></i>
+                      {{ movement.get_movement_type_display }}
+                    </span>
+                    {% elif movement.movement_type == 'DAMAGED' %}
+                    <span class="badge bg-dark">
+                      <i class="fas fa-exclamation-triangle"></i>
+                      {{ movement.get_movement_type_display }}
+                    </span>
+                    {% else %}
+                    <span class="badge bg-info">
+                      <i class="fas fa-edit"></i>
+                      {{ movement.get_movement_type_display }}
+                    </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if movement.movement_type == 'IN' %}
+                    <span class="text-success">+
+                      {{ movement.quantity }}</span>
+                    {% else %}
+                    <span class="text-warning">-
+                      {{ movement.quantity }}</span>
+                    {% endif %}
+                    {{ movement.item.get_unit_display }}
+                  </td>
+                  <td>
+                    {{ movement.old_quantity }}
+                    {{ movement.item.get_unit_display }}
+                  </td>
+                  <td>
+                    {{ movement.new_quantity }}
+                    {{ movement.item.get_unit_display }}
+                  </td>
+                  <td>
+                    {% if movement.reason %}
+                    {{ movement.reason|truncatechars:30 }}
+                    {% else %}
+                    <span class="text-muted">No reason provided</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if movement.created_by %}
+                    {{ movement.created_by.get_full_name|default:movement.created_by.username }}
+                    {% else %}
+                    <span class="text-muted">System</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination would go here if implemented -->
+
+          {% else %}
+          <div class="text-center py-5">
+            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+            <h4>No Stock Movements Found</h4>
+            <p class="text-muted">No stock movements match your current filter criteria.</p>
+            <a href="{% url 'inventory:dashboard' %}" class="btn btn-primary">
+              <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Statistics -->
+  {% if movements %}
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-chart-bar text-primary me-2"></i>
+            Movement Summary
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-2">
+              <div class="border-end">
+                <h4 class="text-success">
+                  {{ in_movements|default:0 }}
+                </h4>
+                <small class="text-muted">Stock In</small>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="border-end">
+                <h4 class="text-warning">
+                  {{ out_movements|default:0 }}
+                </h4>
+                <small class="text-muted">Stock Out</small>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="border-end">
+                <h4 class="text-info">
+                  {{ adjustments|default:0 }}
+                </h4>
+                <small class="text-muted">Adjustments</small>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="border-end">
+                <h4 class="text-danger">
+                  {{ expired_movements|default:0 }}
+                </h4>
+                <small class="text-muted">Expired</small>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="border-end">
+                <h4 class="text-dark">
+                  {{ damaged_movements|default:0 }}
+                </h4>
+                <small class="text-muted">Damaged</small>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <h4 class="text-primary">
+                {{ movements|length }}
+              </h4>
+              <small class="text-muted">Total Movements</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  @media print {
+
+    .btn,
+    .card-header {
+      display: none !important;
+    }
+
+    .border-end {
+      border-right: 1px solid #000 !important;
+    }
+  }
+</style>
+{% endblock %}

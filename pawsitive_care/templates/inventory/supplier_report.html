@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Supplier Report - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-0">
+            <i class="fas fa-truck text-primary me-2"></i>
+            Supplier Report
+          </h1>
+          <p class="text-muted mb-0">Analyze supplier performance and inventory sourcing</p>
+        </div>
+        <div>
+          <a href="{% url 'inventory:reports' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Back to Reports
+          </a>
+          <button class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-0">
+                {{ total_suppliers|default:0 }}
+              </h4>
+              <p class="mb-0">Total Suppliers</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-building fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-0">
+                {{ active_suppliers|default:0 }}
+              </h4>
+              <p class="mb-0">Active Suppliers</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-check-circle fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-0">
+                {{ total_items_supplied|default:0 }}
+              </h4>
+              <p class="mb-0">Items Supplied</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-boxes fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-0">$
+                {{ total_value_supplied|default:0|floatformat:0 }}
+              </h4>
+              <p class="mb-0">Total Value</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suppliers List -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-list text-primary me-2"></i>
+            Supplier Details
+          </h5>
+          <a href="{% url 'inventory:supplier_create' %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add New Supplier
+          </a>
+        </div>
+        <div class="card-body">
+          {% if suppliers %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Supplier</th>
+                  <th>Contact</th>
+                  <th>Items Supplied</th>
+                  <th>Total Value</th>
+                  <th>Status</th>
+                  <th>Last Order</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for supplier in suppliers %}
+                <tr>
+                  <td>
+                    <strong>
+                      {{ supplier.name }}</strong><br>
+                    {% if supplier.address %}
+                    <small class="text-muted">
+                      {{ supplier.address|truncatechars:40 }}</small>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if supplier.contact_person %}
+                    <strong>
+                      {{ supplier.contact_person }}</strong><br>
+                    {% endif %}
+                    {% if supplier.phone %}
+                    <small><i class="fas fa-phone"></i>
+                      {{ supplier.phone }}</small><br>
+                    {% endif %}
+                    {% if supplier.email %}
+                    <small><i class="fas fa-envelope"></i>
+                      {{ supplier.email }}</small>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge bg-info">
+                      {{ supplier.items_count|default:0 }} items</span>
+                  </td>
+                  <td>
+                    <strong>$
+                      {{ supplier.total_value|default:0|floatformat:2 }}</strong>
+                  </td>
+                  <td>
+                    {% if supplier.is_active %}
+                    <span class="badge bg-success">
+                      <i class="fas fa-check"></i> Active
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary">
+                      <i class="fas fa-pause"></i> Inactive
+                    </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if supplier.last_order_date %}
+                    {{ supplier.last_order_date|date:"M d, Y" }}
+                    {% else %}
+                    <span class="text-muted">No orders</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a href="{% url 'inventory:supplier_detail' supplier.id %}" class="btn btn-outline-primary" title="View Details">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'inventory:supplier_edit' supplier.id %}" class="btn btn-outline-secondary" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <i class="fas fa-truck fa-3x text-muted mb-3"></i>
+            <h4>No Suppliers Found</h4>
+            <p class="text-muted">Start by adding your first supplier to track inventory sourcing.</p>
+            <a href="{% url 'inventory:supplier_create' %}" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Add First Supplier
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supplier Performance Chart -->
+  {% if suppliers %}
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-chart-pie text-success me-2"></i>
+            Supplier Distribution by Value
+          </h6>
+        </div>
+        <div class="card-body">
+          <canvas id="supplierChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Performing Suppliers -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-trophy text-warning me-2"></i>
+            Top Suppliers by Value
+          </h6>
+        </div>
+        <div class="card-body">
+          {% for supplier in top_suppliers %}
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <strong>
+                {{ supplier.name }}</strong>
+              <small class="text-muted d-block">
+                {{ supplier.items_count }} items</small>
+            </div>
+            <div class="text-end">
+              <strong>$
+                {{ supplier.total_value|floatformat:0 }}</strong>
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-muted">No supplier data available</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-clock text-info me-2"></i>
+            Recent Activity
+          </h6>
+        </div>
+        <div class="card-body">
+          {% for supplier in recent_suppliers %}
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <strong>
+                {{ supplier.name }}</strong>
+              <small class="text-muted d-block">
+                {% if supplier.last_order_date %}
+                Last order:
+                {{ supplier.last_order_date|date:"M d" }}
+                {% else %}
+                No recent orders
+                {% endif %}
+              </small>
+            </div>
+            <div>
+              {% if supplier.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-muted">No recent activity</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  {% if suppliers %}
+  // Supplier Distribution Chart
+  const ctx = document.getElementById('supplierChart').getContext('2d');
+  const supplierChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: [
+        {% for supplier in suppliers %} '{{ supplier.name|escapejs }}'
+        {% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      ],
+      datasets: [{
+        data: [
+          {% for supplier in suppliers %}
+          {{ supplier.total_value|default:0 }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        ],
+        backgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+          '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': $' + context.parsed.toFixed(2);
+            }
+          }
+        }
+      }
+    }
+  });
+  {% endif %}
+</script>
+
+<style>
+  @media print {
+
+    .btn,
+    .card-header .btn {
+      display: none !important;
+    }
+
+    .card {
+      border: 1px solid #000 !important;
+      box-shadow: none !important;
+    }
+  }
+</style>
+{% endblock %}

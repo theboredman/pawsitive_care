@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventory Reports - Pawsitive Care{% endblock %}
+
+{% block extra_css %}
+<style>
+  .report-card {
+    transition: transform 0.2s;
+    border: 1px solid #dee2e6;
+  }
+
+  .report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .report-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .report-section {
+    margin-bottom: 2rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-0">
+            <i class="fas fa-chart-bar text-primary me-2"></i>
+            Inventory Reports & Analytics
+          </h1>
+          <p class="text-muted mb-0">Comprehensive inventory insights and reports</p>
+        </div>
+        <div>
+          <a href="{% url 'inventory:dashboard' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+          </a>
+          <a href="{% url 'inventory:export_csv' %}" class="btn btn-success">
+            <i class="fas fa-download"></i> Export Data
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats Overview -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card stats-card text-center">
+        <div class="card-body">
+          <i class="fas fa-boxes fa-2x mb-2"></i>
+          <h4 class="mb-0">
+            {{ total_items|default:0 }}
+          </h4>
+          <small>Total Items</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white text-center">
+        <div class="card-body">
+          <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+          <h4 class="mb-0">
+            {{ low_stock_count|default:0 }}
+          </h4>
+          <small>Low Stock Items</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-danger text-white text-center">
+        <div class="card-body">
+          <i class="fas fa-ban fa-2x mb-2"></i>
+          <h4 class="mb-0">
+            {{ out_of_stock_count|default:0 }}
+          </h4>
+          <small>Out of Stock</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white text-center">
+        <div class="card-body">
+          <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+          <h4 class="mb-0">$
+            {{ total_value|default:0|floatformat:0 }}
+          </h4>
+          <small>Total Value</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Categories -->
+  <div class="row report-section">
+    <div class="col-12">
+      <h4 class="mb-3">
+        <i class="fas fa-clipboard-list text-secondary me-2"></i>
+        Available Reports
+      </h4>
+    </div>
+  </div>
+
+  <!-- Stock Reports -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card report-card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-exclamation-triangle text-warning report-icon"></i>
+          <h5 class="card-title">Low Stock Report</h5>
+          <p class="card-text">Items below minimum stock levels requiring immediate attention</p>
+          <a href="{% url 'inventory:low_stock_report' %}" class="btn btn-warning">
+            <i class="fas fa-eye me-1"></i> View Report
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card report-card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-calendar-times text-danger report-icon"></i>
+          <h5 class="card-title">Expiry Report</h5>
+          <p class="card-text">Items that are expired or expiring soon</p>
+          <a href="{% url 'inventory:expiry_report' %}" class="btn btn-danger">
+            <i class="fas fa-eye me-1"></i> View Report
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card report-card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-exchange-alt text-info report-icon"></i>
+          <h5 class="card-title">Stock Movements</h5>
+          <p class="card-text">Track all stock changes and movement history</p>
+          <a href="{% url 'inventory:stock_movements_report' %}" class="btn btn-info">
+            <i class="fas fa-eye me-1"></i> View Report
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Reports -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card report-card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-truck text-success report-icon"></i>
+          <h5 class="card-title">Supplier Report</h5>
+          <p class="card-text">Analysis of supplier performance and inventory distribution</p>
+          <a href="{% url 'inventory:supplier_report' %}" class="btn btn-success">
+            <i class="fas fa-eye me-1"></i> View Report
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card report-card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-chart-pie text-primary report-icon"></i>
+          <h5 class="card-title">Category Analysis</h5>
+          <p class="card-text">Breakdown of inventory by categories and usage patterns</p>
+          <a href="#" class="btn btn-primary" onclick="showCategoryChart()">
+            <i class="fas fa-chart-pie me-1"></i> View Analysis
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card report-card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-dollar-sign text-success report-icon"></i>
+          <h5 class="card-title">Value Report</h5>
+          <p class="card-text">Financial analysis of inventory value and costs</p>
+          <a href="#" class="btn btn-success" onclick="showValueReport()">
+            <i class="fas fa-dollar-sign me-1"></i> View Report
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Options -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-download text-success me-2"></i>
+            Export Options
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-3">Export inventory data in various formats for external analysis</p>
+          <div class="row">
+            <div class="col-md-4">
+              <a href="{% url 'inventory:export_csv' %}" class="btn btn-outline-success w-100 mb-2">
+                <i class="fas fa-file-csv me-2"></i> Export as CSV
+              </a>
+            </div>
+            <div class="col-md-4">
+              <a href="{% url 'inventory:export_excel' %}" class="btn btn-outline-info w-100 mb-2">
+                <i class="fas fa-file-excel me-2"></i> Export as Excel
+              </a>
+            </div>
+            <div class="col-md-4">
+              <a href="{% url 'inventory:export_pdf' %}" class="btn btn-outline-danger w-100 mb-2">
+                <i class="fas fa-file-pdf me-2"></i> Export as PDF
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Chart Modal -->
+  <div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Category Distribution</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <canvas id="categoryChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Value Report Modal -->
+  <div class="modal fade" id="valueModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Inventory Value Analysis</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>By Category</h6>
+              <div class="list-group">
+                <div class="list-group-item d-flex justify-content-between">
+                  <span>Medicines</span>
+                  <strong>$
+                    {{ medicine_value|default:0|floatformat:2 }}</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                  <span>Supplies</span>
+                  <strong>$
+                    {{ supply_value|default:0|floatformat:2 }}</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                  <span>Equipment</span>
+                  <strong>$
+                    {{ equipment_value|default:0|floatformat:2 }}</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                  <span>Food</span>
+                  <strong>$
+                    {{ food_value|default:0|floatformat:2 }}</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h6>Summary</h6>
+              <div class="alert alert-info">
+                <strong>Total Inventory Value:</strong> $
+                {{ total_value|default:0|floatformat:2 }}<br>
+                <strong>Average Item Value:</strong> $
+                {{ average_value|default:0|floatformat:2 }}<br>
+                <strong>Most Valuable Category:</strong>
+                {{ most_valuable_category|default:"N/A" }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showCategoryChart() {
+    var modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+    modal.show();
+
+    // Sample data - in real implementation, this would come from the backend
+    var ctx = document.getElementById('categoryChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Medicines', 'Supplies', 'Equipment', 'Food'],
+        datasets: [{
+          data: [{{ medicine_count|default:0 }}, {{ supply_count|default:0 }}, {{ equipment_count|default:0 }}, {{ food_count|default:0 }}],
+          backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  }
+
+  function showValueReport() {
+    var modal = new bootstrap.Modal(document.getElementById('valueModal'));
+    modal.show();
+  }
+</script>
+
+<!-- Chart.js for category charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
