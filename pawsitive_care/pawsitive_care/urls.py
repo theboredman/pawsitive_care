@@ -16,21 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect
 from django.conf import settings
 from django.conf.urls.static import static
-
-def home_redirect(request):
-    if request.user.is_authenticated:
-        if request.user.is_admin():
-            return redirect('accounts:admin_dashboard')
-        elif request.user.is_vet():
-            return redirect('accounts:vet_dashboard')
-        elif request.user.is_staff_member():
-            return redirect('accounts:staff_dashboard')
-        else:
-            return redirect('accounts:client_dashboard')
-    return redirect('accounts:login')
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,7 +30,7 @@ urlpatterns = [
     path('communication/', include('communication.urls', namespace='communication')),
     path('inventory/', include('inventory.urls', namespace='inventory')),
     path('records/', include('records.urls', namespace='records')),
-    path('', home_redirect, name='home'),  # Root URL redirect
+    path('', views.home_view, name='home'),  # Root URL with welcome page
 ]
 
 # Serve media files in development

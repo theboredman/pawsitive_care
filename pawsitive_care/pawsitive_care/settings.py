@@ -76,7 +76,10 @@ ROOT_URLCONF = 'pawsitive_care.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'accounts'/ 'templates'],
+        'DIRS': [
+            BASE_DIR / 'accounts'/ 'templates',
+            BASE_DIR / 'pawsitive_care' / 'templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
