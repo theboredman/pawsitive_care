@@ -6,71 +6,99 @@ from .models import InventoryItem, StockMovement, Supplier, PurchaseOrder, Purch
 class InventoryItemForm(forms.ModelForm):
     """Form for creating/updating inventory items"""
     
+    # Add a field for preferred pricing strategy
+    preferred_pricing_strategy = forms.ChoiceField(
+        choices=[
+            ('standard', 'Standard Pricing'),
+            ('bulk', 'Bulk Discount Pricing'),
+            ('premium', 'Premium/VIP Pricing'),
+            ('membership', 'Membership Pricing'),
+            ('seasonal', 'Seasonal Pricing'),
+            ('clearance', 'Clearance Pricing'),
+        ],
+        initial='standard',
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        }),
+        help_text='Select the default pricing strategy for this item'
+    )
+    
     class Meta:
         model = InventoryItem
         fields = [
-            'name', 'description', 'sku', 'category', 'cost_price', 
-            'selling_price', 'quantity', 'unit', 'low_stock_threshold',
-            'supplier_name', 'supplier_contact', 'expiry_date', 'is_active'
+            'name', 'description', 'sku', 'category', 'unit_price', 
+            'quantity_in_stock', 'unit', 'minimum_stock_level',
+            'reorder_point', 'supplier', 'expiry_date', 'is_active'
         ]
         widgets = {
             'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter item name'
+                'class': 'form-control form-control-lg',
+                'placeholder': 'Enter item name',
+                'required': True
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
-                'rows': 3,
-                'placeholder': 'Enter description'
+                'rows': 4,
+                'placeholder': 'Detailed description of the item...'
             }),
             'sku': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Leave blank to auto-generate'
+                'placeholder': 'Auto-generated if blank'
             }),
-            'category': forms.Select(attrs={'class': 'form-control'}),
-            'cost_price': forms.NumberInput(attrs={
-                'class': 'form-control',
+            'category': forms.Select(attrs={
+                'class': 'form-select form-select-lg',
+                'required': True
+            }),
+            'unit_price': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg',
                 'step': '0.01',
-                'min': '0'
+                'min': '0.01',
+                'placeholder': '0.00',
+                'required': True
             }),
-            'selling_price': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.01',
-                'min': '0'
+            'quantity_in_stock': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg',
+                'min': '0',
+                'placeholder': '0',
+                'required': True
             }),
-            'quantity': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': '0'
+            'unit': forms.Select(attrs={
+                'class': 'form-select form-select-lg',
+                'required': True
             }),
-            'unit': forms.Select(attrs={'class': 'form-control'}),
-            'low_stock_threshold': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': '0'
+            'minimum_stock_level': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg',
+                'min': '0',
+                'placeholder': '0',
+                'required': True
             }),
-            'supplier_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Supplier name'
+            'reorder_point': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg',
+                'min': '0',
+                'placeholder': '0',
+                'required': True
             }),
-            'supplier_contact': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Contact information'
+            'supplier': forms.Select(attrs={
+                'class': 'form-select form-select-lg'
             }),
             'expiry_date': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date'
             }),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'checked': True
+            }),
         }
     
-    def clean_selling_price(self):
-        """Validate selling price is not less than cost price"""
-        selling_price = self.cleaned_data.get('selling_price')
-        cost_price = self.cleaned_data.get('cost_price')
+    def clean_unit_price(self):
+        """Validate unit price is positive"""
+        unit_price = self.cleaned_data.get('unit_price')
         
-        if selling_price and cost_price and selling_price < cost_price:
-            raise ValidationError("Selling price cannot be less than cost price.")
+        if unit_price and unit_price < 0:
+            raise ValidationError("Unit price cannot be negative.")
         
-        return selling_price
+        return unit_price
     
     def clean_expiry_date(self):
         """Validate expiry date is not in the past"""
@@ -84,6 +112,12 @@ class InventoryItemForm(forms.ModelForm):
 class StockUpdateForm(forms.Form):
     """Form for updating stock quantities"""
     
+    OPERATION_CHOICES = [
+        ('add', 'Add to Stock'),
+        ('remove', 'Remove from Stock'),
+        ('adjust', 'Adjust to Amount'),
+    ]
+    
     REASON_CHOICES = [
         ('restock', 'Restock'),
         ('sale', 'Sale'),
@@ -93,35 +127,40 @@ class StockUpdateForm(forms.Form):
         ('other', 'Other'),
     ]
     
-    quantity_change = forms.IntegerField(
-        label='Quantity Change',
-        help_text='Use positive numbers to add stock, negative to remove',
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'e.g., +50 or -10'
+    operation_type = forms.ChoiceField(
+        label='Operation Type',
+        choices=OPERATION_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'form-control'
         })
     )
     
-    reason = forms.ChoiceField(
-        choices=REASON_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'})
+    quantity_change = forms.IntegerField(
+        label='Quantity',
+        min_value=1,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter quantity',
+            'min': '1'
+        })
     )
     
-    notes = forms.CharField(
-        required=False,
+    reason = forms.CharField(
+        label='Reason for Change',
+        max_length=255,
         widget=forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 3,
-            'placeholder': 'Additional notes (optional)'
+            'placeholder': 'Brief explanation for this stock change'
         })
     )
     
     def clean_quantity_change(self):
-        """Validate quantity change is not zero"""
+        """Validate quantity change is positive"""
         quantity_change = self.cleaned_data.get('quantity_change')
         
-        if quantity_change == 0:
-            raise ValidationError("Quantity change cannot be zero.")
+        if quantity_change <= 0:
+            raise ValidationError("Quantity must be greater than zero.")
         
         return quantity_change
 

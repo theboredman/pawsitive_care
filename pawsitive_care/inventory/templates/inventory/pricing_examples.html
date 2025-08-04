@@ -1,0 +1,629 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pricing Examples - Inventory Management - Pawsitive Care{% endblock %}
+
+{% block extra_css %}
+<style>
+  .pricing-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .strategy-card {
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .strategy-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .price-comparison {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 10px;
+    border: 2px dashed #dee2e6;
+  }
+
+  .savings-badge {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border-radius: 25px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .premium-badge {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #000;
+    border-radius: 25px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .strategy-standard {
+    border-left: 4px solid #6c757d;
+  }
+
+  .strategy-bulk {
+    border-left: 4px solid #28a745;
+  }
+
+  .strategy-premium {
+    border-left: 4px solid #ffc107;
+  }
+
+  .strategy-membership {
+    border-left: 4px solid #17a2b8;
+  }
+
+  .strategy-seasonal {
+    border-left: 4px solid #fd7e14;
+  }
+
+  .strategy-clearance {
+    border-left: 4px solid #dc3545;
+  }
+
+  .price-table {
+    font-size: 0.9rem;
+  }
+
+  .price-table th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  .quantity-badge {
+    background: #007bff;
+    color: white;
+    border-radius: 20px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="pricing-card">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h1 class="h3 mb-2">
+                <i class="fas fa-calculator me-2"></i>
+                Pricing Strategy Examples
+              </h1>
+              <p class="mb-0 opacity-75">
+                Comprehensive examples of different pricing strategies in action
+              </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <a href="{% url 'inventory:dashboard' %}" class="btn btn-light btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Available Strategies Overview -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            Available Pricing Strategies
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for strategy in available_strategies %}
+            <div class="col-md-4 mb-3">
+              <div class="strategy-card strategy-{{ strategy.type }} p-3">
+                <h6 class="fw-bold">
+                  {{ strategy.name }}
+                </h6>
+                <p class="text-muted mb-0 small">
+                  {{ strategy.description }}
+                </p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Strategy Comparison -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-balance-scale text-warning me-2"></i>
+            Strategy Comparison for
+            {{ comparison_item.name }} (
+            {{ comparison_quantity }} units)
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="price-comparison p-4">
+            <div class="row">
+              {% for comparison in strategy_comparison %}
+              <div class="col-md-6 col-lg-4 mb-3">
+                <div class="strategy-card strategy-{{ comparison.strategy_type }} p-3">
+                  <h6 class="fw-bold">
+                    {{ comparison.result.strategy_name }}
+                  </h6>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="h5 mb-0">$
+                      {{ comparison.result.final_price|floatformat:2 }}</span>
+                    {% if comparison.result.savings > 0 %}
+                    <span class="savings-badge">Save $
+                      {{ comparison.result.savings|floatformat:2 }}</span>
+                    {% elif comparison.result.final_price > comparison.result.subtotal %}
+                    <span class="premium-badge">+$
+                      {{ comparison.result.final_price|add:comparison.result.subtotal|floatformat:2 }}</span>
+                    {% endif %}
+                  </div>
+                  <small class="text-muted">
+                    Base: $
+                    {{ comparison.result.subtotal|floatformat:2 }}
+                  </small>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Strategy Examples -->
+  <div class="row">
+
+    <!-- Standard Pricing -->
+    <div class="col-12 mb-4">
+      <div class="card strategy-standard">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-tag text-secondary me-2"></i>
+            Standard Pricing Examples
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-3">No discounts or markups - straightforward pricing</p>
+
+          {% for item_data in examples.standard %}
+          <div class="mb-4">
+            <h6 class="fw-bold">
+              {{ item_data.item.name }} - $
+              {{ item_data.item.base_price }}
+            </h6>
+            <div class="table-responsive">
+              <table class="table price-table table-sm">
+                <thead>
+                  <tr>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                    <th>Final Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for calc in item_data.calculations %}
+                  <tr>
+                    <td><span class="quantity-badge">
+                        {{ calc.quantity }}</span></td>
+                    <td>$
+                      {{ calc.result.base_price|floatformat:2 }}
+                    </td>
+                    <td>$
+                      {{ calc.result.subtotal|floatformat:2 }}
+                    </td>
+                    <td class="fw-bold">$
+                      {{ calc.result.final_price|floatformat:2 }}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Discount Pricing -->
+    <div class="col-12 mb-4">
+      <div class="card strategy-bulk">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-boxes text-success me-2"></i>
+            Bulk Discount Pricing Examples
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-3">
+            <strong>Discount Tiers:</strong> 10+ units: 5%, 25+ units: 10%, 50+ units: 15%, 100+ units: 20%
+          </p>
+
+          {% for item_data in examples.bulk %}
+          <div class="mb-4">
+            <h6 class="fw-bold">
+              {{ item_data.item.name }} - $
+              {{ item_data.item.base_price }}
+            </h6>
+            <div class="table-responsive">
+              <table class="table price-table table-sm">
+                <thead>
+                  <tr>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                    <th>Savings</th>
+                    <th>Final Price</th>
+                    <th>Discount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for calc in item_data.calculations %}
+                  <tr>
+                    <td><span class="quantity-badge">
+                        {{ calc.quantity }}</span></td>
+                    <td>$
+                      {{ calc.result.base_price|floatformat:2 }}
+                    </td>
+                    <td>$
+                      {{ calc.result.subtotal|floatformat:2 }}
+                    </td>
+                    <td class="text-success">
+                      {% if calc.result.savings > 0 %}
+                      $
+                      {{ calc.result.savings|floatformat:2 }}
+                      {% else %}
+                      -
+                      {% endif %}
+                    </td>
+                    <td class="fw-bold">$
+                      {{ calc.result.final_price|floatformat:2 }}
+                    </td>
+                    <td>
+                      {% if calc.result.savings > 0 %}
+                      {% widthratio calc.result.savings calc.result.subtotal 100 %}%
+                      {% else %}
+                      0%
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium Pricing -->
+    <div class="col-12 mb-4">
+      <div class="card strategy-premium">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-crown text-warning me-2"></i>
+            Premium Pricing Examples
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-3">20% premium markup for high-value items</p>
+
+          {% for item_data in examples.premium %}
+          <div class="mb-4">
+            <h6 class="fw-bold">
+              {{ item_data.item.name }} - $
+              {{ item_data.item.base_price }}
+            </h6>
+            <div class="table-responsive">
+              <table class="table price-table table-sm">
+                <thead>
+                  <tr>
+                    <th>Quantity</th>
+                    <th>Base Total</th>
+                    <th>Premium (20%)</th>
+                    <th>Final Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for calc in item_data.calculations %}
+                  <tr>
+                    <td><span class="quantity-badge">
+                        {{ calc.quantity }}</span></td>
+                    <td>$
+                      {{ calc.result.subtotal|floatformat:2 }}
+                    </td>
+                    <td class="text-warning">
+                      +$
+                      {{ calc.result.final_price|add:calc.result.subtotal|floatformat:2 }}
+                    </td>
+                    <td class="fw-bold">$
+                      {{ calc.result.final_price|floatformat:2 }}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Membership Pricing -->
+    <div class="col-12 mb-4">
+      <div class="card strategy-membership">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-users text-info me-2"></i>
+            Membership Pricing Examples
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-3">Member: 10% discount, VIP: 20% discount</p>
+
+          {% for item_data in examples.membership %}
+          <div class="mb-4">
+            <h6 class="fw-bold">
+              {{ item_data.item.name }} - $
+              {{ item_data.item.base_price }}
+            </h6>
+
+            {% for level_data in item_data.levels %}
+            <div class="mb-3">
+              <h6 class="text-capitalize">
+                <i class="fas fa-user me-1"></i>
+                {{ level_data.level }}
+                {% if level_data.level == 'member' %}
+                <span class="badge bg-info">10% Off</span>
+                {% elif level_data.level == 'vip' %}
+                <span class="badge bg-success">20% Off</span>
+                {% else %}
+                <span class="badge bg-secondary">No Discount</span>
+                {% endif %}
+              </h6>
+              <div class="table-responsive">
+                <table class="table price-table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Quantity</th>
+                      <th>Subtotal</th>
+                      <th>Savings</th>
+                      <th>Final Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for calc in level_data.calculations %}
+                    <tr>
+                      <td><span class="quantity-badge">
+                          {{ calc.quantity }}</span></td>
+                      <td>$
+                        {{ calc.result.subtotal|floatformat:2 }}
+                      </td>
+                      <td class="text-success">
+                        {% if calc.result.savings > 0 %}
+                        $
+                        {{ calc.result.savings|floatformat:2 }}
+                        {% else %}
+                        -
+                        {% endif %}
+                      </td>
+                      <td class="fw-bold">$
+                        {{ calc.result.final_price|floatformat:2 }}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Seasonal and Clearance Pricing -->
+    <div class="col-md-6 mb-4">
+      <div class="card strategy-seasonal">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-snowflake text-primary me-2"></i>
+            Seasonal Pricing (15% Off)
+          </h5>
+        </div>
+        <div class="card-body">
+          {% for item_data in examples.seasonal %}
+          <div class="mb-3">
+            <h6 class="fw-bold">
+              {{ item_data.item.name }}
+            </h6>
+            <div class="table-responsive">
+              <table class="table price-table table-sm">
+                <thead>
+                  <tr>
+                    <th>Qty</th>
+                    <th>Regular</th>
+                    <th>Seasonal</th>
+                    <th>Save</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for calc in item_data.calculations %}
+                  <tr>
+                    <td><span class="quantity-badge">
+                        {{ calc.quantity }}</span></td>
+                    <td>$
+                      {{ calc.result.subtotal|floatformat:2 }}
+                    </td>
+                    <td class="fw-bold">$
+                      {{ calc.result.final_price|floatformat:2 }}
+                    </td>
+                    <td class="text-success">$
+                      {{ calc.result.savings|floatformat:2 }}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card strategy-clearance">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-fire text-danger me-2"></i>
+            Clearance Pricing (40% Off)
+          </h5>
+        </div>
+        <div class="card-body">
+          {% for item_data in examples.clearance %}
+          <div class="mb-3">
+            <h6 class="fw-bold">
+              {{ item_data.item.name }}
+            </h6>
+            <div class="table-responsive">
+              <table class="table price-table table-sm">
+                <thead>
+                  <tr>
+                    <th>Qty</th>
+                    <th>Regular</th>
+                    <th>Clearance</th>
+                    <th>Save</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for calc in item_data.calculations %}
+                  <tr>
+                    <td><span class="quantity-badge">
+                        {{ calc.quantity }}</span></td>
+                    <td>$
+                      {{ calc.result.subtotal|floatformat:2 }}
+                    </td>
+                    <td class="fw-bold">$
+                      {{ calc.result.final_price|floatformat:2 }}
+                    </td>
+                    <td class="text-success">$
+                      {{ calc.result.savings|floatformat:2 }}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Real Inventory Examples -->
+  {% if real_examples %}
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-database text-success me-2"></i>
+            Real Inventory Examples (Bulk Discount Applied)
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-3">Examples using actual items from your inventory</p>
+
+          {% for item_data in real_examples %}
+          <div class="mb-4">
+            <h6 class="fw-bold">
+              {{ item_data.item.name }}
+              <small class="text-muted">(
+                {{ item_data.item.sku }})</small>
+              - $
+              {{ item_data.item.unit_price }}
+            </h6>
+            <div class="table-responsive">
+              <table class="table price-table table-sm">
+                <thead>
+                  <tr>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                    <th>Savings</th>
+                    <th>Final Price</th>
+                    <th>Per Unit Final</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for calc in item_data.calculations %}
+                  <tr>
+                    <td><span class="quantity-badge">
+                        {{ calc.quantity }}</span></td>
+                    <td>$
+                      {{ calc.result.base_price|floatformat:2 }}
+                    </td>
+                    <td>$
+                      {{ calc.result.subtotal|floatformat:2 }}
+                    </td>
+                    <td class="text-success">
+                      {% if calc.result.savings > 0 %}
+                      $
+                      {{ calc.result.savings|floatformat:2 }}
+                      {% else %}
+                      -
+                      {% endif %}
+                    </td>
+                    <td class="fw-bold">$
+                      {{ calc.result.final_price|floatformat:2 }}
+                    </td>
+                    <td class="text-info">
+                      ${% widthratio calc.result.final_price calc.quantity 1 %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

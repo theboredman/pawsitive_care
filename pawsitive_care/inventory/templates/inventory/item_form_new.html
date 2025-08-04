@@ -1,0 +1,540 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+
+{{ title }} - Pawsitive Care{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid var(--section-color);
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section-header {
+    background: linear-gradient(135deg, var(--section-color), rgba(var(--section-color-rgb), 0.8));
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px 8px 0 0;
+    margin: -1px -1px 0 -1px;
+  }
+
+  .form-section-body {
+    padding: 1.5rem;
+  }
+
+  .form-section.basic {
+    --section-color: #007bff;
+    --section-color-rgb: 0, 123, 255;
+  }
+
+  .form-section.pricing {
+    --section-color: #28a745;
+    --section-color-rgb: 40, 167, 69;
+  }
+
+  .form-section.stock {
+    --section-color: #ffc107;
+    --section-color-rgb: 255, 193, 7;
+  }
+
+  .form-section.supplier {
+    --section-color: #17a2b8;
+    --section-color-rgb: 23, 162, 184;
+  }
+
+  .form-section.status {
+    --section-color: #6c757d;
+    --section-color-rgb: 108, 117, 125;
+  }
+
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+
+  .form-floating>label {
+    color: #6c757d;
+  }
+
+  .info-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.375rem;
+    margin-left: 0.5rem;
+  }
+
+  .profit-margin {
+    font-weight: 600;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+
+  .btn-create {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+  }
+
+  .required-field::after {
+    content: ' *';
+    color: #dc3545;
+    font-weight: bold;
+  }
+
+  .field-help {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Enhanced Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h1 class="h3 mb-1">
+                <i class="fas fa-{% if object %}edit{% else %}plus-circle{% endif %} me-2"></i>
+                {{ title }}
+              </h1>
+              <p class="mb-0 opacity-75">
+                {% if object %}
+                Update item information and inventory details
+                {% else %}
+                Add a new item to your inventory system
+                {% endif %}
+              </p>
+            </div>
+            <a href="{% if object %}{% url 'inventory:item_detail' object.pk %}{% else %}{% url 'inventory:item_list' %}{% endif %}" class="btn btn-light">
+              <i class="fas fa-arrow-left"></i> Back
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Form -->
+  <div class="row">
+    <div class="col-12">
+      <form method="post" id="inventoryForm">
+        {% csrf_token %}
+
+        <div class="row">
+          <!-- Left Column -->
+          <div class="col-lg-8">
+
+            <!-- Basic Information Section -->
+            <div class="form-section basic">
+              <div class="form-section-header">
+                <h5 class="mb-0">
+                  <i class="fas fa-info-circle me-2"></i>
+                  Basic Information
+                </h5>
+              </div>
+              <div class="form-section-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      {{ form.name }}
+                      <label for="{{ form.name.id_for_label }}" class="required-field">Item Name</label>
+                    </div>
+                    {% if form.name.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.name.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      {{ form.sku }}
+                      <label for="{{ form.sku.id_for_label }}">SKU (Stock Keeping Unit)</label>
+                    </div>
+                    <div class="field-help">
+                      <i class="fas fa-lightbulb text-warning"></i>
+                      Leave blank to auto-generate based on category
+                    </div>
+                    {% if form.sku.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.sku.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.category.id_for_label }}" class="form-label required-field">Category</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.category.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.unit.id_for_label }}" class="form-label required-field">Unit of Measurement</label>
+                    {{ form.unit }}
+                    {% if form.unit.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.unit.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="form-floating">
+                    {{ form.description }}
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                  </div>
+                  {% if form.description.errors %}
+                  <div class="text-danger small mt-1">
+                    {{ form.description.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Pricing Section -->
+            <div class="form-section pricing">
+              <div class="form-section-header">
+                <h5 class="mb-0">
+                  <i class="fas fa-dollar-sign me-2"></i>
+                  Pricing Information
+                </h5>
+              </div>
+              <div class="form-section-body">
+                <div class="row">
+                  <div class="col-md-12 mb-3">
+                    <label for="{{ form.unit_price.id_for_label }}" class="form-label required-field">Unit Price</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text bg-success text-white">
+                        <i class="fas fa-dollar-sign"></i>
+                      </span>
+                      {{ form.unit_price }}
+                    </div>
+                    <div class="field-help">
+                      <i class="fas fa-calculator text-primary"></i>
+                      Price per unit for selling to customers
+                    </div>
+                    {% if form.unit_price.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.unit_price.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stock Management Section -->
+            <div class="form-section stock">
+              <div class="form-section-header">
+                <h5 class="mb-0" style="color: #000;">
+                  <i class="fas fa-boxes me-2"></i>
+                  Stock Management
+                </h5>
+              </div>
+              <div class="form-section-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <div class="form-floating">
+                      {{ form.quantity_in_stock }}
+                      <label for="{{ form.quantity_in_stock.id_for_label }}" class="required-field">Current Stock</label>
+                    </div>
+                    {% if form.quantity_in_stock.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.quantity_in_stock.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <div class="form-floating">
+                      {{ form.minimum_stock_level }}
+                      <label for="{{ form.minimum_stock_level.id_for_label }}" class="required-field">Minimum Stock Level</label>
+                    </div>
+                    <div class="field-help">
+                      <i class="fas fa-exclamation-triangle text-warning"></i>
+                      Alert when stock falls below this level
+                    </div>
+                    {% if form.minimum_stock_level.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.minimum_stock_level.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <div class="form-floating">
+                      {{ form.reorder_point }}
+                      <label for="{{ form.reorder_point.id_for_label }}" class="required-field">Reorder Point</label>
+                    </div>
+                    <div class="field-help">
+                      <i class="fas fa-shopping-cart text-info"></i>
+                      Trigger automatic reordering
+                    </div>
+                    {% if form.reorder_point.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.reorder_point.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.expiry_date.id_for_label }}" class="form-label">Expiry Date</label>
+                    {{ form.expiry_date }}
+                    <div class="field-help">
+                      <i class="fas fa-calendar-alt text-secondary"></i>
+                      Optional - leave blank if item doesn't expire
+                    </div>
+                    {% if form.expiry_date.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.expiry_date.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column -->
+          <div class="col-lg-4">
+
+            <!-- Supplier Information Section -->
+            <div class="form-section supplier">
+              <div class="form-section-header">
+                <h5 class="mb-0">
+                  <i class="fas fa-truck me-2"></i>
+                  Supplier Information
+                </h5>
+              </div>
+              <div class="form-section-body">
+                <div class="mb-3">
+                  <label for="{{ form.supplier.id_for_label }}" class="form-label">Supplier</label>
+                  {{ form.supplier }}
+                  <div class="field-help">
+                    <i class="fas fa-building text-info"></i>
+                    Select the supplier for this item
+                  </div>
+                  {% if form.supplier.errors %}
+                  <div class="text-danger small mt-1">
+                    {{ form.supplier.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Status Section -->
+            <div class="form-section status">
+              <div class="form-section-header">
+                <h5 class="mb-0">
+                  <i class="fas fa-toggle-on me-2"></i>
+                  Item Status
+                </h5>
+              </div>
+              <div class="form-section-body">
+                <div class="form-check form-switch form-check-lg">
+                  {{ form.is_active }}
+                  <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                    <strong>Active Item</strong>
+                  </label>
+                  <div class="field-help">
+                    <i class="fas fa-eye text-success"></i>
+                    Active items are visible in inventory listings
+                  </div>
+                  {% if form.is_active.errors %}
+                  <div class="text-danger small mt-1">
+                    {{ form.is_active.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Info Panel -->
+            <div class="card bg-light">
+              <div class="card-header">
+                <h6 class="mb-0">
+                  <i class="fas fa-lightbulb text-warning me-2"></i>
+                  Quick Tips
+                </h6>
+              </div>
+              <div class="card-body">
+                <ul class="list-unstyled mb-0 small">
+                  <li class="mb-2">
+                    <i class="fas fa-check text-success me-2"></i>
+                    SKU will auto-generate if left blank
+                  </li>
+                  <li class="mb-2">
+                    <i class="fas fa-check text-success me-2"></i>
+                    Set minimum stock to get low inventory alerts
+                  </li>
+                  <li class="mb-2">
+                    <i class="fas fa-check text-success me-2"></i>
+                    Reorder point helps with automatic purchasing
+                  </li>
+                  <li class="mb-0">
+                    <i class="fas fa-check text-success me-2"></i>
+                    Expiry date helps track perishable items
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <a href="{% if object %}{% url 'inventory:item_detail' object.pk %}{% else %}{% url 'inventory:item_list' %}{% endif %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>Cancel
+                  </a>
+
+                  <button type="submit" class="btn btn-primary btn-create btn-lg">
+                    <i class="fas fa-save me-2"></i>
+                    {% if object %}Update Item{% else %}Create Item{% endif %}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced form validation and UX improvements
+    const form = document.getElementById('inventoryForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    // Add loading state to submit button
+    form.addEventListener('submit', function() {
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+      submitBtn.disabled = true;
+    });
+
+    // Real-time validation feedback
+    const requiredFields = form.querySelectorAll('input[required], select[required]');
+    requiredFields.forEach(field => {
+      field.addEventListener('blur', function() {
+        validateField(this);
+      });
+
+      field.addEventListener('input', function() {
+        if (this.classList.contains('is-invalid')) {
+          validateField(this);
+        }
+      });
+    });
+
+    function validateField(field) {
+      const isValid = field.checkValidity();
+      field.classList.toggle('is-valid', isValid);
+      field.classList.toggle('is-invalid', !isValid);
+    }
+
+    // Stock level warnings
+    const currentStock = document.getElementById('{{ form.quantity_in_stock.id_for_label }}');
+    const minStock = document.getElementById('{{ form.minimum_stock_level.id_for_label }}');
+    const reorderPoint = document.getElementById('{{ form.reorder_point.id_for_label }}');
+
+    function checkStockLevels() {
+      const current = parseInt(currentStock.value) || 0;
+      const minimum = parseInt(minStock.value) || 0;
+      const reorder = parseInt(reorderPoint.value) || 0;
+
+      // Remove existing alerts
+      document.querySelectorAll('.stock-alert').forEach(el => el.remove());
+
+      if (current < minimum) {
+        showStockAlert(currentStock, 'Current stock is below minimum level!', 'danger');
+      } else if (current <= reorder) {
+        showStockAlert(currentStock, 'Stock is at reorder point.', 'warning');
+      }
+    }
+
+    function showStockAlert(field, message, type) {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} alert-sm mt-2 stock-alert`;
+      alert.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${message}`;
+      field.parentNode.appendChild(alert);
+    }
+
+    [currentStock, minStock, reorderPoint].forEach(field => {
+      if (field) {
+        field.addEventListener('input', checkStockLevels);
+      }
+    });
+
+    // Auto-generate SKU preview
+    const categoryField = document.getElementById('{{ form.category.id_for_label }}');
+    const nameField = document.getElementById('{{ form.name.id_for_label }}');
+    const skuField = document.getElementById('{{ form.sku.id_for_label }}');
+
+    function updateSKUPreview() {
+      if (skuField.value === '' && categoryField.value && nameField.value) {
+        const category = categoryField.options[categoryField.selectedIndex].text.toUpperCase().substring(0, 3);
+        const name = nameField.value.replace(/[^a-zA-Z0-9]/g, '').substring(0, 4).toUpperCase();
+        const preview = `${category}-${name}-${new Date().getMonth() + 1}${new Date().getDate()}`;
+
+        // Show preview
+        let previewEl = document.getElementById('sku-preview');
+        if (!previewEl) {
+          previewEl = document.createElement('div');
+          previewEl.id = 'sku-preview';
+          previewEl.className = 'field-help text-primary';
+          skuField.parentNode.appendChild(previewEl);
+        }
+        previewEl.innerHTML = `<i class="fas fa-eye me-1"></i>Preview: ${preview}`;
+      }
+    }
+
+    if (categoryField && nameField && skuField) {
+      categoryField.addEventListener('change', updateSKUPreview);
+      nameField.addEventListener('input', updateSKUPreview);
+    }
+
+    // Initialize stock level check
+    checkStockLevels();
+  });
+</script>
+{% endblock %}

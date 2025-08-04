@@ -1,0 +1,532 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pricing Management Dashboard - Pawsitive Care{% endblock %}
+
+{% block extra_css %}
+<style>
+  .pricing-dashboard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .strategy-overview-card {
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    background: white;
+    height: 100%;
+  }
+
+  .strategy-overview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .pricing-metric {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .revenue-impact {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border-radius: 10px;
+    padding: 1rem;
+  }
+
+  .pricing-heatmap {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .heatmap-cell {
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    color: white;
+    margin: 2px;
+    border-radius: 4px;
+  }
+
+  .strategy-performance-chart {
+    height: 300px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="pricing-dashboard text-center">
+    <h1 class="display-4 mb-3">
+      <i class="fas fa-chart-line me-3"></i>
+      Pricing Management Dashboard
+    </h1>
+    <p class="lead mb-4">
+      Comprehensive pricing strategy management and analytics powered by the Strategy Design Pattern
+    </p>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="pricing-metric">
+          <h3 class="text-primary">
+            {{ total_items }}
+          </h3>
+          <small>Total Items</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="pricing-metric">
+          <h3 class="text-success">$
+            {{ total_revenue|floatformat:0 }}
+          </h3>
+          <small>Monthly Revenue</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="pricing-metric">
+          <h3 class="text-info">
+            {{ active_strategies }}
+          </h3>
+          <small>Active Strategies</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="pricing-metric">
+          <h3 class="text-warning">$
+            {{ savings_generated|floatformat:0 }}
+          </h3>
+          <small>Savings Generated</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Strategy Overview -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="h4 mb-3">
+        <i class="fas fa-chess-board text-primary me-2"></i>
+        Pricing Strategy Overview
+      </h2>
+    </div>
+
+    <!-- Standard Pricing -->
+    <div class="col-md-4 mb-3">
+      <div class="strategy-overview-card">
+        <div class="card-header bg-primary text-white">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-tag me-2"></i>Standard Pricing
+          </h6>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Base pricing strategy for all items without discounts.</p>
+          <div class="row">
+            <div class="col-6">
+              <strong>Items Using:</strong><br>
+              <span class="h5 text-primary">
+                {{ strategy_stats.standard.count }}</span>
+            </div>
+            <div class="col-6">
+              <strong>Avg Revenue:</strong><br>
+              <span class="h6 text-success">$
+                {{ strategy_stats.standard.revenue|floatformat:0 }}</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="progress">
+              <div class="progress-bar bg-primary" style="width: {{ strategy_stats.standard.percentage }}%"></div>
+            </div>
+            <small class="text-muted">
+              {{ strategy_stats.standard.percentage }}% of inventory</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Pricing -->
+    <div class="col-md-4 mb-3">
+      <div class="strategy-overview-card">
+        <div class="card-header bg-success text-white">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-boxes me-2"></i>Bulk Discount
+          </h6>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Volume-based discounts for large quantity purchases.</p>
+          <div class="row">
+            <div class="col-6">
+              <strong>Avg Discount:</strong><br>
+              <span class="h5 text-success">
+                {{ strategy_stats.bulk.avg_discount }}%</span>
+            </div>
+            <div class="col-6">
+              <strong>Orders Saved:</strong><br>
+              <span class="h6 text-success">$
+                {{ strategy_stats.bulk.savings|floatformat:0 }}</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="revenue-impact">
+              <small>Revenue Impact:
+                {{ strategy_stats.bulk.impact }}%</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium Pricing -->
+    <div class="col-md-4 mb-3">
+      <div class="strategy-overview-card">
+        <div class="card-header bg-warning text-dark">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-crown me-2"></i>Premium/VIP
+          </h6>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Exclusive pricing for premium customers and members.</p>
+          <div class="row">
+            <div class="col-6">
+              <strong>VIP Customers:</strong><br>
+              <span class="h5 text-warning">
+                {{ strategy_stats.premium.customers }}</span>
+            </div>
+            <div class="col-6">
+              <strong>Loyalty Value:</strong><br>
+              <span class="h6 text-success">$
+                {{ strategy_stats.premium.value|floatformat:0 }}</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="progress">
+              <div class="progress-bar bg-warning" style="width: {{ strategy_stats.premium.satisfaction }}%"></div>
+            </div>
+            <small class="text-muted">
+              {{ strategy_stats.premium.satisfaction }}% satisfaction rate</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing Heatmap -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-fire text-danger me-2"></i>
+            Pricing Strategy Performance Heatmap
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="pricing-heatmap">
+            <div class="row g-2">
+              <div class="col-12">
+                <div class="row g-1">
+                  <div class="col-2"><strong>Strategy</strong></div>
+                  <div class="col-2"><strong>1-10 Units</strong></div>
+                  <div class="col-2"><strong>11-25 Units</strong></div>
+                  <div class="col-2"><strong>26-50 Units</strong></div>
+                  <div class="col-2"><strong>51+ Units</strong></div>
+                  <div class="col-2"><strong>Avg Savings</strong></div>
+                </div>
+              </div>
+
+              <!-- Standard Pricing Row -->
+              <div class="col-12">
+                <div class="row g-1">
+                  <div class="col-2"><strong>Standard</strong></div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6c757d;">0%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6c757d;">0%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6c757d;">0%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6c757d;">0%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6c757d;">0%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bulk Discount Row -->
+              <div class="col-12">
+                <div class="row g-1">
+                  <div class="col-2"><strong>Bulk</strong></div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #28a745;">5%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #20c997;">10%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #17a2b8;">15%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #007bff;">15%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #17a2b8;">11.25%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Premium Row -->
+              <div class="col-12">
+                <div class="row g-1">
+                  <div class="col-2"><strong>Premium</strong></div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #ffc107; color: #000;">15%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #ffc107; color: #000;">15%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #ffc107; color: #000;">15%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #ffc107; color: #000;">15%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #ffc107; color: #000;">15%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Membership Row -->
+              <div class="col-12">
+                <div class="row g-1">
+                  <div class="col-2"><strong>Membership</strong></div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #17a2b8;">12%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #17a2b8;">12%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #17a2b8;">12%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #17a2b8;">12%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #17a2b8;">12%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Seasonal Row -->
+              <div class="col-12">
+                <div class="row g-1">
+                  <div class="col-2"><strong>Seasonal</strong></div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6f42c1;">10%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6f42c1;">10%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6f42c1;">10%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6f42c1;">10%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #6f42c1;">10%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Clearance Row -->
+              <div class="col-12">
+                <div class="row g-1">
+                  <div class="col-2"><strong>Clearance</strong></div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #dc3545;">30%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #dc3545;">30%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #dc3545;">30%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #dc3545;">30%</div>
+                  </div>
+                  <div class="col-2">
+                    <div class="heatmap-cell" style="background-color: #dc3545;">30%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strategy Controls -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-cogs text-primary me-2"></i>
+            Strategy Controls
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary" onclick="bulkApplyStrategy('bulk')">
+              <i class="fas fa-boxes me-2"></i>Apply Bulk Pricing
+            </button>
+            <button class="btn btn-warning" onclick="bulkApplyStrategy('seasonal')">
+              <i class="fas fa-sun me-2"></i>Apply Seasonal Discounts
+            </button>
+            <button class="btn btn-danger" onclick="bulkApplyStrategy('clearance')">
+              <i class="fas fa-percentage me-2"></i>Mark as Clearance
+            </button>
+            <hr>
+            <a href="{% url 'inventory:pricing_examples' %}" class="btn btn-info">
+              <i class="fas fa-calculator me-2"></i>Pricing Examples
+            </a>
+            <a href="{% url 'inventory:dashboard' %}" class="btn btn-outline-secondary">
+              <i class="fas fa-tachometer-alt me-2"></i>Inventory Dashboard
+            </a>
+          </div>
+
+          <div class="mt-4">
+            <h6>Quick Stats</h6>
+            <div class="row">
+              <div class="col-6">
+                <small class="text-muted">Most Used Strategy</small>
+                <div class="h6 text-primary">Standard</div>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Best Performing</small>
+                <div class="h6 text-success">Bulk</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Pricing Activities -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-history text-info me-2"></i>
+            Recent Pricing Activities
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Item</th>
+                  <th>Strategy Applied</th>
+                  <th>Original Price</th>
+                  <th>Final Price</th>
+                  <th>Savings</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    {{ current_time|date:"M d, H:i" }}
+                  </td>
+                  <td>Dog Food Premium</td>
+                  <td><span class="badge bg-success">Bulk Discount</span></td>
+                  <td>$45.00</td>
+                  <td>$40.50</td>
+                  <td class="text-success">$4.50</td>
+                  <td>
+                    {{ user.username }}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    {{ current_time|date:"M d, H:i" }}
+                  </td>
+                  <td>Cat Vitamins</td>
+                  <td><span class="badge bg-warning">Premium VIP</span></td>
+                  <td>$25.99</td>
+                  <td>$22.09</td>
+                  <td class="text-success">$3.90</td>
+                  <td>
+                    {{ user.username }}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    {{ current_time|date:"M d, H:i" }}
+                  </td>
+                  <td>Pet Shampoo</td>
+                  <td><span class="badge bg-info">Membership</span></td>
+                  <td>$18.50</td>
+                  <td>$16.28</td>
+                  <td class="text-success">$2.22</td>
+                  <td>
+                    {{ user.username }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function bulkApplyStrategy(strategy) {
+    const strategyNames = {
+      'bulk': 'Bulk Discount Pricing',
+      'seasonal': 'Seasonal Pricing',
+      'clearance': 'Clearance Pricing'
+    };
+
+    if (confirm(`Are you sure you want to apply ${strategyNames[strategy]} to selected items?`)) {
+      // In a real application, this would make an AJAX call to apply the strategy
+      alert(`${strategyNames[strategy]} has been applied successfully!`);
+    }
+  }
+
+  // Sample chart initialization (you could integrate Chart.js here)
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Pricing Management Dashboard loaded');
+
+    // Add any interactive features here
+    const heatmapCells = document.querySelectorAll('.heatmap-cell');
+    heatmapCells.forEach(cell => {
+      cell.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.05)';
+        this.style.transition = 'transform 0.2s ease';
+      });
+
+      cell.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+      });
+    });
+  });
+</script>
+{% endblock %}

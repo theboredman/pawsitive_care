@@ -5,71 +5,15 @@ from django.utils import timezone
 from django.urls import reverse
 from decimal import Decimal
 import uuid
-from abc import ABC, abstractmethod
 
-# Observer Pattern for Inventory Notifications
-class InventoryObserver(ABC):
-    """Abstract base class for inventory observers"""
-    @abstractmethod
-    def update(self, item, action, **kwargs):
-        pass
-
-class LowStockNotifier(InventoryObserver):
-    """Concrete observer for low stock notifications"""
-    def update(self, item, action, **kwargs):
-        if action == 'stock_low' and item.quantity <= item.low_stock_threshold:
-            # In real implementation, send notification to staff/admin
-            print(f"LOW STOCK ALERT: {item.name} has only {item.quantity} units left!")
-
-class ExpiryNotifier(InventoryObserver):
-    """Concrete observer for expiry notifications"""
-    def update(self, item, action, **kwargs):
-        if action == 'expiry_check' and item.is_expiring_soon():
-            print(f"EXPIRY ALERT: {item.name} expires on {item.expiry_date}")
-
-# Strategy Pattern for Pricing
-class PricingStrategy(ABC):
-    """Abstract base class for pricing strategies"""
-    @abstractmethod
-    def calculate_price(self, base_price, quantity):
-        pass
-
-class StandardPricing(PricingStrategy):
-    """Standard pricing - no discount"""
-    def calculate_price(self, base_price, quantity):
-        return base_price * quantity
-
-class BulkPricing(PricingStrategy):
-    """Bulk pricing - discount for large quantities"""
-    def calculate_price(self, base_price, quantity):
-        if quantity >= 50:
-            return base_price * quantity * Decimal('0.9')  # 10% discount
-        elif quantity >= 20:
-            return base_price * quantity * Decimal('0.95')  # 5% discount
-        return base_price * quantity
-
-class VIPPricing(PricingStrategy):
-    """VIP pricing - always 15% discount"""
-    def calculate_price(self, base_price, quantity):
-        return base_price * quantity * Decimal('0.85')
-
-# Factory Pattern for Creating Inventory Items
-class InventoryItemFactory:
-    """Factory for creating different types of inventory items"""
-    
-    @staticmethod
-    def create_item(item_type, **kwargs):
-        """Create inventory item based on type"""
-        if item_type == 'MEDICINE':
-            return MedicineItem.objects.create(**kwargs)
-        elif item_type == 'SUPPLY':
-            return SupplyItem.objects.create(**kwargs)
-        elif item_type == 'EQUIPMENT':
-            return EquipmentItem.objects.create(**kwargs)
-        elif item_type == 'FOOD':
-            return FoodItem.objects.create(**kwargs)
-        else:
-            return InventoryItem.objects.create(category=item_type, **kwargs)
+# Import design patterns from patterns package
+from .patterns import (
+    InventoryNotificationCenter,
+    InventoryItemFactory,
+    PricingStrategy,
+    StandardPricing,
+    BulkDiscountPricing
+)
 
 # Repository Pattern for Inventory Queries
 class InventoryQuerySet(models.QuerySet):
@@ -77,11 +21,11 @@ class InventoryQuerySet(models.QuerySet):
     
     def low_stock(self):
         """Items with low stock"""
-        return self.filter(quantity__lte=models.F('low_stock_threshold'))
+        return self.filter(quantity_in_stock__lte=models.F('minimum_stock_level'))
     
     def out_of_stock(self):
         """Items that are out of stock"""
-        return self.filter(quantity=0)
+        return self.filter(quantity_in_stock=0)
     
     def expiring_soon(self, days=30):
         """Items expiring within specified days"""
@@ -149,15 +93,14 @@ class InventoryItem(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     
     # Pricing and Stock
-    cost_price = models.DecimalField(max_digits=10, decimal_places=2)
-    selling_price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=0)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity_in_stock = models.PositiveIntegerField(default=0)
     unit = models.CharField(max_length=20, choices=UNIT_CHOICES, default='PIECES')
-    low_stock_threshold = models.PositiveIntegerField(default=10)
+    minimum_stock_level = models.PositiveIntegerField(default=10)
+    reorder_point = models.PositiveIntegerField(default=20)
     
     # Supplier Information
-    supplier_name = models.CharField(max_length=200, blank=True)
-    supplier_contact = models.CharField(max_length=100, blank=True)
+    supplier = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True)
     
     # Dates
     expiry_date = models.DateField(null=True, blank=True)
@@ -168,16 +111,15 @@ class InventoryItem(models.Model):
     # Status
     is_active = models.BooleanField(default=True)
     
-    # Manager and Observers
+    # Manager
     objects = InventoryManager()
-    _observers = []
     
     class Meta:
         ordering = ['name']
         indexes = [
             models.Index(fields=['sku']),
             models.Index(fields=['category']),
-            models.Index(fields=['quantity']),
+            models.Index(fields=['quantity_in_stock']),
         ]
     
     def __str__(self):
@@ -186,30 +128,13 @@ class InventoryItem(models.Model):
     def get_absolute_url(self):
         return reverse('inventory:item_detail', kwargs={'pk': self.pk})
     
-    @classmethod
-    def add_observer(cls, observer):
-        """Add observer to the list"""
-        if observer not in cls._observers:
-            cls._observers.append(observer)
-    
-    @classmethod
-    def remove_observer(cls, observer):
-        """Remove observer from the list"""
-        if observer in cls._observers:
-            cls._observers.remove(observer)
-    
-    def notify_observers(self, action, **kwargs):
-        """Notify all observers"""
-        for observer in self._observers:
-            observer.update(self, action, **kwargs)
-    
     def is_low_stock(self):
         """Check if item is low on stock"""
-        return self.quantity <= self.low_stock_threshold
+        return self.quantity_in_stock <= self.minimum_stock_level
     
     def is_out_of_stock(self):
         """Check if item is out of stock"""
-        return self.quantity == 0
+        return self.quantity_in_stock == 0
     
     def is_expiring_soon(self, days=30):
         """Check if item is expiring soon"""
@@ -220,12 +145,17 @@ class InventoryItem(models.Model):
     
     def calculate_total_value(self):
         """Calculate total inventory value"""
-        return self.cost_price * self.quantity
+        return self.unit_price * self.quantity_in_stock
     
-    def update_stock(self, quantity_change, reason="Manual adjustment"):
+    @property
+    def selling_price(self):
+        """Alias for unit_price to maintain compatibility with templates"""
+        return self.unit_price
+    
+    def update_stock(self, quantity_change, reason="Manual adjustment", user="System"):
         """Update stock quantity with logging"""
-        old_quantity = self.quantity
-        self.quantity = max(0, self.quantity + quantity_change)
+        old_quantity = self.quantity_in_stock
+        self.quantity_in_stock = max(0, self.quantity_in_stock + quantity_change)
         self.save()
         
         # Create stock movement record
@@ -235,14 +165,20 @@ class InventoryItem(models.Model):
             quantity=abs(quantity_change),
             reason=reason,
             old_quantity=old_quantity,
-            new_quantity=self.quantity
+            new_quantity=self.quantity_in_stock
         )
         
-        # Notify observers
-        if self.is_low_stock():
-            self.notify_observers('stock_low')
-        if self.is_expiring_soon():
-            self.notify_observers('expiry_check')
+        # Notify observers through notification center
+        notification_center = InventoryNotificationCenter()
+        notification_center.notify_stock_change(
+            item_name=self.name,
+            old_quantity=old_quantity,
+            new_quantity=self.quantity_in_stock,
+            expiry_date=self.expiry_date,
+            user=user,
+            reason=reason,
+            timestamp=timezone.now()
+        )
     
     def save(self, *args, **kwargs):
         # Generate SKU if not provided
@@ -392,7 +328,3 @@ class PurchaseOrderItem(models.Model):
     
     def __str__(self):
         return f"{self.item.name} x {self.quantity_ordered}"
-
-# Initialize observers
-InventoryItem.add_observer(LowStockNotifier())
-InventoryItem.add_observer(ExpiryNotifier())

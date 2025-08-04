@@ -1,0 +1,199 @@
+<!-- Pricing Calculator Widget -->
+<div class="pricing-calculator-widget" data-item-id="{{ item.id }}" data-base-price="{{ item.selling_price }}">
+  <div class="card border-info">
+    <div class="card-header bg-info text-white">
+      <h6 class="card-title mb-0">
+        <i class="fas fa-calculator me-2"></i>
+        Quick Pricing Calculator
+      </h6>
+    </div>
+    <div class="card-body">
+      <!-- Quantity Input -->
+      <div class="mb-3">
+        <label for="calc-quantity-{{ item.id }}" class="form-label">Quantity</label>
+        <input type="number" class="form-control calc-quantity" id="calc-quantity-{{ item.id }}" value="1" min="1" placeholder="Enter quantity">
+      </div>
+
+      <!-- Strategy Selection -->
+      <div class="mb-3">
+        <label for="calc-strategy-{{ item.id }}" class="form-label">Pricing Strategy</label>
+        <select class="form-select calc-strategy" id="calc-strategy-{{ item.id }}">
+          <option value="standard">Standard Pricing</option>
+          <option value="bulk">Bulk Discount (5-15% off)</option>
+          <option value="premium">Premium/VIP (15% off)</option>
+          <option value="membership">Membership (12% off)</option>
+          <option value="seasonal">Seasonal (10% off)</option>
+          {% if item.expiry_date %}
+          <option value="clearance">Clearance (30% off)</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <!-- Calculated Results -->
+      <div class="pricing-results">
+        <div class="row">
+          <div class="col-6">
+            <div class="text-center p-2 bg-light rounded">
+              <small class="text-muted">Total Price</small>
+              <div class="h5 mb-0 text-primary calc-total">
+                $
+                {{ item.selling_price }}
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="text-center p-2 bg-light rounded">
+              <small class="text-muted">Price per Unit</small>
+              <div class="h6 mb-0 text-secondary calc-per-unit">
+                $
+                {{ item.selling_price }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <div class="text-center p-2 bg-success text-white rounded calc-savings" style="display: none;">
+            <small>You Save</small>
+            <div class="h6 mb-0 calc-savings-amount">$0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy Info -->
+      <div class="mt-3">
+        <div class="calc-strategy-info">
+          <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Standard pricing applies to all quantities.
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Pricing strategy definitions
+    const pricingStrategies = {
+      standard: {
+        name: 'Standard Pricing',
+        description: 'Standard pricing applies to all quantities.',
+        calculate: (basePrice, quantity) => basePrice * quantity,
+        getDiscount: () => 0
+      },
+      bulk: {
+        name: 'Bulk Discount',
+        description: 'Volume discounts: 5% (10+ units), 10% (25+ units), 15% (50+ units).',
+        calculate: (basePrice, quantity) => {
+          let discount = 0;
+          if (quantity >= 50) discount = 0.15;
+          else if (quantity >= 25) discount = 0.10;
+          else if (quantity >= 10) discount = 0.05;
+          return basePrice * quantity * (1 - discount);
+        },
+        getDiscount: (quantity) => {
+          if (quantity >= 50) return 0.15;
+          if (quantity >= 25) return 0.10;
+          if (quantity >= 10) return 0.05;
+          return 0;
+        }
+      },
+      premium: {
+        name: 'Premium/VIP',
+        description: 'Exclusive 15% discount for premium customers.',
+        calculate: (basePrice, quantity) => basePrice * quantity * 0.85,
+        getDiscount: () => 0.15
+      },
+      membership: {
+        name: 'Membership',
+        description: 'Special 12% discount for members.',
+        calculate: (basePrice, quantity) => basePrice * quantity * 0.88,
+        getDiscount: () => 0.12
+      },
+      seasonal: {
+        name: 'Seasonal',
+        description: 'Current seasonal discount of 10%.',
+        calculate: (basePrice, quantity) => basePrice * quantity * 0.90,
+        getDiscount: () => 0.10
+      },
+      clearance: {
+        name: 'Clearance',
+        description: 'Clearance pricing with 30% discount.',
+        calculate: (basePrice, quantity) => basePrice * quantity * 0.70,
+        getDiscount: () => 0.30
+      }
+    };
+
+    // Initialize calculator for each widget
+    document.querySelectorAll('.pricing-calculator-widget').forEach(widget => {
+      const itemId = widget.dataset.itemId;
+      const basePrice = parseFloat(widget.dataset.basePrice);
+
+      const quantityInput = widget.querySelector('.calc-quantity');
+      const strategySelect = widget.querySelector('.calc-strategy');
+      const totalElement = widget.querySelector('.calc-total');
+      const perUnitElement = widget.querySelector('.calc-per-unit');
+      const savingsElement = widget.querySelector('.calc-savings');
+      const savingsAmountElement = widget.querySelector('.calc-savings-amount');
+      const strategyInfoElement = widget.querySelector('.calc-strategy-info');
+
+      function updateCalculation() {
+        const quantity = parseInt(quantityInput.value) || 1;
+        const strategy = strategySelect.value;
+        const strategyConfig = pricingStrategies[strategy];
+
+        // Calculate prices
+        const totalPrice = strategyConfig.calculate(basePrice, quantity);
+        const perUnitPrice = totalPrice / quantity;
+        const standardTotal = basePrice * quantity;
+        const savings = standardTotal - totalPrice;
+        const discount = strategyConfig.getDiscount(quantity);
+
+        // Update display
+        totalElement.textContent = '$' + totalPrice.toFixed(2);
+        perUnitElement.textContent = '$' + perUnitPrice.toFixed(2);
+        strategyInfoElement.innerHTML = `
+        <i class="fas fa-info-circle me-1"></i>
+        ${strategyConfig.description}
+      `;
+
+        // Show/hide savings
+        if (savings > 0) {
+          savingsElement.style.display = 'block';
+          savingsAmountElement.textContent = '$' + savings.toFixed(2);
+        } else {
+          savingsElement.style.display = 'none';
+        }
+      }
+
+      // Event listeners
+      quantityInput.addEventListener('input', updateCalculation);
+      strategySelect.addEventListener('change', updateCalculation);
+
+      // Initial calculation
+      updateCalculation();
+    });
+  });
+</script>
+
+<style>
+  .pricing-calculator-widget {
+    max-width: 350px;
+  }
+
+  .calc-total {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .pricing-results .bg-light {
+    border: 1px solid #dee2e6;
+  }
+
+  .calc-strategy-info {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+</style>

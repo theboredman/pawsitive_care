@@ -19,6 +19,9 @@
           <a href="{% url 'inventory:item_create' %}" class="btn btn-primary me-2">
             <i class="fas fa-plus"></i> Add Item
           </a>
+          <a href="{% url 'inventory:pricing_examples' %}" class="btn btn-info me-2">
+            <i class="fas fa-calculator"></i> Pricing Examples
+          </a>
           <a href="{% url 'inventory:export_csv' %}" class="btn btn-outline-secondary">
             <i class="fas fa-download"></i> Export CSV
           </a>
@@ -95,7 +98,8 @@
                   <th>Category</th>
                   <th>Quantity</th>
                   <th>Unit</th>
-                  <th>Price</th>
+                  <th>Standard Price</th>
+                  <th>Bulk Price</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -134,8 +138,19 @@
                   <td>
                     {{ item.get_unit_display }}
                   </td>
-                  <td>$
-                    {{ item.selling_price }}
+                  <td>
+                    <strong>$
+                      {{ item.selling_price }}</strong>
+                    <br>
+                    <small class="text-muted">per
+                      {{ item.get_unit_display|lower }}</small>
+                  </td>
+                  <td>
+                    <span class="text-success">
+                      ${% widthratio item.selling_price 1 0.9 %}
+                    </span>
+                    <br>
+                    <small class="text-success">10% off (10+ units)</small>
                   </td>
                   <td>
                     {% if item.is_expiring_soon %}

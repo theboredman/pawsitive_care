@@ -12,12 +12,12 @@ class InventoryItemAdmin(admin.ModelAdmin):
     """Admin interface for inventory items"""
     list_display = [
         'sku', 'name', 'category', 'quantity_display', 'unit', 
-        'cost_price', 'selling_price', 'stock_status', 'expiry_status', 'is_active'
+        'unit_price', 'stock_status', 'expiry_status', 'is_active'
     ]
     list_filter = [
         'category', 'unit', 'is_active', 'created_at', 'expiry_date'
     ]
-    search_fields = ['name', 'sku', 'description', 'supplier_name']
+    search_fields = ['name', 'sku', 'description', 'supplier__name']
     readonly_fields = ['created_at', 'updated_at', 'calculate_total_value']
     date_hierarchy = 'created_at'
     list_per_page = 25
@@ -28,13 +28,13 @@ class InventoryItemAdmin(admin.ModelAdmin):
         }),
         ('Pricing & Stock', {
             'fields': (
-                ('cost_price', 'selling_price'), 
-                ('quantity', 'unit', 'low_stock_threshold'),
+                'unit_price', 
+                ('quantity_in_stock', 'unit', 'minimum_stock_level'),
                 'calculate_total_value'
             )
         }),
         ('Supplier Info', {
-            'fields': ('supplier_name', 'supplier_contact'),
+            'fields': ('supplier',),
             'classes': ('collapse',)
         }),
         ('Dates', {
@@ -48,18 +48,18 @@ class InventoryItemAdmin(admin.ModelAdmin):
         if obj.is_out_of_stock():
             return format_html(
                 '<span style="color: red; font-weight: bold;">{} {}</span>',
-                obj.quantity, obj.get_unit_display()
+                obj.quantity_in_stock, obj.get_unit_display()
             )
         elif obj.is_low_stock():
             return format_html(
                 '<span style="color: orange; font-weight: bold;">{} {} ⚠️</span>',
-                obj.quantity, obj.get_unit_display()
+                obj.quantity_in_stock, obj.get_unit_display()
             )
         else:
-            return f"{obj.quantity} {obj.get_unit_display()}"
+            return f"{obj.quantity_in_stock} {obj.get_unit_display()}"
     
     quantity_display.short_description = 'Quantity'
-    quantity_display.admin_order_field = 'quantity'
+    quantity_display.admin_order_field = 'quantity_in_stock'
     
     def stock_status(self, obj):
         """Display stock status with color coding"""

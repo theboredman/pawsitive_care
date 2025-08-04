@@ -200,52 +200,153 @@
         </div>
         <div class="card-body">
           <p class="text-muted small mb-3">
-            Demonstrating different pricing strategies (Design Pattern: Strategy)
+            Real-time pricing examples using Strategy Design Pattern
           </p>
 
+          <!-- Standard Pricing -->
           <div class="mb-3">
-            <h6>Standard Pricing</h6>
-            <ul class="list-unstyled mb-0">
-              <li>10 units: $
-                {{ pricing_examples.standard.qty_10|floatformat:2 }}
-              </li>
-              <li>25 units: $
-                {{ pricing_examples.standard.qty_25|floatformat:2 }}
-              </li>
-              <li>50 units: $
-                {{ pricing_examples.standard.qty_50|floatformat:2 }}
-              </li>
-            </ul>
+            <h6 class="text-primary">
+              <i class="fas fa-tag me-1"></i>Standard Pricing
+            </h6>
+            <div class="row">
+              <div class="col-6">
+                <small>1 unit: $
+                  {{ pricing_examples.standard.qty_1|floatformat:2 }}</small><br>
+                <small>5 units: $
+                  {{ pricing_examples.standard.qty_5|floatformat:2 }}</small><br>
+                <small>10 units: $
+                  {{ pricing_examples.standard.qty_10|floatformat:2 }}</small>
+              </div>
+              <div class="col-6">
+                <small>25 units: $
+                  {{ pricing_examples.standard.qty_25|floatformat:2 }}</small><br>
+                <small>50 units: $
+                  {{ pricing_examples.standard.qty_50|floatformat:2 }}</small>
+              </div>
+            </div>
           </div>
 
+          <!-- Bulk Pricing -->
           <div class="mb-3">
-            <h6>Bulk Pricing <small class="text-success">(5-10% discount)</small></h6>
-            <ul class="list-unstyled mb-0">
-              <li>10 units: $
-                {{ pricing_examples.bulk.qty_10|floatformat:2 }}
-              </li>
-              <li>25 units: $
-                {{ pricing_examples.bulk.qty_25|floatformat:2 }}
-              </li>
-              <li>50 units: $
-                {{ pricing_examples.bulk.qty_50|floatformat:2 }}
-              </li>
-            </ul>
+            <h6 class="text-success">
+              <i class="fas fa-boxes me-1"></i>Bulk Pricing <small class="text-success">(5-15% off)</small>
+            </h6>
+            <div class="row">
+              <div class="col-6">
+                <small>1 unit: $
+                  {{ pricing_examples.bulk.qty_1|floatformat:2 }}</small><br>
+                <small>5 units: $
+                  {{ pricing_examples.bulk.qty_5|floatformat:2 }}</small><br>
+                <small>10 units: <span class="text-success">$
+                    {{ pricing_examples.bulk.qty_10|floatformat:2 }}</span></small>
+              </div>
+              <div class="col-6">
+                <small>25 units: <span class="text-success">$
+                    {{ pricing_examples.bulk.qty_25|floatformat:2 }}</span></small><br>
+                <small>50 units: <span class="text-success">$
+                    {{ pricing_examples.bulk.qty_50|floatformat:2 }}</span></small>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <h6>VIP Pricing <small class="text-primary">(15% discount)</small></h6>
-            <ul class="list-unstyled mb-0">
-              <li>10 units: $
-                {{ pricing_examples.vip.qty_10|floatformat:2 }}
-              </li>
-              <li>25 units: $
-                {{ pricing_examples.vip.qty_25|floatformat:2 }}
-              </li>
-              <li>50 units: $
-                {{ pricing_examples.vip.qty_50|floatformat:2 }}
-              </li>
-            </ul>
+          <!-- Premium/VIP Pricing -->
+          <div class="mb-3">
+            <h6 class="text-warning">
+              <i class="fas fa-crown me-1"></i>Premium Pricing <small class="text-warning">(15% off)</small>
+            </h6>
+            <div class="row">
+              <div class="col-6">
+                <small>1 unit: <span class="text-warning">$
+                    {{ pricing_examples.premium.qty_1|floatformat:2 }}</span></small><br>
+                <small>5 units: <span class="text-warning">$
+                    {{ pricing_examples.premium.qty_5|floatformat:2 }}</span></small><br>
+                <small>10 units: <span class="text-warning">$
+                    {{ pricing_examples.premium.qty_10|floatformat:2 }}</span></small>
+              </div>
+              <div class="col-6">
+                <small>25 units: <span class="text-warning">$
+                    {{ pricing_examples.premium.qty_25|floatformat:2 }}</span></small><br>
+                <small>50 units: <span class="text-warning">$
+                    {{ pricing_examples.premium.qty_50|floatformat:2 }}</span></small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Membership Pricing -->
+          <div class="mb-3">
+            <h6 class="text-info">
+              <i class="fas fa-id-card me-1"></i>Membership Pricing <small class="text-info">(12% off)</small>
+            </h6>
+            <div class="row">
+              <div class="col-6">
+                <small>1 unit: <span class="text-info">$
+                    {{ pricing_examples.membership.qty_1|floatformat:2 }}</span></small><br>
+                <small>5 units: <span class="text-info">$
+                    {{ pricing_examples.membership.qty_5|floatformat:2 }}</span></small><br>
+                <small>10 units: <span class="text-info">$
+                    {{ pricing_examples.membership.qty_10|floatformat:2 }}</span></small>
+              </div>
+              <div class="col-6">
+                <small>25 units: <span class="text-info">$
+                    {{ pricing_examples.membership.qty_25|floatformat:2 }}</span></small><br>
+                <small>50 units: <span class="text-info">$
+                    {{ pricing_examples.membership.qty_50|floatformat:2 }}</span></small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seasonal Pricing -->
+          <div class="mb-3">
+            <h6 class="text-secondary">
+              <i class="fas fa-sun me-1"></i>Seasonal Pricing <small class="text-secondary">(10% summer discount)</small>
+            </h6>
+            <div class="row">
+              <div class="col-6">
+                <small>1 unit: <span class="text-secondary">$
+                    {{ pricing_examples.seasonal.qty_1|floatformat:2 }}</span></small><br>
+                <small>5 units: <span class="text-secondary">$
+                    {{ pricing_examples.seasonal.qty_5|floatformat:2 }}</span></small><br>
+                <small>10 units: <span class="text-secondary">$
+                    {{ pricing_examples.seasonal.qty_10|floatformat:2 }}</span></small>
+              </div>
+              <div class="col-6">
+                <small>25 units: <span class="text-secondary">$
+                    {{ pricing_examples.seasonal.qty_25|floatformat:2 }}</span></small><br>
+                <small>50 units: <span class="text-secondary">$
+                    {{ pricing_examples.seasonal.qty_50|floatformat:2 }}</span></small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clearance Pricing (if item has expiry date) -->
+          {% if item.expiry_date and pricing_examples.clearance %}
+          <div class="mb-3">
+            <h6 class="text-danger">
+              <i class="fas fa-percentage me-1"></i>Clearance Pricing <small class="text-danger">(30% off)</small>
+            </h6>
+            <div class="row">
+              <div class="col-6">
+                <small>1 unit: <span class="text-danger">$
+                    {{ pricing_examples.clearance.qty_1|floatformat:2 }}</span></small><br>
+                <small>5 units: <span class="text-danger">$
+                    {{ pricing_examples.clearance.qty_5|floatformat:2 }}</span></small><br>
+                <small>10 units: <span class="text-danger">$
+                    {{ pricing_examples.clearance.qty_10|floatformat:2 }}</span></small>
+              </div>
+              <div class="col-6">
+                <small>25 units: <span class="text-danger">$
+                    {{ pricing_examples.clearance.qty_25|floatformat:2 }}</span></small><br>
+                <small>50 units: <span class="text-danger">$
+                    {{ pricing_examples.clearance.qty_50|floatformat:2 }}</span></small>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="mt-3 pt-3 border-top">
+            <a href="{% url 'inventory:pricing_examples' %}" class="btn btn-sm btn-outline-info">
+              <i class="fas fa-calculator me-1"></i>View All Pricing Strategies
+            </a>
           </div>
         </div>
       </div>
@@ -276,6 +377,11 @@
             {% endif %}
           </div>
         </div>
+      </div>
+
+      <!-- Interactive Pricing Calculator -->
+      <div class="mt-4">
+        {% include 'inventory/widgets/pricing_calculator.html' %}
       </div>
     </div>
   </div>
