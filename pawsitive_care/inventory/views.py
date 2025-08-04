@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 Inventory Management Views for Pawsitive Care
 
@@ -339,7 +338,56 @@ def stock_history_view(request, pk):
 @login_required
 def inventory_reports_view(request):
     """Main reports dashboard"""
-    return render(request, 'inventory/reports.html')
+    from django.db.models import Sum, Count
+    
+    # Get basic inventory statistics
+    total_items = InventoryItem.objects.filter(is_active=True).count()
+    low_stock_count = InventoryItem.objects.filter(
+        quantity_in_stock__lte=F('minimum_stock_level'),
+        is_active=True
+    ).count()
+    out_of_stock_count = InventoryItem.objects.filter(
+        quantity_in_stock=0,
+        is_active=True
+    ).count()
+    
+    # Calculate total inventory value
+    total_value = InventoryItem.objects.filter(is_active=True).aggregate(
+        total=Sum(F('quantity_in_stock') * F('unit_price'))
+    )['total'] or 0
+    
+    # Category breakdown
+    category_stats = {}
+    for category_code, category_name in InventoryItem.CATEGORY_CHOICES:
+        count = InventoryItem.objects.filter(category=category_code, is_active=True).count()
+        value = InventoryItem.objects.filter(category=category_code, is_active=True).aggregate(
+            total=Sum(F('quantity_in_stock') * F('unit_price'))
+        )['total'] or 0
+        category_stats[category_code.lower()] = {'count': count, 'value': value}
+    
+    # Calculate average value
+    average_value = total_value / total_items if total_items > 0 else 0
+    
+    # Find most valuable category
+    most_valuable_category = max(category_stats.items(), key=lambda x: x[1]['value'])[0] if category_stats else "N/A"
+    
+    context = {
+        'total_items': total_items,
+        'low_stock_count': low_stock_count,
+        'out_of_stock_count': out_of_stock_count,
+        'total_value': total_value,
+        'average_value': average_value,
+        'most_valuable_category': most_valuable_category.title(),
+        'medicine_count': category_stats.get('medicine', {}).get('count', 0),
+        'supply_count': category_stats.get('supply', {}).get('count', 0),
+        'equipment_count': category_stats.get('equipment', {}).get('count', 0),
+        'food_count': category_stats.get('food', {}).get('count', 0),
+        'medicine_value': category_stats.get('medicine', {}).get('value', 0),
+        'supply_value': category_stats.get('supply', {}).get('value', 0),
+        'equipment_value': category_stats.get('equipment', {}).get('value', 0),
+        'food_value': category_stats.get('food', {}).get('value', 0),
+    }
+    return render(request, 'inventory/reports.html', context)
 
 @login_required
 def low_stock_report_view(request):
@@ -503,10 +551,57 @@ class PurchaseOrderDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView
 
 @login_required
 def stock_movements_report_view(request):
-    """Report for stock movements"""
-    movements = StockMovement.objects.all().order_by('-timestamp')[:100]
+    """Report for stock movements with filtering"""
+    from datetime import datetime, timedelta
+    from django.db.models import Q
+    
+    # Get filter parameters
+    movement_type = request.GET.get('movement_type', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    
+    # Base queryset
+    movements = StockMovement.objects.select_related('item', 'created_by').all()
+    
+    # Apply filters
+    if movement_type:
+        movements = movements.filter(movement_type=movement_type)
+    
+    if date_from:
+        try:
+            date_from_obj = datetime.strptime(date_from, '%Y-%m-%d').date()
+            movements = movements.filter(created_at__date__gte=date_from_obj)
+        except ValueError:
+            pass
+    
+    if date_to:
+        try:
+            date_to_obj = datetime.strptime(date_to, '%Y-%m-%d').date()
+            movements = movements.filter(created_at__date__lte=date_to_obj)
+        except ValueError:
+            pass
+    
+    # Calculate summary statistics before slicing
+    all_movements = movements.order_by('-created_at')
+    in_movements = all_movements.filter(movement_type='IN').count()
+    out_movements = all_movements.filter(movement_type='OUT').count()
+    adjustments = all_movements.filter(movement_type='ADJUSTMENT').count()
+    expired_movements = all_movements.filter(movement_type='EXPIRED').count()
+    damaged_movements = all_movements.filter(movement_type='DAMAGED').count()
+    
+    # Limit results for display
+    movements = all_movements[:100]
+    
     context = {
         'movements': movements,
+        'in_movements': in_movements,
+        'out_movements': out_movements,
+        'adjustments': adjustments,
+        'expired_movements': expired_movements,
+        'damaged_movements': damaged_movements,
+        'movement_type': movement_type,
+        'date_from': date_from,
+        'date_to': date_to,
         'report_title': 'Stock Movements Report'
     }
     return render(request, 'inventory/stock_movements_report.html', context)
@@ -514,9 +609,35 @@ def stock_movements_report_view(request):
 @login_required
 def supplier_report_view(request):
     """Report for supplier analysis"""
-    suppliers = Supplier.objects.all()
+    from django.db.models import Count, Sum, Max
+    
+    # Get all suppliers with annotations
+    suppliers = Supplier.objects.annotate(
+        items_count=Count('inventoryitem'),
+        total_value=Sum('inventoryitem__unit_price'),
+        last_order_date=Max('inventoryitem__created_at')
+    ).order_by('-total_value')
+    
+    # Calculate summary statistics
+    total_suppliers = suppliers.count()
+    active_suppliers = suppliers.filter(is_active=True).count()
+    total_items_supplied = sum(s.items_count or 0 for s in suppliers)
+    total_value_supplied = sum(s.total_value or 0 for s in suppliers)
+    
+    # Get top suppliers (by value)
+    top_suppliers = suppliers.filter(total_value__isnull=False)[:5]
+    
+    # Get recent suppliers (by last order date)
+    recent_suppliers = suppliers.filter(last_order_date__isnull=False).order_by('-last_order_date')[:5]
+    
     context = {
         'suppliers': suppliers,
+        'total_suppliers': total_suppliers,
+        'active_suppliers': active_suppliers,
+        'total_items_supplied': total_items_supplied,
+        'total_value_supplied': total_value_supplied,
+        'top_suppliers': top_suppliers,
+        'recent_suppliers': recent_suppliers,
         'report_title': 'Supplier Report'
     }
     return render(request, 'inventory/supplier_report.html', context)
@@ -797,15 +918,4 @@ def pricing_dashboard(request):
     }
     
     return render(request, 'inventory/pricing_dashboard.html', context)
-=======
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
-# Create your views here.
-
-@login_required
-def inventory_list(request):
-    return render(request, 'inventory/inventory_list.html', {
-        'title': 'Inventory'
-    })
->>>>>>> 3d3cf23477fae850525bbf35b308265b43c18d54

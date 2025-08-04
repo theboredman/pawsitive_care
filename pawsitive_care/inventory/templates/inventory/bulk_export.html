@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bulk Export - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-0">
+            <i class="fas fa-download text-success me-2"></i>
+            Bulk Export
+          </h1>
+          <p class="text-muted mb-0">Export inventory data in various formats</p>
+        </div>
+        <div>
+          <a href="{% url 'inventory:dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Options -->
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-file-csv fa-3x text-success mb-3"></i>
+          <h5>CSV Export</h5>
+          <p class="text-muted">Export data in comma-separated values format, perfect for spreadsheet applications.</p>
+          <div class="mt-auto">
+            <a href="{% url 'inventory:export_csv' %}" class="btn btn-success">
+              <i class="fas fa-download"></i> Download CSV
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-file-excel fa-3x text-info mb-3"></i>
+          <h5>Excel Export</h5>
+          <p class="text-muted">Export data in Microsoft Excel format with formatting and multiple sheets.</p>
+          <div class="mt-auto">
+            <a href="{% url 'inventory:export_excel' %}" class="btn btn-info">
+              <i class="fas fa-download"></i> Download Excel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+          <h5>PDF Export</h5>
+          <p class="text-muted">Export data as a formatted PDF document, ideal for printing and reports.</p>
+          <div class="mt-auto">
+            <a href="{% url 'inventory:export_pdf' %}" class="btn btn-danger">
+              <i class="fas fa-download"></i> Download PDF
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Configuration -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-cog text-primary me-2"></i>
+            Export Configuration
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="get" action="{% url 'inventory:export_csv' %}">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Data to Include</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="include_basic" id="include_basic" checked>
+                  <label class="form-check-label" for="include_basic">
+                    Basic Information (Name, SKU, Category)
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="include_stock" id="include_stock" checked>
+                  <label class="form-check-label" for="include_stock">
+                    Stock Levels (Current, Min, Max)
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="include_pricing" id="include_pricing" checked>
+                  <label class="form-check-label" for="include_pricing">
+                    Pricing Information
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="include_suppliers" id="include_suppliers">
+                  <label class="form-check-label" for="include_suppliers">
+                    Supplier Information
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Filter by Category</label>
+                <select name="category" class="form-select">
+                  <option value="">All Categories</option>
+                  <option value="medication">Medication</option>
+                  <option value="supplies">Medical Supplies</option>
+                  <option value="equipment">Equipment</option>
+                  <option value="food">Pet Food</option>
+                  <option value="toys">Toys & Accessories</option>
+                </select>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Stock Status Filter</label>
+                <select name="stock_status" class="form-select">
+                  <option value="">All Items</option>
+                  <option value="in_stock">In Stock</option>
+                  <option value="low_stock">Low Stock</option>
+                  <option value="out_of_stock">Out of Stock</option>
+                  <option value="expired">Expired</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="btn-group" role="group">
+                  <button type="submit" formaction="{% url 'inventory:export_csv' %}" class="btn btn-success">
+                    <i class="fas fa-file-csv"></i> Export as CSV
+                  </button>
+                  <button type="submit" formaction="{% url 'inventory:export_excel' %}" class="btn btn-info">
+                    <i class="fas fa-file-excel"></i> Export as Excel
+                  </button>
+                  <button type="submit" formaction="{% url 'inventory:export_pdf' %}" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> Export as PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export History -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-history text-secondary me-2"></i>
+            Recent Exports
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead class="table-light">
+                <tr>
+                  <th>Date/Time</th>
+                  <th>Format</th>
+                  <th>Records</th>
+                  <th>Size</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    {{ "now"|date:"M d, Y H:i" }}
+                  </td>
+                  <td><span class="badge bg-success">CSV</span></td>
+                  <td>45 items</td>
+                  <td>12.3 KB</td>
+                  <td><span class="badge bg-success">Ready</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    {{ "now"|date:"M d, Y H:i" }}
+                  </td>
+                  <td><span class="badge bg-info">Excel</span></td>
+                  <td>45 items</td>
+                  <td>18.7 KB</td>
+                  <td><span class="badge bg-success">Ready</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    {{ "now"|date:"M d, Y H:i" }}
+                  </td>
+                  <td><span class="badge bg-danger">PDF</span></td>
+                  <td>45 items</td>
+                  <td>156.2 KB</td>
+                  <td><span class="badge bg-success">Ready</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

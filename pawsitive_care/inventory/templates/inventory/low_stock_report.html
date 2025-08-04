@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+
+{{ report_title }} - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-0">
+            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+            {{ report_title }}
+          </h1>
+          <p class="text-muted mb-0">Items below minimum stock levels requiring immediate attention</p>
+        </div>
+        <div>
+          <a href="{% url 'inventory:reports' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Back to Reports
+          </a>
+          <button class="btn btn-warning" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Alert -->
+  {% if items %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="alert alert-warning">
+        <h5 class="alert-heading">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Action Required
+        </h5>
+        <p class="mb-0">
+          {{ items|length }} item
+          {{ items|length|pluralize }} require
+          {{ items|length|pluralize:"s," }} immediate restocking. Please review and place orders accordingly.
+        </p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Low Stock Items Table -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-list text-warning me-2"></i>
+            Low Stock Items
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if items %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-warning">
+                <tr>
+                  <th>Item Name</th>
+                  <th>SKU</th>
+                  <th>Category</th>
+                  <th>Current Stock</th>
+                  <th>Minimum Level</th>
+                  <th>Shortage</th>
+                  <th>Unit Price</th>
+                  <th>Supplier</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in items %}
+                <tr>
+                  <td>
+                    <strong>
+                      {{ item.name }}</strong>
+                    {% if item.is_out_of_stock %}
+                    <span class="badge bg-danger ms-2">OUT OF STOCK</span>
+                    {% endif %}
+                  </td>
+                  <td><code>
+                      {{ item.sku }}</code></td>
+                  <td>
+                    <span class="badge bg-secondary">
+                      {{ item.get_category_display }}</span>
+                  </td>
+                  <td>
+                    <span class="text-{% if item.is_out_of_stock %}danger{% else %}warning{% endif %}">
+                      {{ item.quantity_in_stock }}
+                      {{ item.get_unit_display }}
+                    </span>
+                  </td>
+                  <td>
+                    {{ item.minimum_stock_level }}
+                    {{ item.get_unit_display }}
+                  </td>
+                  <td>
+                    <span class="text-danger">
+                      {{ item.minimum_stock_level|add:item.quantity_in_stock|add:"-"|add:item.quantity_in_stock }}
+                      {{ item.get_unit_display }}
+                    </span>
+                  </td>
+                  <td>$
+                    {{ item.unit_price }}
+                  </td>
+                  <td>
+                    {% if item.supplier %}
+                    {{ item.supplier.name }}
+                    {% else %}
+                    <span class="text-muted">No supplier</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'inventory:stock_update' item.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-plus"></i> Restock
+                      </a>
+                      <a href="{% url 'inventory:item_detail' item.pk %}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-eye"></i> View
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+            <h4>All Stock Levels Are Good!</h4>
+            <p class="text-muted">No items are currently below their minimum stock levels.</p>
+            <a href="{% url 'inventory:dashboard' %}" class="btn btn-success">
+              <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  {% if items %}
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-bolt text-primary me-2"></i>
+            Quick Actions
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <a href="{% url 'inventory:purchase_order_create' %}" class="btn btn-primary w-100 mb-2">
+                <i class="fas fa-shopping-cart me-2"></i>
+                Create Purchase Order
+              </a>
+            </div>
+            <div class="col-md-4">
+              <a href="{% url 'inventory:bulk_stock_update' %}" class="btn btn-warning w-100 mb-2">
+                <i class="fas fa-boxes me-2"></i>
+                Bulk Stock Update
+              </a>
+            </div>
+            <div class="col-md-4">
+              <a href="{% url 'inventory:supplier_list' %}" class="btn btn-info w-100 mb-2">
+                <i class="fas fa-truck me-2"></i>
+                Contact Suppliers
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  @media print {
+
+    .btn,
+    .card-header {
+      display: none !important;
+    }
+
+    .alert {
+      border: 1px solid #000 !important;
+    }
+  }
+</style>
+{% endblock %}

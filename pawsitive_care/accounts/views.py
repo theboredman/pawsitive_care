@@ -111,6 +111,18 @@ def admin_dashboard(request):
         post_count=Count('blogpost')
     ).order_by('-post_count')[:5]
     
+    # Inventory statistics
+    from inventory.models import InventoryItem
+    from django.db import models
+    
+    total_inventory_items = InventoryItem.objects.filter(is_active=True).count()
+    low_stock_inventory = InventoryItem.objects.filter(
+        quantity_in_stock__lte=models.F('minimum_stock_level'),
+        is_active=True
+    ).count()
+    medicine_items = InventoryItem.objects.filter(category='MEDICINE', is_active=True).count()
+    supply_items = InventoryItem.objects.filter(category='SUPPLY', is_active=True).count()
+    
     context = {
         'title': 'Admin Dashboard',
         'user_role': 'Administrator',
@@ -132,6 +144,12 @@ def admin_dashboard(request):
             'pending_comments': pending_comments,
             'total_likes': total_likes,
         },
+        'inventory_stats': {
+            'total_items': total_inventory_items,
+            'low_stock_items': low_stock_inventory,
+            'medicine_items': medicine_items,
+            'supply_items': supply_items,
+        },
         'recent_users': recent_users,
         'recent_posts': recent_posts,
         'top_categories': categories_with_counts,
@@ -141,18 +159,103 @@ def admin_dashboard(request):
 
 @vet_required
 def vet_dashboard(request):
+    # Import inventory models
+    from inventory.models import InventoryItem
+    from django.utils import timezone
+    from django.db import models
+    from datetime import timedelta
+    
+    # Get inventory statistics
+    medicine_count = InventoryItem.objects.filter(category='MEDICINE', is_active=True).count()
+    supply_count = InventoryItem.objects.filter(category='SUPPLY', is_active=True).count()
+    low_stock_items = InventoryItem.objects.filter(
+        quantity_in_stock__lte=models.F('minimum_stock_level'),
+        is_active=True
+    ).count()
+    
+    # Get inventory alerts
+    inventory_alerts = []
+    
+    # Low stock alerts
+    low_stock = InventoryItem.objects.filter(
+        quantity_in_stock__lte=models.F('minimum_stock_level'),
+        is_active=True
+    )[:3]
+    
+    for item in low_stock:
+        inventory_alerts.append({
+            'type': 'low_stock',
+            'message': f"{item.name} is low in stock ({item.quantity_in_stock} left)"
+        })
+    
+    # Expiring items
+    cutoff_date = timezone.now().date() + timedelta(days=30)
+    expiring_items = InventoryItem.objects.filter(
+        expiry_date__lte=cutoff_date,
+        expiry_date__isnull=False,
+        is_active=True
+    )[:2]
+    
+    for item in expiring_items:
+        days_until_expiry = (item.expiry_date - timezone.now().date()).days
+        inventory_alerts.append({
+            'type': 'expiring',
+            'message': f"{item.name} expires in {days_until_expiry} days"
+        })
+    
+    # Out of stock items
+    out_of_stock = InventoryItem.objects.filter(
+        quantity_in_stock=0,
+        is_active=True
+    )[:2]
+    
+    for item in out_of_stock:
+        inventory_alerts.append({
+            'type': 'out_of_stock',
+            'message': f"{item.name} is out of stock"
+        })
+    
+    # Get recent blog posts for the community section
+    try:
+        from petmedia.models import BlogPost
+        recent_blog_posts = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:5]
+    except ImportError:
+        recent_blog_posts = []
+    
     context = {
         'title': 'Veterinarian Dashboard',
-        'user_role': 'Veterinarian'
+        'user_role': 'Veterinarian',
+        'inventory_stats': {
+            'medicine_count': medicine_count,
+            'supply_count': supply_count,
+            'low_stock_items': low_stock_items,
+        },
+        'inventory_alerts': inventory_alerts,
+        'recent_blog_posts': recent_blog_posts,
     }
     return render(request, 'accounts/vet_dashboard.html', context)
 
 
 @staff_required
 def staff_dashboard(request):
+    # Import inventory models
+    from inventory.models import InventoryItem
+    from django.db import models
+    
+    # Get inventory statistics
+    total_items = InventoryItem.objects.filter(is_active=True).count()
+    low_stock_items = InventoryItem.objects.filter(
+        quantity_in_stock__lte=models.F('minimum_stock_level'),
+        is_active=True
+    ).count()
+    
     context = {
         'title': 'Staff Dashboard',
-        'user_role': 'Staff Member'
+        'user_role': 'Staff Member',
+        'inventory_stats': {
+            'total_items': total_items,
+            'low_stock_items': low_stock_items,
+        }
     }
     return render(request, 'accounts/staff_dashboard.html', context)
 
