@@ -13,6 +13,16 @@ from .models import Pet, MedicalRecord, PetDocument, PetPhoto
 from .forms import PetForm, MedicalRecordForm, PetDocumentForm, PetPhotoForm, PetSearchForm
 import json
 from datetime import datetime
+from .patterns.factory import MedicalRecordFactory, DocumentFactory, PhotoFactory
+from .patterns.observer import EmailNotifier
+
+# Initialize factories
+medical_record_factory = MedicalRecordFactory()
+document_factory = DocumentFactory()
+photo_factory = PhotoFactory()
+
+# Initialize observer
+email_notifier = EmailNotifier()
 
 @login_required
 def pet_list(request):
@@ -21,7 +31,7 @@ def pet_list(request):
     if request.user.is_staff:
         pets = Pet.objects.active()
     else:
-        pets = Pet.objects.active().by_owner(request.user)
+        pets = Pet.objects.active().for_user(request.user)
 
     # Use form for search handling
     search_form = PetSearchForm(request.GET)
@@ -69,7 +79,7 @@ def pet_create(request):
     """Enhanced pet creation using forms"""
     if request.method == 'POST':
         form = PetForm(request.POST, user=request.user)
-        photo_form = PetPhotoForm(request.POST, request.FILES) if 'pet_photo' in request.FILES else None
+        photo_form = PetPhotoForm(request.POST, request.FILES)
         
         try:
             with transaction.atomic():
@@ -80,11 +90,18 @@ def pet_create(request):
                     pet.save()
 
                     # Handle photo upload if provided
-                    if photo_form and photo_form.is_valid():
-                        photo = photo_form.save(commit=False)
-                        photo.pet = pet
-                        photo.is_primary = True
-                        photo.save()
+                    if 'image' in request.FILES:
+                        if photo_form.is_valid():
+                            # Delete any existing photos
+                            PetPhoto.objects.filter(pet=pet).delete()
+                            # Add new photo
+                            photo = photo_form.save(commit=False)
+                            photo.pet = pet
+                            photo.is_primary = True
+                            photo.save()
+                        else:
+                            for error in photo_form.errors.get('image', []):
+                                messages.error(request, f'Photo error: {error}')
 
                     messages.success(request, f'{pet.name} has been registered successfully!')
                     
@@ -296,10 +313,14 @@ def pet_photo_add(request, pk):
     
     try:
         if form.is_valid():
-            photo = form.save(commit=False)
-            photo.pet = pet
-            photo.save()
-            messages.success(request, 'Photo uploaded successfully!')
+            with transaction.atomic():
+                # Delete any existing photos
+                PetPhoto.objects.filter(pet=pet).delete()
+                # Add new photo
+                photo = form.save(commit=False)
+                photo.pet = pet
+                photo.save()
+                messages.success(request, 'Photo uploaded successfully!')
         else:
             # Form validation failed
             error_messages = []

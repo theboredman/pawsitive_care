@@ -1,2 +1,6 @@
 ./env
 .env
+pawsitive_care/accounts/__pycache__/__init__.cpython-313.pyc
+pawsitive_care/accounts/__pycache__/admin.cpython-313.pyc
+pawsitive_care/accounts/__pycache__/apps.cpython-313.pyc
+*.pyc
