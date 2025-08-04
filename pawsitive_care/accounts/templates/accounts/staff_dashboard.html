@@ -73,68 +73,6 @@
   </div>
 </div>
 
-<!-- Inventory Quick Access -->
-<div class="row mt-4">
-  <div class="col-12">
-    <h4><i class="fas fa-boxes text-info"></i> Inventory Quick Access</h4>
-    <p class="text-muted">Manage clinic supplies and stock levels</p>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-info">
-      <div class="card-body text-center">
-        <i class="fas fa-tachometer-alt fa-2x text-info mb-3"></i>
-        <h5>Dashboard</h5>
-        <p class="text-muted">Stock overview</p>
-        <a href="{% url 'inventory:dashboard' %}" class="btn btn-info btn-sm">
-          <i class="fas fa-eye"></i> View
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-primary">
-      <div class="card-body text-center">
-        <i class="fas fa-plus fa-2x text-primary mb-3"></i>
-        <h5>Add Item</h5>
-        <p class="text-muted">New inventory</p>
-        <a href="{% url 'inventory:item_create' %}" class="btn btn-primary btn-sm">
-          <i class="fas fa-plus"></i> Add
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-warning">
-      <div class="card-body text-center">
-        <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
-        <h5>Low Stock</h5>
-        <p class="text-muted">Items needing attention</p>
-        <a href="{% url 'inventory:item_list' %}?low_stock=1" class="btn btn-warning btn-sm">
-          <i class="fas fa-bell"></i> Check
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-success">
-      <div class="card-body text-center">
-        <i class="fas fa-search fa-2x text-success mb-3"></i>
-        <h5>Search Items</h5>
-        <p class="text-muted">Find supplies</p>
-        <a href="{% url 'inventory:item_list' %}" class="btn btn-success btn-sm">
-          <i class="fas fa-search"></i> Browse
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="row">
   <div class="col-md-8">
     <div class="card">

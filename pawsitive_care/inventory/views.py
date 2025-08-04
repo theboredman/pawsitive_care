@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Inventory Management Views for Pawsitive Care
 
@@ -796,3 +797,15 @@ def pricing_dashboard(request):
     }
     
     return render(request, 'inventory/pricing_dashboard.html', context)
+=======
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+# Create your views here.
+
+@login_required
+def inventory_list(request):
+    return render(request, 'inventory/inventory_list.html', {
+        'title': 'Inventory'
+    })
+>>>>>>> 3d3cf23477fae850525bbf35b308265b43c18d54

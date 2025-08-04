@@ -4,43 +4,9 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 import os
 
-class PetObserver:
-    """Observer Pattern: Base class for pet-related notifications"""
-    def update(self, pet, action):
-        pass
-
-class EmailNotifier(PetObserver):
-    """Concrete observer for email notifications"""
-    def update(self, pet, action):
-        # In real implementation, send actual emails
-        print(f"Email notification: {action} performed on pet {pet.name}")
-
-class PetFactory:
-    """Factory Pattern: Creates different types of pets"""
-    @staticmethod
-    def create_pet(pet_type, **kwargs):
-        # Simplified factory that creates pets with correct species
-        kwargs['species'] = pet_type
-        return Pet.objects.create(**kwargs)
-
-class PetQuerySet(models.QuerySet):
-    """Repository Pattern: Encapsulates pet querying logic"""
-    def search(self, query):
-        return self.filter(
-            models.Q(name__icontains=query) |
-            models.Q(owner__email__icontains=query) |
-            models.Q(breed__icontains=query)
-        )
-
-    def active(self):
-        return self.filter(is_active=True)
-
-    def by_species(self, species):
-        return self.filter(species=species)
-        
-    def by_owner(self, user):
-        """Filter pets by owner"""
-        return self.filter(owner=user)
+# Import patterns
+from .patterns.repository import PetQuerySet
+from .patterns.observer import PetObserver, EmailNotifier
 
 class Pet(models.Model):
     """Base Pet Model"""

@@ -1,4 +1,5 @@
 from django.db import models
+<<<<<<< HEAD
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -328,3 +329,7 @@ class PurchaseOrderItem(models.Model):
     
     def __str__(self):
         return f"{self.item.name} x {self.quantity_ordered}"
+=======
+
+# Create your models here.
+>>>>>>> 3d3cf23477fae850525bbf35b308265b43c18d54
