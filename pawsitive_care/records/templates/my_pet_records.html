@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Pawsitive Care</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f9f1;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #43a047;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        main {
+            padding: 30px;
+        }
+
+        .records-table {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .records-table thead {
+            background-color: #e8f5e9;
+        }
+
+        .records-table th, .records-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .records-table th {
+            color: #2e7d32;
+        }
+
+        .records-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-records {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+            padding: 40px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #e0e0e0;
+            color: #555;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    🐶 My Pet Medical Records
+</header>
+
+<main>
+    {% if records %}
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Record Id</th>
+                    <th>Pet</th>
+                    <th>Veterinarian</th>
+                    <th>Visit Date</th>
+                    <th>Diagnosis</th>
+                    <th>Treatment</th>
+                    <th>Prescription</th>
+                    <th>Vaccination</th>
+                    <th>Notes</th>
+                    <th>Recorded On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                  <tr>
+             
+                        <td>{{ record.record_id }}</td>
+                        <td>{{ record.pet.name }}</td>
+                        <td>{{ record.vaterian.get_full_name|default:record.vaterian.username }}</td>
+                        <td>{{ record.visit_date }}</td>
+                        <td>{{ record.diagnosis }}</td>
+                        <td>{{ record.treatment }}</td>
+                        <td>{{ record.prescription }}</td>
+                        <td>{{ record.vaccination_date }}</td>
+                        <td>{{ record.notes|default:"N/A" }}</td>
+                        <td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="no-records">
+            No records found for your pets.
+        </div>
+    {% endif %}
+</main>
+
+<footer>
+    &copy; {{ now|date:"Y" }} Pawsitive Care Clinic – Compassionate Care for Pets.
+</footer>
+
+</body>
+</html>

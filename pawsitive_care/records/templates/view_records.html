@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Pawsitive Care</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fdfdfd;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4caf50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        main {
+            padding: 30px;
+        }
+
+        .records-table {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .records-table thead {
+            background-color: #f7f7f7;
+        }
+
+        .records-table th, .records-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .records-table th {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .records-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-records {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+            padding: 40px 0;
+        }
+
+        .search-form {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-form input[type="number"] {
+            padding: 8px 12px;
+            font-size: 16px;
+        }
+
+        .search-form button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #f5f5f5;
+            margin-top: 50px;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    🐾 Pawsitive Care – Medical Records
+</header>
+
+<main>
+    <form method="get" class="search-form">
+        <label for="pet_id" style="font-size: 16px; margin-right: 10px;">Search by Pet ID:</label>
+        <input type="number" name="pet_id" id="pet_id" placeholder="Enter Pet ID">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if records %}
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Pet Name</th>
+                    <th>Veterinarian</th>
+                    <th>Visit Date</th>
+                    <th>Treatment</th>
+                    <th>Prescription</th>
+                    <th>Vaccination Date</th>
+                    <th>Diagnosis</th>
+                    <th>Notes</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.pet.name }}</td>
+                        <td>{{ record.vaterian.get_full_name|default:record.vaterian.username }}</td>
+                        <td>{{ record.visit_date }}</td>
+                        <td>{{ record.treatment }}</td>
+                        <td>{{ record.prescription }}</td>
+                        <td>{{ record.vaccination_date }}</td>
+                        <td>{{ record.diagnosis }}</td>
+                        <td>{{ record.notes|default:"N/A" }}</td>
+                        <td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="no-records">
+            No medical records found.
+        </div>
+    {% endif %}
+</main>
+
+<footer>
+    &copy; {{ now|date:"Y" }} Pawsitive Care Clinic. All rights reserved.
+</footer>
+
+</body>
+</html>

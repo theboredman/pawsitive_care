@@ -159,3 +159,14 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/client-dashboard/'
 LOGOUT_URL = '/accounts/logout/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+
+#For mailing
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'nsupawsitivecare@gmail.com'  # Replace with your actual Gmail address
+EMAIL_HOST_PASSWORD = 'xgsh jsgk kiwi mcsg'  # Your app password (not your Gmail login password)
