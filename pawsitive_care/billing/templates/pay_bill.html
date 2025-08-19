@@ -1,0 +1,21 @@
+<h2>Pay Bill for {{ billing.pet_name }}</h2>
+<p>Owner: {{ billing.owner_name }}</p>
+<p>Amount: ${{ billing.amount }}</p>
+<p>Status: {{ billing.status }}</p>
+
+{% if error %}
+<p style="color:red">{{ error }}</p>
+{% endif %}
+
+{% if result %}
+<p style="color:green">{{ result }}</p>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <label>Select Payment Method:</label><br>
+  <input type="radio" name="method" value="card"> Card<br>
+  <input type="radio" name="method" value="paypal"> PayPal<br>
+  <input type="radio" name="method" value="cash"> Cash<br><br>
+  <button type="submit">Pay Bill</button>
+</form>

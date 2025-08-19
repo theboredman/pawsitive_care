@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{% if bill %}Update{% else %}Create{% endif %} Bill</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if bill %}Update{% else %}Create{% endif %}</button>
+</form>
+<a href="{% url 'billing:billing_list' %}">Back to list</a>
+{% endblock %}

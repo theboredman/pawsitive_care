@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Bill #{{ bill.billing_id }}</h1>
+<p><strong>Pet:</strong> {{ bill.pet.name }}</p>
+<p><strong>Owner:</strong> {{ bill.owner.username }}</p>
+<p><strong>Amount:</strong> ${{ bill.amount }}</p>
+<p><strong>Status:</strong> {{ bill.status }}</p>
+<p><strong>Description:</strong> {{ bill.description }}</p>
+<p><strong>Issued At:</strong> {{ bill.issued_at }}</p>
+<p><strong>Paid At:</strong> {{ bill.paid_at|default:"Not Paid" }}</p>
+
+<a href="{% url 'billing:billing_update' bill.billing_id %}">Edit</a> |
+<a href="{% url 'billing:billing_delete' bill.billing_id %}">Delete</a> |
+<a href="{% url 'billing:billing_list' %}">Back to list</a>
+{% if bill.status != 'paid' %}
+    | <a href="{% url 'billing:mark_billing_paid' bill.billing_id %}">Mark as Paid</a>
+{% endif %}
+{% endblock %}

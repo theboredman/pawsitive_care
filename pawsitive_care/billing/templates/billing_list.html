@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Billing List</h1>
+<a href="{% url 'billing:billing_create' %}">Create New Bill</a>
+<table border="1" cellpadding="5">
+    <tr>
+        <th>ID</th>
+        <th>Pet</th>
+        <th>Owner</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    {% for bill in bills %}
+    <tr>
+        <td>{{ bill.billing_id }}</td>
+        <td>{{ bill.pet.name }}</td>
+        <td>{{ bill.owner.username }}</td>
+        <td>${{ bill.amount }}</td>
+        <td>{{ bill.status }}</td>
+        <td>
+            <a href="{% url 'billing:billing_detail' bill.billing_id %}">View</a> |
+            <a href="{% url 'billing:billing_update' bill.billing_id %}">Edit</a> |
+            <a href="{% url 'billing:billing_delete' bill.billing_id %}">Delete</a>
+            {% if bill.status != 'paid' %}
+                | <a href="{% url 'billing:mark_billing_paid' bill.billing_id %}">Mark as Paid</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No bills found.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}
