@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.conf import settings
 from pets.models import Pet  # Add this import
 from datetime import datetime, timedelta
 
@@ -43,6 +45,26 @@ def book_appointment(request):
             appointment = AppointmentFactory.create_appointment(appointment_data)
             
             if appointment:
+                # Send confirmation email
+                subject = 'Appointment Confirmation - Pawsitive Care'
+                message = f"""Appointment Booked Successfully!
+
+Pet Name: {pet.name}
+Owner Name: {request.user.get_full_name() or request.user.username}
+Veterinarian: {vet.get_full_name() or vet.username}
+Purpose: {appointment_data['appointment_type']}
+Visit Date: {appointment_data['date']} at {appointment_data['time']}
+
+Thank you for choosing Pawsitive Care!"""
+
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[request.user.email],
+                    fail_silently=True,
+                )
+                
                 messages.success(request, 'Appointment booked successfully!')
                 return redirect('appointments:client_appointments')
             else:
@@ -183,6 +205,32 @@ def update_appointment_status(request, appointment_id):
                     messages.success(request, 'Appointment marked as completed.')
                 elif status == 'PENDING':
                     appointment.status = 'PENDING'
+                    
+                    # Send email notification to client about pending reassignment
+                    subject = 'Appointment Update - Pawsitive Care'
+                    message = f"""Dear {appointment.client.get_full_name() or appointment.client.username},
+
+Your appointment has been cancelled and is pending reassignment.
+
+Original Appointment Details:
+Pet Name: {appointment.pet.name}
+Original Date: {appointment.date} at {appointment.time}
+Original Veterinarian: Dr. {appointment.vet.get_full_name() or appointment.vet.username}
+Purpose: {appointment.appointment_type}
+
+Our staff will contact you shortly to reschedule your appointment with another veterinarian.
+
+Thank you for your understanding.
+Pawsitive Care Team"""
+
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[appointment.client.email],
+                        fail_silently=True,
+                    )
+                    
                     messages.warning(request, 'Appointment marked as pending reassignment.')
                 else:
                     messages.error(request, 'Invalid status update requested.')
@@ -310,6 +358,31 @@ def manage_appointment(request, appointment_id=None):
                     appointment.status = 'SCHEDULED'
                 
                 appointment.save()
+                
+                # Send email notification to client about reassignment
+                subject = 'Appointment Reassigned - Pawsitive Care'
+                message = f"""Dear {appointment.client.get_full_name() or appointment.client.username},
+
+Your appointment has been successfully reassigned.
+
+Updated Appointment Details:
+Pet Name: {appointment.pet.name}
+New Veterinarian: Dr. {vet.get_full_name() or vet.username}
+New Date: {new_date} at {new_time}
+Purpose: {appointment.appointment_type}
+
+If this time doesn't work for you, please contact us to reschedule.
+
+Thank you for choosing Pawsitive Care!"""
+
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[appointment.client.email],
+                    fail_silently=True,
+                )
+                
                 messages.success(request, 'Appointment reassigned successfully!')
                 return redirect('appointments:staff_calendar')
             

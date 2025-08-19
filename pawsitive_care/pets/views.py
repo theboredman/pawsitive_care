@@ -89,6 +89,38 @@ def pet_create(request):
                     pet.owner = request.user
                     pet.save()
 
+                    # Send confirmation email
+                    subject = 'Pet Registration Confirmation - Pawsitive Care'
+                    message = f"""Dear {request.user.get_full_name() or request.user.username},
+
+Your pet has been successfully registered with Pawsitive Care!
+
+Pet Details:
+Name: {pet.name}
+Species: {pet.get_species_display()}
+Breed: {pet.breed}
+Gender: {pet.get_gender_display()}
+Age: {pet.age if pet.age else 'Not specified'} years
+Weight: {pet.weight if pet.weight else 'Not specified'} kg
+Microchip ID: {pet.microchip_id if pet.microchip_id else 'Not specified'}
+
+Medical Conditions: {pet.medical_conditions if pet.medical_conditions else 'None'}
+
+You can view and manage your pet's information anytime from your dashboard.
+
+Thank you for choosing Pawsitive Care!"""
+
+                    from django.core.mail import send_mail
+                    from django.conf import settings
+                    
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[request.user.email],
+                        fail_silently=True,
+                    )
+
                     # Handle photo upload if provided
                     if 'image' in request.FILES:
                         if photo_form.is_valid():
@@ -211,6 +243,40 @@ def pet_update(request, pk):
             with transaction.atomic():
                 if form.is_valid():
                     pet = form.save()
+                    
+                    # Send email notification for pet update
+                    subject = 'Pet Information Updated - Pawsitive Care'
+                    message = f"""Dear {request.user.get_full_name() or request.user.username},
+
+Your pet's information has been successfully updated.
+
+Updated Pet Details:
+Name: {pet.name}
+Species: {pet.get_species_display()}
+Breed: {pet.breed}
+Gender: {pet.get_gender_display()}
+Age: {pet.age if pet.age else 'Not specified'} years
+Weight: {pet.weight if pet.weight else 'Not specified'} kg
+Color: {pet.color if pet.color else 'Not specified'}
+Microchip ID: {pet.microchip_id if pet.microchip_id else 'Not specified'}
+
+Medical Conditions: {pet.medical_conditions if pet.medical_conditions else 'None'}
+
+You can view these updates anytime from your dashboard.
+
+Thank you for choosing Pawsitive Care!"""
+
+                    from django.core.mail import send_mail
+                    from django.conf import settings
+                    
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[request.user.email],
+                        fail_silently=True,
+                    )
+
                     messages.success(request, f'{pet.name}\'s information has been updated!')
                     
                     # Handle AJAX requests
@@ -517,8 +583,31 @@ def pet_delete(request, pk):
 
     if request.method == 'POST':
         try:
-            # Get pet name before deletion for the success message
+            # Get pet details before deletion for the email
             pet_name = pet.name
+            pet_species = pet.get_species_display()
+            
+            # Send email notification for pet deletion
+            subject = 'Pet Removed - Pawsitive Care'
+            message = f"""Dear {request.user.get_full_name() or request.user.username},
+
+This email confirms that {pet_name} ({pet_species}) has been successfully removed from your Pawsitive Care profile.
+
+If this was done by mistake, please contact our support team immediately.
+
+Thank you for using Pawsitive Care!"""
+
+            from django.core.mail import send_mail
+            from django.conf import settings
+            
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[request.user.email],
+                fail_silently=True,
+            )
+            
             # Use the delete method we defined in the model
             # This will handle cleaning up all related files and data
             pet.delete()
