@@ -3,6 +3,9 @@ from abc import ABC, abstractmethod
 import stripe
 from django.conf import settings
 from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -34,6 +37,7 @@ class StripePayment(PaymentStrategy):
             cancel_url=request.build_absolute_uri('/billing/cancel/'),
         )
         return redirect(session.url)
+
 
 
 class PaypalPayment(PaymentStrategy):

@@ -15,8 +15,8 @@ class BillingRepository:
     def update_status(billing_id, status, payment_date=None):
         billing = BillingRepository.get_billing_by_id(billing_id)
         if billing:
-            billing.pay_status = status
+            billing.status = status
             if payment_date:
-                billing.payment_date = payment_date
+                billing.paid_at = payment_date
             billing.save()
         return billing

@@ -5,8 +5,8 @@ from pets.models import Pet
 from .models import PetsMedicalRecord
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseForbidden
-from .patterns.factory import NewMedicalRecordFactory
-from .patterns.repository import MedicalRecordRepository
+from .patterns.factory import NewMedicalRecordFactory,SurgeryRecordFactory
+from .patterns.repository import MedicalRecordRepository,SurgeryRepository,SurgeryRecord
 from .patterns.observer import RecordObserver,EmailNotificationObserver
 from .form import PetsMedicalRecordForm
 from django.utils import timezone
@@ -22,21 +22,21 @@ record_observer = RecordObserver()
 record_observer.subscribe(EmailNotificationObserver())
 
 @login_required
-def add_record(request):
+def add_medical_record(request):
     if request.method == 'POST':
         try:
             record_data = factory.create(request.POST, request.user)
             record = repository.create_record(record_data)
             record_observer.notify(record)
 
-            return redirect(f"{reverse('records:add_record')}?success=1&record_id={record.record_id}")
+            return redirect(f"{reverse('records:add_medical_record')}?success=1&record_id={record.record_id}")
 
         except Pet.DoesNotExist:
             messages.error(request, "Selected pet does not exist.")
         except Exception as e:
             messages.error(request, f"Error adding record: {str(e)}")
 
-    return render(request, 'add_record.html', {
+    return render(request, 'Medical/add_medicalrecord.html', {
         'success': request.GET.get('success') == '1',
         'record_id': request.GET.get('record_id'),
         'pets': Pet.objects.all(),
@@ -58,24 +58,18 @@ def view_records(request):
         'records': records,
         'title': 'All Medical Records',
     }
-    return render(request, 'view_records.html', context)
+    return render(request, 'Medical/view_records.html', context)
 
 
 @login_required
 def my_pet_records(request):
     records = repository.get_records_by_owner(request.user)
-    return render(request, 'my_pet_records.html', {
+    return render(request, 'Medical/my_pet_records.html', {
         'records': records,
         'title': 'My Pet Records'
     })
 
-@login_required
-def record_detail(request, record_id):
-    record = get_object_or_404(PetsMedicalRecord, id=record_id, pet__owner=request.user)
-    return render(request, 'record_detail.html', {
-        'record': record,
-        'title': 'Record Details'
-    })
+
 
 
 #record detail
@@ -101,7 +95,7 @@ def record_detail(request, record_id):
         'is_client': is_client,
         'now': timezone.now(),
     }
-    return render(request, 'record_detail.html', context)
+    return render(request, 'Medical/record_detail.html', context)
 
 @login_required
 def update_record(request, record_id):
@@ -118,7 +112,7 @@ def update_record(request, record_id):
     else:
         form = PetsMedicalRecordForm(instance=record)
 
-    return render(request, 'update_record.html', {'form': form, 'record': record})
+    return render(request, 'Medical/update_record.html', {'form': form, 'record': record})
 
 
 @login_required
@@ -133,4 +127,90 @@ def delete_record(request, record_id):
         messages.success(request, "Record deleted successfully.")
         return redirect('records:view_records')
 
-    return render(request, 'confirm_delete.html', {'record': record})
+    return render(request, 'Medical/confirm_delete.html', {'record': record})
+
+
+#surgery
+
+
+surgery_factory = SurgeryRecordFactory()
+surgery_repository = SurgeryRepository()
+surgery_observer = RecordObserver()
+surgery_observer.subscribe(EmailNotificationObserver())
+
+@login_required
+def add_surgery(request):
+    if request.method == 'POST':
+        try:
+            surgery_data = surgery_factory.create(request.POST, request.user)
+            surgery_record = surgery_repository.create_record(surgery_data)
+            surgery_observer.notify(surgery_record)
+            messages.success(request, f"Surgery record added for {surgery_record.pet.name}!")
+            return redirect(f"{reverse('records:add_surgery')}?success=1&record_id={surgery_record.id}")
+
+        except Pet.DoesNotExist:
+            messages.error(request, "Selected pet does not exist.")
+        except Exception as e:
+            messages.error(request, f"Error adding surgery record: {str(e)}")
+
+    return render(request, 'surgery/add_surgery.html', {
+        'success': request.GET.get('success') == '1',
+        'record_id': request.GET.get('record_id'),
+        'pets': Pet.objects.all(),
+        'user': request.user
+    })
+
+
+@login_required
+def view_surgeries(request):
+    query = request.GET.get('query', '').strip()
+    surgeries = surgery_repository.get_all_records()
+
+    if query:
+        surgeries = [
+            s for s in surgeries
+            if query.lower() in s.pet.name.lower() or query in s.pet.owner.phone
+        ]
+
+    return render(request, 'surgery/view_records.html', {
+        'surgeries': surgeries,
+        'query': query,
+        'title': 'All Surgery Records'
+    })
+
+
+@login_required
+def surgery_detail(request, record_id):
+    record = get_object_or_404(SurgeryRecord, pk=record_id)
+    primary_photo = record.pet.photos.filter(is_primary=True).first()
+
+    context = {
+        'record': record,
+        'primary_photo': primary_photo,
+        'title': 'Surgery Details',
+        'is_veterian': record.veterinarian == request.user,
+        'is_staff': request.user.is_staff,
+    }
+    return render(request, 'surgery/surgery_detail.html', context)
+
+
+
+#Define which record to add
+@login_required
+def add_record(request):
+    """
+    View to choose whether to add a Medical Record or Surgery Record.
+    """
+    if request.method == 'POST':
+        record_type = request.POST.get('record_type')
+
+        if record_type == 'medical':
+            return redirect(reverse('records:add_medical_record'))
+        elif record_type == 'surgery':
+            return redirect(reverse('records:add_surgery'))
+        else:
+            messages.error(request, "Please select a valid record type.")
+
+    return render(request, 'add_record.html', {
+        'user': request.user
+    })

@@ -19,4 +19,24 @@ class PetsMedicalRecord(models.Model):
     def __str__(self):
            return f"{self.pet.name} - {self.vaterian.username} ({self.visit_date})"
     
+class SurgeryRecord(models.Model):
+    pet = models.ForeignKey(pet_models.Pet, on_delete=models.CASCADE,related_name='pets_surgery_records')
+    veterinarian = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pets_surgery_records_vaterian')
+    surgeon = models.CharField(max_length=100,null= True, blank=True)
+    surgery_date = models.DateField()
+    surgery_type = models.CharField(max_length=255)
+    anesthesia_used = models.CharField(max_length=255, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-surgery_date']
+        verbose_name = 'Surgery Record'
+        verbose_name_plural = 'Surgery Records'
+
+    def __str__(self):
+        return f"{self.pet.name} - {self.surgery_type} on {self.surgery_date}"
+    
 # Create your models here.

@@ -16,6 +16,9 @@ from appointments.models import Appointment
 from .utils import calculate_total
 from .forms import ServiceCostForm
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+
+
 
 User = get_user_model()
 repository = BillingRepository()
@@ -27,7 +30,11 @@ billing_subject.attach(EmailNotifier())
 billing_subject.attach(SMSNotifier())
 @login_required
 def add_bill(request):
-    appointments = Appointment.objects.filter(status="COMPLETED")
+    appointments = Appointment.objects.filter(
+        status="COMPLETED"
+    ).exclude(
+        billing__isnull=False  # exclude appointments that already have a billing
+    )   
     selected_appointment = None
     pet = None
     owner = None
@@ -39,6 +46,7 @@ def add_bill(request):
 
         if "select_appointment" in request.POST:
             try:
+                
                 selected_appointment = Appointment.objects.get(appointment_id=appointment_id)
                 pet = selected_appointment.pet
                 owner = selected_appointment.client
@@ -109,37 +117,44 @@ def view_bills(request):
     })
 
 
-
 @login_required
 def my_bills(request):
-    bills = repository.get_bills_by_owner(request.user)
-    return render(request, "billing/my_bills.html", {
-        "bills": bills,
-        "title": "My Bills"
-    })
-
+    HttpResponseForbidden("You are not allowed to view this page.")
 @login_required
 def pay_bill(request, billing_id):
     billing = get_object_or_404(Billing, billing_id=billing_id, owner=request.user)
+    total_amount = calculate_total(billing.amount)
 
     if request.method == "POST":
         payment_method = request.POST.get("payment_method")
-        
-        if payment_method not in ["cash", "stripe", "paypal"]:
+
+        strategies = {
+            "stripe": StripePayment(),
+            "paypal": PaypalPayment(),
+            "cash": CashPayment(),
+        }
+
+        if payment_method not in strategies:
             messages.error(request, "Invalid payment method.")
         else:
-            # Here you would integrate actual payment gateway logic for Stripe/PayPal
-            billing.mark_as_paid()
-            messages.success(request, f"Payment successful! Billing ID: {billing.billing_id}")
-            return redirect("billing:view_bills")
+            strategy = strategies[payment_method]
+            result = strategy.pay(request, total_amount)
 
-    # Use utility function to calculate total safely
-    total_amount = calculate_total(billing.amount)
+            if payment_method in ["cash", "paypal"]:
+                repository.update_status(billing.billing_id, "paid", timezone.now())
+                messages.success(request, f"{payment_method.capitalize()} payment successful! Billing ID: {billing.billing_id}")
+                return redirect("billing:view_bills")
+            else:
+                return result
 
     return render(request, "pay_bill.html", {
         "billing": billing,
         "total_amount": total_amount,
     })
+
+
+    #With stripe
+
 @login_required
 def delete_bill(request, billing_id):
     bill = get_object_or_404(Billing, billing_id=billing_id)
@@ -154,7 +169,21 @@ def delete_bill(request, billing_id):
 
     return render(request, "service/confirm_delete.html", {"bill": bill})
 
+def payment_success(request):
+    billing_id = request.GET.get('billing_id')
+    session_id = request.GET.get('session_id')
+    status = request.GET.get('status', 'success')
 
+    if status == 'success' and billing_id:
+        billing = Billing.objects.get(billing_id=billing_id)
+        billing.status = 'paid'
+        billing.paid_at = timezone.now()
+        billing.save()
+        messages.success(request, f"Payment successful for Billing ID {billing_id}!")
+    else:
+        messages.error(request, "Payment was canceled or failed.")
+
+    return redirect('billing:view')
 
 
 

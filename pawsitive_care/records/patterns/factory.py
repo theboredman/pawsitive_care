@@ -23,27 +23,26 @@ class NewMedicalRecordFactory:
         }
 
 
-# Concrete Creator 2 — load existing record
-class PreviousMedicalRecordFactory(MedicalRecordCreator):
+class SurgeryRecordFactory:
     def create(self, form_data, user):
-        record_id = form_data.get('record_id')
-        record = PetsMedicalRecord.objects.get(pk=record_id)
+        pet = Pet.objects.get(id=form_data.get('pet'))
         return {
-            'pet': record.pet,
-            'vaterian': user,  # Or keep original vet if needed
-            'visit_date': record.visit_date,
-            'treatment': record.treatment,
-            'prescription': record.prescription,
-            'vaccination_date': record.vaccination_date,
-            'diagnosis': record.diagnosis,
-            'notes': record.notes,
-            'created_at': record.created_at,
+            'pet': pet,
+            'veterinarian': user,
+            'surgery_date': form_data.get('surgery_date'),
+            'surgeon': form_data.get('surgeon'),
+            'surgery_type': form_data.get('surgery_type'),
+            'anesthesia_used': form_data.get('anesthesia_used'),
+            'notes': form_data.get('notes'),
+            'created_at': form_data.get('created_at'),
         }
+
 
 FACTORY_REGISTRY = {
     "new": NewMedicalRecordFactory(),
-    "previous": PreviousMedicalRecordFactory()
+    "surgery": SurgeryRecordFactory()
 }
+
 
 def get_factory(mode: str) -> MedicalRecordCreator:
     factory = FACTORY_REGISTRY.get(mode)

@@ -1,4 +1,5 @@
-from records.models import PetsMedicalRecord
+from records.models import PetsMedicalRecord,SurgeryRecord
+
 
 class MedicalRecordRepository:
     def get_all_records(self):
@@ -14,3 +15,14 @@ class MedicalRecordRepository:
         return PetsMedicalRecord.objects.create(**record_data)
     def get_records_by_pet_id(self, pet_id):
         return PetsMedicalRecord.objects.filter(pet_id=pet_id).select_related('pet', 'vaterian')
+    
+class SurgeryRepository:
+    def create_record(self, data):
+        record = SurgeryRecord.objects.create(**data)
+        return record
+
+    def get_records_by_pet(self, pet):
+        return SurgeryRecord.objects.filter(pet=pet)
+
+    def get_all_records(self):
+        return SurgeryRecord.objects.all()

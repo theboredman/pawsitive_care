@@ -17,6 +17,7 @@ urlpatterns = [
     path('pay/<int:billing_id>/', views.pay_bill, name='pay_bill'),
     path('servicecost/', views.servicecost_list, name='servicecost_list'),
     path('servicecost/delete/<int:pk>/', views.servicecost_delete, name='servicecost_delete'),
+    path('success/', views.payment_success, name='payment_success')
 
    
 ]
