@@ -1,7 +1,10 @@
+collaps.js
+
+
 /*global gettext*/
 'use strict';
 {
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
         // Add anchor tag for Show/Hide link
         const fieldsets = document.querySelectorAll('fieldset.collapse');
         for (const [i, elem] of fieldsets.entries()) {
@@ -20,7 +23,7 @@
             }
         }
         // Add toggle to hide/show anchor tag
-        const toggleFunc = function(ev) {
+        const toggleFunc = function (ev) {
             if (ev.target.matches('.collapse-toggle')) {
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -36,7 +39,7 @@
                 }
             }
         };
-        document.querySelectorAll('fieldset.module').forEach(function(el) {
+        document.querySelectorAll('fieldset.module').forEach(function (el) {
             el.addEventListener('click', toggleFunc);
         });
     });

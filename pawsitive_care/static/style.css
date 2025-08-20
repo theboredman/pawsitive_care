@@ -220,6 +220,7 @@ main {
         transform: translateY(0);
     }
 }
+
 /* ========= Sticky, Full-Width, High-Contrast Navbar ========= */
 .app-navbar {
     position: sticky;
@@ -884,6 +885,7 @@ a:hover {
         animation: none !important;
     }
 }
+
 /* Progress bar inside navbar area */
 #scrollProgress {
     position: fixed;
@@ -897,6 +899,7 @@ a:hover {
     /* higher than navbar */
     transition: width 0.2s ease-out;
 }
+
 /* Works in Chrome, Edge, Safari */
 ::-webkit-scrollbar {
     width: 10px;
@@ -1072,9 +1075,10 @@ a:hover {
 
 .app-main {
     min-width: 0;
-padding-inline: 20px;
+    padding-inline: 20px;
     /* add left/right space inside main */
 }
+
 /* ===== Sidebar ===== */
 .app-sidebar {
     position: sticky;
@@ -1089,13 +1093,13 @@ padding-inline: 20px;
     background: var(--surface-card);
 
     overflow-y: auto;
-        /* enable wheel/touch scroll */
-        overflow-x: hidden;
-        /* no horizontal scroll */
-        -ms-overflow-style: none;
-        /* IE/Edge */
-        scrollbar-width: none;
-        /* Firefox */
+    /* enable wheel/touch scroll */
+    overflow-x: hidden;
+    /* no horizontal scroll */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+    scrollbar-width: none;
+    /* Firefox */
     /* solid for contrast */
 }
 
@@ -1208,6 +1212,7 @@ padding-inline: 20px;
     position: relative;
     /* for the absolute ::before */
 }
+
 .sidebar-link i {
     flex: 0 0 24px;
     width: 24px;
@@ -1248,6 +1253,7 @@ padding-inline: 20px;
     opacity: 1;
     transform: translateY(-50%) scale(1);
 }
+
 /* Collapsed state */
 .app-shell.sidebar-collapsed {
     grid-template-columns: 68px 1fr;
@@ -1316,6 +1322,7 @@ padding-inline: 20px;
         padding-inline: 16px;
     }
 }
+
 /* Responsive */
 @media (max-width: 1100px) {
     .app-shell {
@@ -1362,21 +1369,29 @@ padding-inline: 20px;
 
 /* ===== Right-rail layout inside main ===== */
 .main-grid {
-  display: grid;
-  grid-template-columns: 1fr 360px;  /* left content, right rail */
-  gap: 28px;
-  align-items: start;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    /* left content, right rail */
+    gap: 28px;
+    align-items: start;
 }
 
 .right-rail {
-  position: sticky;
-  top: calc(var(--nav-height) + 16px);
+    position: sticky;
+    top: calc(var(--nav-height) + 16px);
 }
 
-.right-rail .card { margin-bottom: 0; }
+.right-rail .card {
+    margin-bottom: 0;
+}
 
 /* Responsive: collapse the rail below content */
 @media (max-width: 1200px) {
-  .main-grid { grid-template-columns: 1fr; }
-  .right-rail { position: static; }
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .right-rail {
+        position: static;
+    }
 }
