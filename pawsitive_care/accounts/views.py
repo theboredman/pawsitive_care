@@ -666,6 +666,135 @@ def user_management(request):
     return render(request, 'accounts/user_management.html', context)
 
 
+# User detail view (admin only)
+@admin_required
+def user_detail(request, user_id):
+    """View individual user details (admin only)"""
+    from django.contrib.auth import get_user_model
+    from django.shortcuts import get_object_or_404
+    User = get_user_model()
+    
+    user = get_object_or_404(User, id=user_id)
+    
+    # Get user's pets if they have any
+    user_pets = []
+    try:
+        from pets.models import Pet
+        user_pets = Pet.objects.filter(owner=user, is_active=True)
+    except ImportError:
+        pass
+    
+    # Get user's appointments if they have any
+    user_appointments = []
+    try:
+        from appointments.models import Appointment
+        user_appointments = Appointment.objects.filter(client=user).order_by('-date')[:5]
+    except ImportError:
+        pass
+    
+    # Get user's billing if they have any
+    user_bills = []
+    try:
+        from billing.models import Billing
+        user_bills = Billing.objects.filter(owner=user).order_by('-issued_at')[:5]
+    except ImportError:
+        pass
+    
+    context = {
+        'user_detail': user,
+        'user_pets': user_pets,
+        'user_appointments': user_appointments,
+        'user_bills': user_bills,
+    }
+    return render(request, 'accounts/user_detail.html', context)
+
+
+# User edit view (admin only)
+@admin_required
+def user_edit(request, user_id):
+    """Edit user details (admin only)"""
+    from django.contrib.auth import get_user_model
+    from django.shortcuts import get_object_or_404
+    User = get_user_model()
+    
+    user = get_object_or_404(User, id=user_id)
+    
+    if request.method == 'POST':
+        # Update user fields
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.email = request.POST.get('email', user.email)
+        user.role = request.POST.get('role', user.role)
+        user.phone = request.POST.get('phone', user.phone)
+        user.is_active = 'is_active' in request.POST
+        
+        try:
+            user.save()
+            messages.success(request, f'User {user.get_full_name() or user.username} updated successfully.')
+            return redirect('accounts:user_detail', user_id=user.id)
+        except Exception as e:
+            messages.error(request, f'Error updating user: {str(e)}')
+    
+    context = {
+        'user_edit': user,
+        'role_choices': User.ROLE_CHOICES if hasattr(User, 'ROLE_CHOICES') else [
+            ('client', 'Client'),
+            ('staff', 'Staff'),
+            ('vet', 'Veterinarian'),
+            ('admin', 'Administrator'),
+        ]
+    }
+    return render(request, 'accounts/user_edit.html', context)
+
+
+# User delete view (admin only)
+@admin_required
+def user_delete(request, user_id):
+    """Delete user (admin only)"""
+    from django.contrib.auth import get_user_model
+    from django.shortcuts import get_object_or_404
+    from django.http import JsonResponse
+    User = get_user_model()
+    
+    user = get_object_or_404(User, id=user_id)
+    
+    # Prevent admin from deleting themselves
+    if user == request.user:
+        messages.error(request, 'You cannot delete your own account.')
+        return redirect('accounts:user_management')
+    
+    if request.method == 'POST':
+        user_name = user.get_full_name() or user.username
+        
+        # Handle AJAX requests
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            try:
+                user.delete()
+                return JsonResponse({
+                    'success': True, 
+                    'message': f'User {user_name} deleted successfully.'
+                })
+            except Exception as e:
+                return JsonResponse({
+                    'success': False, 
+                    'message': f'Error deleting user: {str(e)}'
+                })
+        
+        # Handle regular form submission
+        try:
+            user.delete()
+            messages.success(request, f'User {user_name} deleted successfully.')
+        except Exception as e:
+            messages.error(request, f'Error deleting user: {str(e)}')
+        
+        return redirect('accounts:user_management')
+    
+    context = {
+        'user_delete': user,
+    }
+    return render(request, 'accounts/user_delete.html', context)
+
+
 # Client promotion view (admin only)
 @admin_required
 def promote_clients(request):

@@ -1,0 +1,259 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}
+
+{{ user_detail.get_full_name|default:user_detail.username }} - User Details{% endblock %}
+
+{% block content %}
+<div class="app-shell" id="appShell">
+  <!-- ========= SIDEBAR ========= -->
+  <aside class="app-sidebar glass" aria-label="Primary">
+    <div class="sidebar-header">
+      <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="sidebar-title">Admin</span>
+    </div>
+
+    <!-- Sections -->
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Users</div>
+        <a href="{% url 'accounts:user_management' %}" class="sidebar-link">
+          <i class="fas fa-users"></i><span>Manage Users</span>
+        </a>
+        <a href="{% url 'accounts:promote_clients' %}" class="sidebar-link">
+          <i class="fas fa-user-plus"></i><span>Promote Clients</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="app-main">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="m-0"><i class="fas fa-user me-2"></i>
+              {{ user_detail.get_full_name|default:user_detail.username }}
+            </h2>
+            <p class="text-muted mb-0">User details and activity</p>
+          </div>
+          <div class="btn-group" role="group" aria-label="User actions">
+            <a href="{% url 'accounts:user_edit' user_detail.id %}" class="btn btn-accent">
+              <i class="fas fa-edit me-1"></i> Edit User
+            </a>
+            <a href="{% url 'accounts:user_management' %}" class="btn btn-ghost">
+              <i class="fas fa-arrow-left me-1"></i> Back to Users
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Information -->
+    <div class="row g-4">
+      <!-- Basic Information -->
+      <div class="col-lg-6">
+        <div class="card glass">
+          <div class="card-header">
+            <h5 class="m-0"><i class="fas fa-info-circle me-2"></i> Basic Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <label class="form-label fw-bold">Username</label>
+                <p class="mb-0">
+                  {{ user_detail.username }}
+                </p>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-bold">Email</label>
+                <p class="mb-0">
+                  {{ user_detail.email|default:"Not provided" }}
+                </p>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-bold">First Name</label>
+                <p class="mb-0">
+                  {{ user_detail.first_name|default:"Not provided" }}
+                </p>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-bold">Last Name</label>
+                <p class="mb-0">
+                  {{ user_detail.last_name|default:"Not provided" }}
+                </p>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-bold">Phone</label>
+                <p class="mb-0">
+                  {{ user_detail.phone|default:"Not provided" }}
+                </p>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-bold">Role</label>
+                <p class="mb-0">
+                  <span class="badge {% if user_detail.role == 'admin' %}badge-solid{% elif user_detail.role == 'vet' %}badge-accent{% elif user_detail.role == 'staff' %}badge-outline{% else %}badge-ghost{% endif %}">
+                    {{ user_detail.get_role_display|default:user_detail.role|title }}
+                  </span>
+                </p>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-bold">Status</label>
+                <p class="mb-0">
+                  <span class="badge {% if user_detail.is_active %}badge-solid{% else %}badge-ghost{% endif %}">
+                    {% if user_detail.is_active %}Active{% else %}Inactive{% endif %}
+                  </span>
+                </p>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-bold">Date Joined</label>
+                <p class="mb-0">
+                  {{ user_detail.date_joined|date:"F d, Y" }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Summary -->
+      <div class="col-lg-6">
+        <div class="card glass">
+          <div class="card-header">
+            <h5 class="m-0"><i class="fas fa-chart-line me-2"></i> Activity Summary</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <div class="text-center p-3 bg-light rounded">
+                  <i class="fas fa-paw fa-2x text-primary mb-2"></i>
+                  <h6 class="mb-1">
+                    {{ user_pets|length }}
+                  </h6>
+                  <small class="text-muted">Pets</small>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="text-center p-3 bg-light rounded">
+                  <i class="fas fa-calendar fa-2x text-success mb-2"></i>
+                  <h6 class="mb-1">
+                    {{ user_appointments|length }}
+                  </h6>
+                  <small class="text-muted">Appointments</small>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="text-center p-3 bg-light rounded">
+                  <i class="fas fa-receipt fa-2x text-warning mb-2"></i>
+                  <h6 class="mb-1">
+                    {{ user_bills|length }}
+                  </h6>
+                  <small class="text-muted">Bills</small>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="text-center p-3 bg-light rounded">
+                  <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                  <h6 class="mb-1">
+                    {{ user_detail.last_login|timesince|default:"Never" }}
+                  </h6>
+                  <small class="text-muted">Last Login</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User's Pets -->
+    {% if user_pets %}
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card glass">
+          <div class="card-header">
+            <h5 class="m-0"><i class="fas fa-paw me-2"></i> User's Pets</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              {% for pet in user_pets %}
+              <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h6 class="card-title">
+                      {{ pet.name }}
+                    </h6>
+                    <p class="card-text">
+                      <small class="text-muted">
+                        {{ pet.species|default:"Unknown" }} •
+                        {{ pet.breed|default:"Mixed" }}</small><br>
+                      <small class="text-muted">Age:
+                        {{ pet.age|default:"Unknown" }}</small>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Appointments -->
+    {% if user_appointments %}
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card glass">
+          <div class="card-header">
+            <h5 class="m-0"><i class="fas fa-calendar me-2"></i> Recent Appointments</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Pet</th>
+                    <th>Veterinarian</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for appointment in user_appointments %}
+                  <tr>
+                    <td>
+                      {{ appointment.date|date:"M d, Y" }}
+                    </td>
+                    <td>
+                      {{ appointment.time|time:"g:i A" }}
+                    </td>
+                    <td>
+                      {{ appointment.pet.name }}
+                    </td>
+                    <td>Dr.
+                      {{ appointment.vet.last_name }}
+                    </td>
+                    <td>
+                      <span class="badge {% if appointment.status == 'completed' %}badge-solid{% elif appointment.status == 'confirmed' %}badge-accent{% else %}badge-outline{% endif %}">
+                        {{ appointment.status|title }}
+                      </span>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

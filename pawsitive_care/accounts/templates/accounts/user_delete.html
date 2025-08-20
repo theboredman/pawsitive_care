@@ -1,0 +1,204 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}
+
+{{ user_delete.get_full_name|default:user_delete.username }} - User Profile{% endblock %}
+
+{% block content %}
+<style>
+  /* Fix glass effect pointer events issue */
+  .glass::before {
+    pointer-events: none;
+  }
+
+  .alert {
+    position: relative;
+    z-index: 10;
+  }
+</style>
+
+<div class="app-shell" id="appShell">
+  <!-- ========= SIDEBAR ========= -->
+  <aside class="app-sidebar glass" aria-label="Primary">
+    <div class="sidebar-header">
+      <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="sidebar-title">Admin</span>
+    </div>
+
+    <!-- Sections -->
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Users</div>
+        <a href="{% url 'accounts:user_management' %}" class="sidebar-link">
+          <i class="fas fa-users"></i><span>Manage Users</span>
+        </a>
+        <a href="{% url 'accounts:promote_clients' %}" class="sidebar-link">
+          <i class="fas fa-user-plus"></i><span>Promote Clients</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="app-main">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="m-0"><i class="fas fa-user me-2 text-primary"></i>
+              {{ user_delete.get_full_name|default:user_delete.username }}
+            </h2>
+            <p class="text-muted mb-0">User profile summary and quick actions</p>
+          </div>
+          <div class="btn-group" role="group" aria-label="User actions">
+            <a href="{% url 'accounts:user_detail' user_delete.id %}" class="btn btn-primary">
+              <i class="fas fa-eye me-1"></i> Full Profile
+            </a>
+            <a href="{% url 'accounts:user_edit' user_delete.id %}" class="btn btn-accent">
+              <i class="fas fa-edit me-1"></i> Edit User
+            </a>
+            <a href="{% url 'accounts:user_management' %}" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left me-1"></i> Back to Users
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Profile Card -->
+    <div class="row g-4">
+      <!-- User Information -->
+      <div class="col-lg-8 mx-auto">
+        <div class="card glass">
+          <div class="card-header bg-primary text-white">
+            <h5 class="m-0"><i class="fas fa-user me-2"></i> User Information</h5>
+          </div>
+          <div class="card-body">
+            <!-- User Avatar and Basic Info -->
+            <div class="row g-4">
+              <div class="col-md-4 text-center">
+                <div class="mb-3">
+                  <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                  <h5 class="mb-1">
+                    {{ user_delete.get_full_name|default:user_delete.username }}
+                  </h5>
+                  <span class="badge fs-6 {% if user_delete.role == 'admin' %}badge-solid{% elif user_delete.role == 'vet' %}badge-accent{% elif user_delete.role == 'staff' %}badge-outline{% else %}badge-ghost{% endif %}">
+                    {{ user_delete.get_role_display|default:user_delete.role|title }}
+                  </span>
+                </div>
+                <div class="d-grid gap-2">
+                  <a href="{% url 'accounts:user_detail' user_delete.id %}" class="btn btn-primary">
+                    <i class="fas fa-eye me-2"></i> View Full Profile
+                  </a>
+                  <a href="{% url 'accounts:user_edit' user_delete.id %}" class="btn btn-accent">
+                    <i class="fas fa-edit me-2"></i> Edit User
+                  </a>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <h6 class="border-bottom pb-2 mb-3">Account Details</h6>
+                <div class="row g-3">
+                  <div class="col-sm-6">
+                    <label class="form-label fw-bold text-muted">Username</label>
+                    <p class="mb-0">
+                      {{ user_delete.username }}
+                    </p>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label fw-bold text-muted">Email</label>
+                    <p class="mb-0">
+                      {{ user_delete.email|default:"Not provided" }}
+                    </p>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label fw-bold text-muted">First Name</label>
+                    <p class="mb-0">
+                      {{ user_delete.first_name|default:"Not provided" }}
+                    </p>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label fw-bold text-muted">Last Name</label>
+                    <p class="mb-0">
+                      {{ user_delete.last_name|default:"Not provided" }}
+                    </p>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label fw-bold text-muted">Account Status</label>
+                    <p class="mb-0">
+                      <span class="badge {% if user_delete.is_active %}badge-solid{% else %}badge-ghost{% endif %}">
+                        {% if user_delete.is_active %}Active{% else %}Inactive{% endif %}
+                      </span>
+                    </p>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label fw-bold text-muted">Date Joined</label>
+                    <p class="mb-0">
+                      {{ user_delete.date_joined|date:"F d, Y" }}
+                    </p>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label fw-bold text-muted">Last Login</label>
+                    <p class="mb-0">
+                      {% if user_delete.last_login %}
+                      {{ user_delete.last_login|date:"F d, Y g:i A" }}
+                      {% else %}
+                      Never
+                      {% endif %}
+                    </p>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label fw-bold text-muted">Phone</label>
+                    <p class="mb-0">
+                      {{ user_delete.phone|default:"Not provided" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Card -->
+      <div class="col-lg-8 mx-auto">
+        <div class="card glass">
+          <div class="card-header">
+            <h6 class="m-0"><i class="fas fa-cogs me-2"></i> Quick Actions</h6>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="d-grid">
+                  <a href="{% url 'accounts:user_detail' user_delete.id %}" class="btn btn-outline-primary">
+                    <i class="fas fa-user-circle me-2"></i>
+                    View Full Profile
+                  </a>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="d-grid">
+                  <a href="{% url 'accounts:user_edit' user_delete.id %}" class="btn btn-outline-accent">
+                    <i class="fas fa-edit me-2"></i>
+                    Edit Information
+                  </a>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="d-grid">
+                  <a href="{% url 'accounts:user_management' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Back to Users
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

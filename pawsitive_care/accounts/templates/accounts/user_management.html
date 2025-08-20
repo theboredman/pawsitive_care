@@ -3,6 +3,24 @@
 {% block title %}User Management - Pawsitive Care{% endblock %}
 
 {% block content %}
+<style>
+  /* Prevent modal backdrop from appearing */
+  .modal-backdrop,
+  .modal-backdrop.fade,
+  .modal-backdrop.show,
+  .modal-backdrop.fade.show {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Ensure body doesn't get modal-open class effects */
+  body.modal-open {
+    overflow: auto !important;
+    padding-right: 0 !important;
+  }
+</style>
+
 <div class="app-shell" id="appShell">
   <!-- ========= SIDEBAR ========= -->
   <aside class="app-sidebar glass" aria-label="Primary">
@@ -86,6 +104,7 @@
 
   <!-- ========== MAIN CONTENT ========== -->
   <main class="app-main">
+    {% csrf_token %}
     <div class="row">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -163,181 +182,183 @@
       </div>
     </div>
 
-   <!-- Users Table (Modern) -->
-   <div class="card glass table-card">
-     <div class="card-header soft-accent-bg">
-       <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-         <div class="d-flex align-items-center gap-2">
-           <h5 class="m-0"><i class="fas fa-list me-2"></i> All Users</h5>
-         </div>
-
-         <div class="d-flex flex-wrap align-items-center gap-2">
-           <!-- Search -->
-           <div class="input-group input-group-sm table-toolbar-search">
-             <span class="input-group-text bg-transparent border-0 ps-0">
-               <i class="fas fa-search"></i>
-             </span>
-             <input type="text" class="form-control" placeholder="Search users…" id="userSearch" aria-label="Search users">
-           </div>
-
-           <!-- Role Filter -->
-           <select id="roleFilter" class="form-select form-select-sm">
-             <option value="">Role: All</option>
-             <option value="Admin">Admin</option>
-             <option value="Veterinarian">Veterinarian</option>
-             <option value="Staff">Staff</option>
-             <option value="Client">Client</option>
-           </select>
-
-           <!-- Status Filter -->
-           <select id="statusFilter" class="form-select form-select-sm">
-             <option value="">Status: All</option>
-             <option value="Active">Active</option>
-             <option value="Inactive">Inactive</option>
-           </select>
-
-           <!-- Density -->
-           <button class="btn btn-ghost btn-sm" id="densityToggle" type="button" aria-pressed="false" title="Toggle density">
-             <i class="fas fa-compress-arrows-alt me-1"></i> Compact
-           </button>
-         </div>
-       </div>
-     </div>
-
-     <div class="table-wrap table-responsive">
-       <table class="table table-modern align-middle mb-0" id="usersTable">
-         <thead>
-           <tr>
-             <th style="width:42px;">
-               <input class="form-check-input" type="checkbox" id="selectAll">
-             </th>
-
-             <th data-sortkey="user">
-               User <i class="fas fa-sort sort-indicator"></i>
-             </th>
-
-             <th data-sortkey="email">
-               Email <i class="fas fa-sort sort-indicator"></i>
-             </th>
-
-             <th data-sortkey="phone">
-               Phone <i class="fas fa-sort sort-indicator"></i>
-             </th>
-
-             <th data-sortkey="role">
-               Role <i class="fas fa-sort sort-indicator"></i>
-             </th>
-
-             <th data-sortkey="status">
-               Status <i class="fas fa-sort sort-indicator"></i>
-             </th>
-
-             <th data-sortkey="joined" style="min-width: 120px;">
-               Joined <i class="fas fa-sort sort-indicator"></i>
-             </th>
-
-             <th class="text-end" style="width:120px;">Actions</th>
-           </tr>
-         </thead>
-<tbody>
-  {% for user in users %}
-  <tr data-role="{% if user.is_admin %}Admin{% elif user.is_vet %}Veterinarian{% elif user.is_staff_member %}Staff{% else %}Client{% endif %}" data-status="{% if user.is_active %}Active{% else %}Inactive{% endif %}" data-joined="{{ user.date_joined|date:'U' }}">
-    <td>
-      <input class="form-check-input row-check" type="checkbox">
-    </td>
-
-    <!-- User + avatar/handle -->
-    <td data-value="{{ user.get_full_name|default:user.username }}">
-      <div class="user-cell d-flex align-items-center gap-2">
-        <img class="avatar-sm rounded-circle" src="https://api.dicebear.com/7.x/identicon/svg?seed={{ user.username }}" alt="{{ user.username }} avatar" width="32" height="32" />
-        <div class="user-meta">
-          <div class="user-name fw-semibold">
-            {{ user.get_full_name|default:user.username }}
+    <!-- Users Table (Modern) -->
+    <div class="card glass table-card">
+      <div class="card-header soft-accent-bg">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <h5 class="m-0"><i class="fas fa-list me-2"></i> All Users</h5>
           </div>
-          {% if not user.get_full_name %}
-          <div class="user-handle text-muted small">@
-            {{ user.username }}
+
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <!-- Search -->
+            <div class="input-group input-group-sm table-toolbar-search">
+              <span class="input-group-text bg-transparent border-0 ps-0">
+                <i class="fas fa-search"></i>
+              </span>
+              <input type="text" class="form-control" placeholder="Search users…" id="userSearch" aria-label="Search users">
+            </div>
+
+            <!-- Role Filter -->
+            <select id="roleFilter" class="form-select form-select-sm">
+              <option value="">Role: All</option>
+              <option value="Admin">Admin</option>
+              <option value="Veterinarian">Veterinarian</option>
+              <option value="Staff">Staff</option>
+              <option value="Client">Client</option>
+            </select>
+
+            <!-- Status Filter -->
+            <select id="statusFilter" class="form-select form-select-sm">
+              <option value="">Status: All</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+
+            <!-- Density -->
+            <button class="btn btn-ghost btn-sm" id="densityToggle" type="button" aria-pressed="false" title="Toggle density">
+              <i class="fas fa-compress-arrows-alt me-1"></i> Compact
+            </button>
           </div>
-          {% endif %}
         </div>
       </div>
-    </td>
 
-    <!-- Email -->
-    <td data-value="{{ user.email|default:'' }}">
-      {% if user.email %}
-      <a href="mailto:{{ user.email }}" class="text-decoration-none">
-        {{ user.email }}</a>
-      {% else %}
-      <span class="text-muted">Not provided</span>
-      {% endif %}
-    </td>
+      <div class="table-wrap table-responsive">
+        <table class="table table-modern align-middle mb-0" id="usersTable">
+          <thead>
+            <tr>
+              <th style="width:42px;">
+                <input class="form-check-input" type="checkbox" id="selectAll">
+              </th>
 
-    <!-- Phone -->
-    <td data-value="{{ user.phone|default:'' }}">
-      {% if user.phone %}
-      <a href="tel:{{ user.phone }}" class="text-decoration-none">
-        {{ user.phone }}</a>
-      {% else %}
-      <span class="text-muted">Not provided</span>
-      {% endif %}
-    </td>
+              <th data-sortkey="user">
+                User <i class="fas fa-sort sort-indicator"></i>
+              </th>
 
-    <!-- Role chip -->
-    <td data-value="{% if user.is_admin %}Admin{% elif user.is_vet %}Veterinarian{% elif user.is_staff_member %}Staff{% else %}Client{% endif %}">
-      {% if user.is_admin %}
-      <span class="chip chip-admin"><i class="fas fa-user-shield me-1"></i> Admin</span>
-      {% elif user.is_vet %}
-      <span class="chip chip-vet"><i class="fas fa-user-md me-1"></i> Veterinarian</span>
-      {% elif user.is_staff_member %}
-      <span class="chip chip-staff"><i class="fas fa-user-tie me-1"></i> Staff</span>
-      {% else %}
-      <span class="chip chip-client"><i class="fas fa-user me-1"></i> Client</span>
-      {% endif %}
-    </td>
+              <th data-sortkey="email">
+                Email <i class="fas fa-sort sort-indicator"></i>
+              </th>
 
-    <!-- Status pill -->
-    <td data-value="{% if user.is_active %}Active{% else %}Inactive{% endif %}">
-      {% if user.is_active %}
-      <span class="status-pill status-active"><span class="dot"></span> Active</span>
-      {% else %}
-      <span class="status-pill status-inactive"><span class="dot"></span> Inactive</span>
-      {% endif %}
-    </td>
+              <th data-sortkey="phone">
+                Phone <i class="fas fa-sort sort-indicator"></i>
+              </th>
 
-    <!-- Joined (sortable by timestamp) -->
-    <td data-value="{{ user.date_joined|date:'U' }}">
-      <small>
-        {{ user.date_joined|date:'M d, Y' }}</small>
-    </td>
+              <th data-sortkey="role">
+                Role <i class="fas fa-sort sort-indicator"></i>
+              </th>
 
-    <!-- Actions -->
-    <td class="text-end">
-      <div class="btn-group btn-group-sm" role="group" aria-label="Row actions">
-        <a class="btn btn-ghost" title="View"><i class="fas fa-eye"></i></a>
-        <a class="btn btn-accent" title="Edit"><i class="fas fa-edit"></i></a>
-        {% if user != request.user %}
-        <button type="button" class="btn btn-ghost" title="Delete"><i class="fas fa-trash"></i></button>
-        {% endif %}
+              <th data-sortkey="status">
+                Status <i class="fas fa-sort sort-indicator"></i>
+              </th>
+
+              <th data-sortkey="joined" style="min-width: 120px;">
+                Joined <i class="fas fa-sort sort-indicator"></i>
+              </th>
+
+              <th class="text-end" style="width:120px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr data-role="{% if user.is_admin %}Admin{% elif user.is_vet %}Veterinarian{% elif user.is_staff_member %}Staff{% else %}Client{% endif %}" data-status="{% if user.is_active %}Active{% else %}Inactive{% endif %}" data-joined="{{ user.date_joined|date:'U' }}">
+              <td>
+                <input class="form-check-input row-check" type="checkbox">
+              </td>
+
+              <!-- User + avatar/handle -->
+              <td data-value="{{ user.get_full_name|default:user.username }}">
+                <div class="user-cell d-flex align-items-center gap-2">
+                  <img class="avatar-sm rounded-circle" src="https://api.dicebear.com/7.x/identicon/svg?seed={{ user.username }}" alt="{{ user.username }} avatar" width="32" height="32" />
+                  <div class="user-meta">
+                    <div class="user-name fw-semibold">
+                      {{ user.get_full_name|default:user.username }}
+                    </div>
+                    {% if not user.get_full_name %}
+                    <div class="user-handle text-muted small">@
+                      {{ user.username }}
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+
+              <!-- Email -->
+              <td data-value="{{ user.email|default:'' }}">
+                {% if user.email %}
+                <a href="mailto:{{ user.email }}" class="text-decoration-none">
+                  {{ user.email }}</a>
+                {% else %}
+                <span class="text-muted">Not provided</span>
+                {% endif %}
+              </td>
+
+              <!-- Phone -->
+              <td data-value="{{ user.phone|default:'' }}">
+                {% if user.phone %}
+                <a href="tel:{{ user.phone }}" class="text-decoration-none">
+                  {{ user.phone }}</a>
+                {% else %}
+                <span class="text-muted">Not provided</span>
+                {% endif %}
+              </td>
+
+              <!-- Role chip -->
+              <td data-value="{% if user.is_admin %}Admin{% elif user.is_vet %}Veterinarian{% elif user.is_staff_member %}Staff{% else %}Client{% endif %}">
+                {% if user.is_admin %}
+                <span class="chip chip-admin"><i class="fas fa-user-shield me-1"></i> Admin</span>
+                {% elif user.is_vet %}
+                <span class="chip chip-vet"><i class="fas fa-user-md me-1"></i> Veterinarian</span>
+                {% elif user.is_staff_member %}
+                <span class="chip chip-staff"><i class="fas fa-user-tie me-1"></i> Staff</span>
+                {% else %}
+                <span class="chip chip-client"><i class="fas fa-user me-1"></i> Client</span>
+                {% endif %}
+              </td>
+
+              <!-- Status pill -->
+              <td data-value="{% if user.is_active %}Active{% else %}Inactive{% endif %}">
+                {% if user.is_active %}
+                <span class="status-pill status-active"><span class="dot"></span> Active</span>
+                {% else %}
+                <span class="status-pill status-inactive"><span class="dot"></span> Inactive</span>
+                {% endif %}
+              </td>
+
+              <!-- Joined (sortable by timestamp) -->
+              <td data-value="{{ user.date_joined|date:'U' }}">
+                <small>
+                  {{ user.date_joined|date:'M d, Y' }}</small>
+              </td>
+
+              <!-- Actions -->
+              <td class="text-end">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Row actions">
+                  <a href="{% url 'accounts:user_detail' user.id %}" class="btn btn-ghost" title="View"><i class="fas fa-eye"></i></a>
+                  <a href="{% url 'accounts:user_edit' user.id %}" class="btn btn-accent" title="Edit"><i class="fas fa-edit"></i></a>
+                  {% if user != request.user %}
+                  <button type="button" class="btn btn-ghost delete-user-btn" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-user-id="{{ user.id }}" data-user-name="{{ user.get_full_name|default:user.username }}" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr class="table-empty">
+              <td colspan="8" class="text-center py-4">
+                <i class="fas fa-users fa-2x text-muted mb-2 d-block"></i>
+                <p class="text-muted mb-0">No users found.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+
+
+        </table>
       </div>
-    </td>
-  </tr>
-  {% empty %}
-  <tr class="table-empty">
-    <td colspan="8" class="text-center py-4">
-      <i class="fas fa-users fa-2x text-muted mb-2 d-block"></i>
-      <p class="text-muted mb-0">No users found.</p>
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
+    </div>
 
-         
-       </table>
-     </div>
-   </div>
 
-    
 
     <!-- Role Legend -->
     <div class="row mt-4">
@@ -388,5 +409,154 @@
   </main>
 </div>
 
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteUserModalLabel">Delete User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete user <strong id="deleteUserName"></strong>?</p>
+        <p class="text-muted">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Clean up any existing modal backdrop on page load
+    const existingBackdrop = document.querySelector('.modal-backdrop');
+    if (existingBackdrop) {
+      existingBackdrop.remove();
+    }
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+
+    const deleteModalElement = document.getElementById('deleteUserModal');
+    const deleteUserName = document.getElementById('deleteUserName');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    let userIdToDelete = null;
+
+    console.log('Delete modal script loaded');
+
+    // Listen for modal show event
+    deleteModalElement.addEventListener('show.bs.modal', function(event) {
+      console.log('Modal show event triggered');
+      // Button that triggered the modal
+      const button = event.relatedTarget;
+      userIdToDelete = button.getAttribute('data-user-id');
+      const userName = button.getAttribute('data-user-name');
+
+      console.log('User ID to delete:', userIdToDelete, 'User name:', userName);
+
+      // Update modal content
+      deleteUserName.textContent = userName;
+    });
+
+    // Handle confirm delete
+    confirmDeleteBtn.addEventListener('click', function() {
+      console.log('Confirm delete clicked for user ID:', userIdToDelete);
+      if (userIdToDelete) {
+        // Immediately remove all backdrops and modal-related classes
+        const removeAllBackdrops = () => {
+          const backdrops = document.querySelectorAll('.modal-backdrop');
+          backdrops.forEach(backdrop => backdrop.remove());
+          document.body.classList.remove('modal-open');
+          document.body.style.overflow = '';
+          document.body.style.paddingRight = '';
+        };
+
+        // Remove immediately
+        removeAllBackdrops();
+
+        // Hide the modal instance
+        const modal = bootstrap.Modal.getInstance(deleteModalElement);
+        if (modal) {
+          modal.dispose(); // Completely dispose of the modal
+        }
+
+        // Force hide the modal element
+        deleteModalElement.style.display = 'none';
+        deleteModalElement.classList.remove('show');
+
+        // Create and submit form immediately
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/accounts/users/${userIdToDelete}/delete/`;
+
+        // Add CSRF token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        form.appendChild(csrfInput);
+
+        document.body.appendChild(form);
+
+        // Final cleanup before submit
+        setTimeout(() => {
+          removeAllBackdrops();
+          form.submit();
+        }, 50);
+      }
+    }); // Also add direct click event for debugging
+    const deleteButtons = document.querySelectorAll('.delete-user-btn');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        console.log('Delete button clicked directly');
+      });
+    });
+  });
+</script>
+
+<!-- Remove modal backdrop -->
+<script>
+  // Aggressively prevent and remove modal backdrops
+  (function() {
+    // Function to remove backdrop
+    function removeBackdrop() {
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => backdrop.remove());
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+
+    // Remove any existing backdrops immediately
+    removeBackdrop();
+
+    // Observe for new backdrop elements being added
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach(function(node) {
+            if (node.nodeType === 1 && node.classList &&
+              (node.classList.contains('modal-backdrop') ||
+                (node.classList.contains('fade') && node.classList.contains('show')))) {
+              setTimeout(() => node.remove(), 10);
+            }
+          });
+        }
+      });
+    });
+
+    // Start observing
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Also remove backdrops periodically
+    setInterval(removeBackdrop, 100);
+  })();
+</script>
 
 {% endblock %}
