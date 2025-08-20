@@ -2,94 +2,100 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Pawsitive Care{% endblock %}</title>
 
-  <!-- Bootstrap CSS -->
+  <!-- Bootstrap CSS (5.3) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-  <!-- Custom CSS -->
-  <style>
-    body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  <!-- Inter font (your CSS references it) -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    main {
-      flex: 1;
-    }
+  {% load static %}
+  <!-- Your Night Sands theme CSS -->
+  <link rel="stylesheet" href="{% static 'style.css' %}">
 
-    .navbar-brand img {
-      height: 40px;
-      margin-right: 10px;
-    }
-  </style>
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-  <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" href="{% url 'home' %}">
-        <img src="{{ MEDIA_URL }}pawsitive_logo.png" alt="Pawsitive Care Logo">
-        Pawsitive Care
+  <!-- Slim scroll progress (theme styles it via #scrollProgress) -->
+  <div id="scrollProgress"></div>
+
+  <!-- NAVIGATION (full-bleed background, centered content via .nav-inner) -->
+  <nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+    <div class="container-fluid nav-inner">
+      <!-- Brand -->
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+        <i class="fas fa-paw"></i>
+        <span>Pawsitive Care</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+
+      <!-- Toggler -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
+
+      <!-- Collapsible content -->
       <div class="collapse navbar-collapse" id="navbarNav">
+
         {% if user.is_authenticated %}
+        <!-- LEFT: main nav -->
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'pets:pet_list' %}">Pets</a>
+            <a class="nav-link" href="{% url 'pets:pet_list' %}">
+              <i class="fa-solid fa-dog me-1"></i>Pets
+            </a>
           </li>
+
+          <!-- PetMedia -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="blogDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fas fa-blog me-1"></i>PetMedia
             </a>
             <ul class="dropdown-menu" aria-labelledby="blogDropdown">
               <li><a class="dropdown-item" href="{% url 'petmedia:blog_list' %}">
-                  <i class="fas fa-list me-2"></i>All Posts
-                </a></li>
+                  <i class="fas fa-list me-2"></i>All Posts</a></li>
               <li><a class="dropdown-item" href="{% url 'petmedia:professional_advice' %}">
-                  <i class="fas fa-user-md me-2"></i>Professional Advice
-                </a></li>
+                  <i class="fas fa-user-md me-2"></i>Professional Advice</a></li>
               <li><a class="dropdown-item" href="{% url 'petmedia:medications' %}">
-                  <i class="fas fa-pills me-2"></i>Medications
-                </a></li>
+                  <i class="fas fa-pills me-2"></i>Medications</a></li>
+
               <li>
                 <hr class="dropdown-divider">
               </li>
+
               <li><a class="dropdown-item" href="{% url 'petmedia:create_post' %}">
-                  <i class="fas fa-plus me-2"></i>Create Post
-                </a></li>
+                  <i class="fas fa-plus me-2"></i>Create Post</a></li>
               {% if user.is_vet %}
               <li><a class="dropdown-item" href="{% url 'petmedia:create_professional_post' %}">
-                  <i class="fas fa-stethoscope me-2"></i>Professional Post
-                </a></li>
+                  <i class="fas fa-stethoscope me-2"></i>Professional Post</a></li>
               <li><a class="dropdown-item" href="{% url 'petmedia:create_medication_post' %}">
-                  <i class="fas fa-prescription-bottle me-2"></i>Medication Guide
-                </a></li>
+                  <i class="fas fa-prescription-bottle me-2"></i>Medication Guide</a></li>
               {% endif %}
+
               <li>
                 <hr class="dropdown-divider">
               </li>
+
               <li><a class="dropdown-item" href="{% url 'petmedia:user_posts' %}">
-                  <i class="fas fa-user-edit me-2"></i>My Posts
-                </a></li>
+                  <i class="fas fa-user-edit me-2"></i>My Posts</a></li>
             </ul>
           </li>
+
           {% if user.is_staff %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'appointments:appointment_list' %}">Appointments</a>
+            <a class="nav-link" href="{% url 'appointments:appointment_list' %}">
+              <i class="fa-regular fa-calendar-check me-1"></i>Appointments
+            </a>
           </li>
           {% endif %}
+
           {% if user.is_staff_member or user.is_vet or user.is_admin %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -97,67 +103,69 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="inventoryDropdown">
               <li><a class="dropdown-item" href="{% url 'inventory:dashboard' %}">
-                  <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                </a></li>
+                  <i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
               <li><a class="dropdown-item" href="{% url 'inventory:item_list' %}">
-                  <i class="fas fa-list me-2"></i>All Items
-                </a></li>
+                  <i class="fas fa-list me-2"></i>All Items</a></li>
               <li><a class="dropdown-item" href="{% url 'inventory:item_create' %}">
-                  <i class="fas fa-plus me-2"></i>Add Item
-                </a></li>
+                  <i class="fas fa-plus me-2"></i>Add Item</a></li>
+
               <li>
                 <hr class="dropdown-divider">
               </li>
+
               <li><a class="dropdown-item" href="{% url 'inventory:item_list' %}?low_stock=1">
-                  <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Low Stock
-                </a></li>
+                  <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Low Stock</a></li>
               <li><a class="dropdown-item" href="{% url 'inventory:item_list' %}?expiring=1">
-                  <i class="fas fa-clock me-2 text-danger"></i>Expiring Soon
-                </a></li>
+                  <i class="fas fa-clock me-2 text-danger"></i>Expiring Soon</a></li>
+
               <li>
                 <hr class="dropdown-divider">
               </li>
+
               <li><a class="dropdown-item" href="{% url 'inventory:supplier_list' %}">
-                  <i class="fas fa-truck me-2"></i>Suppliers
-                </a></li>
+                  <i class="fas fa-truck me-2"></i>Suppliers</a></li>
               <li><a class="dropdown-item" href="{% url 'inventory:pricing_dashboard' %}">
-                  <i class="fas fa-chart-line me-2 text-success"></i>Pricing Dashboard
-                </a></li>
+                  <i class="fas fa-chart-line me-2 text-success"></i>Pricing Dashboard</a></li>
               <li><a class="dropdown-item" href="{% url 'inventory:pricing_examples' %}">
-                  <i class="fas fa-calculator me-2 text-info"></i>Pricing Examples
-                </a></li>
+                  <i class="fas fa-calculator me-2 text-info"></i>Pricing Examples</a></li>
               <li><a class="dropdown-item" href="{% url 'inventory:reports' %}">
-                  <i class="fas fa-chart-bar me-2"></i>Reports
-                </a></li>
+                  <i class="fas fa-chart-bar me-2"></i>Reports</a></li>
             </ul>
           </li>
           {% endif %}
         </ul>
+
+        <!-- RIGHT: user menu -->
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ user.get_full_name|default:user.username }}
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-regular fa-user"></i>
+              <span>
+                {{ user.get_full_name|default:user.username }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-              <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                  <i class="fas fa-user-edit me-2"></i>Profile</a></li>
               {% if user.is_staff %}
-              <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin Panel</a></li>
+              <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                  <i class="fas fa-shield-halved me-2"></i>Admin Panel</a></li>
               {% endif %}
               <li>
                 <hr class="dropdown-divider">
               </li>
-              <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
+              <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                  <i class="fas fa-right-from-bracket me-2"></i>Logout</a></li>
             </ul>
           </li>
         </ul>
+
         {% else %}
+        <!-- When logged out -->
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">
+              <i class="fas fa-sign-in-alt me-1"></i>Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:register' %}">
+              <i class="fas fa-user-plus me-1"></i>Register</a></li>
         </ul>
         {% endif %}
       </div>
@@ -166,7 +174,6 @@
 
   <!-- Main Content -->
   <main class="py-4">
-    <!-- Messages - Only show once at the top level -->
     {% if messages %}
     <div class="container">
       <div class="messages mb-4">
@@ -179,11 +186,12 @@
       </div>
     </div>
     {% endif %}
+
     {% block content %}{% endblock %}
   </main>
 
   <!-- Footer -->
-  <footer class="bg-light py-3 mt-auto">
+  <footer class="py-3 mt-auto">
     <div class="container text-center">
       <p class="mb-0">&copy; {% now "Y" %} Pawsitive Care. All rights reserved.</p>
     </div>
@@ -191,6 +199,8 @@
 
   <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="{% static 'scripts.js' %}"></script>
 
   {% block extra_js %}{% endblock %}
 </body>

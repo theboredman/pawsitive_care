@@ -3,322 +3,410 @@
 {% block title %}Client Dashboard - Pawsitive Care{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
+<div class="app-shell">
+  {# ================= LEFT SIDEBAR ================= #}
+  <aside class="app-sidebar glass" aria-label="Primary">
+    <div class="sidebar-header">
+      <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="sidebar-title">Client</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Overview</div>
+        <a href="{% url 'accounts:client_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'client_dashboard' %}active{% endif %}">
+          <i class="fas fa-home"></i><span>Dashboard</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Appointments</div>
+        <a href="{% url 'appointments:book_appointment' %}" class="sidebar-link">
+          <i class="fas fa-calendar-plus"></i><span>Book Appointment</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-calendar-alt"></i><span>My Appointments</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Pets</div>
+        <a href="{% url 'pets:pet_list' %}" class="sidebar-link">
+          <i class="fas fa-paw"></i><span>My Pets</span>
+        </a>
+        <a href="{% url 'pets:pet_create' %}" class="sidebar-link">
+          <i class="fas fa-plus"></i><span>Add Pet</span>
+        </a>
+        <a href="{% url 'records:my_pet_records' %}" class="sidebar-link">
+          <i class="fas fa-file-medical"></i><span>Medical Records</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Billing</div>
+        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
+          <i class="fas fa-receipt"></i><span>Invoices</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Community</div>
+        <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link">
+          <i class="fas fa-blog"></i><span>Browse Posts</span>
+        </a>
+        <a href="{% url 'petmedia:create_post' %}" class="sidebar-link">
+          <i class="fas fa-pen"></i><span>Create Post</span>
+        </a>
+        <a href="{% url 'petmedia:professional_advice' %}" class="sidebar-link">
+          <i class="fas fa-user-md"></i><span>Vet Advice</span>
+        </a>
+        <a href="{% url 'petmedia:medications' %}" class="sidebar-link">
+          <i class="fas fa-pills"></i><span>Medications</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Account</div>
+        <a href="{% url 'accounts:profile' %}" class="sidebar-link">
+          <i class="fas fa-user"></i><span>Profile</span>
+        </a>
+        <a href="{% url 'accounts:logout' %}" class="sidebar-link">
+          <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  {# ================= MAIN CONTENT ================= #}
+  <main class="app-main">
+
+    <!-- Page header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h2><i class="fas fa-heart text-info"></i> Welcome to Pawsitive Care</h2>
-        <p class="text-muted">Manage your pets' health and appointments</p>
-      </div>
-      <div>
-        <span class="badge bg-info fs-6">
-          {{ user.get_role_display }}</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <!-- Quick Actions -->
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-info">
-      <div class="card-body text-center">
-        <i class="fas fa-calendar-plus fa-2x text-info mb-3"></i>
-        <h5>Book Appointment</h5>
-        <p class="text-muted">Schedule a visit</p>
-        <a href="{% url 'appointments:book_appointment' %}" class="btn btn-info btn-sm">
-          <i class="fas fa-plus"></i> New Appointment
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-success">
-      <div class="card-body text-center">
-        <i class="fas fa-paw fa-2x text-success mb-3"></i>
-        <h5>My Pets</h5>
-        <p class="text-muted">Manage pet profiles</p>
-        <div class="d-grid gap-2">
-          <a href="{% url 'pets:pet_list' %}" class="btn btn-outline-success btn-sm">
-            <i class="fas fa-list"></i> View Pets
-          </a>
-          <a href="{% url 'pets:pet_create' %}" class="btn btn-success btn-sm">
-            <i class="fas fa-plus"></i> Add Pet
-          </a>
+        <!-- Welcome note -->
+        <div class="alert alert-info glass mt-4">
+          <h5 class="m-0"><i class="fas fa-info-circle me-2"></i> Welcome to Pawsitive Care!</h5>
+          <p class="mb-0">We're here to provide the best care for your beloved pets. Book appointments, manage your pets' health records, and stay connected with our veterinary team.</p>
         </div>
-      </div>
+      
     </div>
-  </div>
 
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-warning">
-      <div class="card-body text-center">
-        <i class="fas fa-file-medical fa-2x text-warning mb-3"></i>
-        <h5>Medical Records</h5>
-        <p class="text-muted">View health history</p>
-        <a href="{% url 'records:my_pet_records' %}" class="btn btn-warning btn-sm">
-          <i class="fas fa-eye"></i> View Records
-        </a>
-      </div>
-    </div>
-  </div>
+    <!-- Two-column main layout: left content + right rail -->
+    <div class="main-grid">
 
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-primary">
-      <div class="card-body text-center">
-        <i class="fas fa-receipt fa-2x text-primary mb-3"></i>
-        <h5>Billing</h5>
-        <p class="text-muted">View invoices</p>
-        <a href="{% url 'billing:view_bills' %}" class="btn btn-primary btn-sm">
-          <i class="fas fa-dollar-sign"></i> View Bills
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PetMedia Blog Section -->
-<div class="row">
-  <div class="col-md-6 mb-4">
-    <div class="card dashboard-card h-100 border-info">
-      <div class="card-header bg-info text-white">
-        <h5 class="mb-0"><i class="fas fa-blog me-2"></i>PetMedia Blog</h5>
-      </div>
-      <div class="card-body">
-        <p class="text-muted">Share your pet experiences and learn from others</p>
-        {% if user_blog_posts_count > 0 %}
-        <div class="alert alert-success small mb-3">
-          <i class="fas fa-check-circle me-1"></i>
-          You have <strong>
-            {{ user_blog_posts_count }}</strong> published post
-          {{ user_blog_posts_count|pluralize }}
-        </div>
-        {% endif %}
-        <div class="d-grid gap-2">
-          <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-info btn-sm">
-            <i class="fas fa-list me-1"></i> Browse Posts
-          </a>
-          <a href="{% url 'petmedia:create_post' %}" class="btn btn-info btn-sm">
-            <i class="fas fa-plus me-1"></i> Share Your Story
-          </a>
-        </div>
-        <hr>
-        <div class="d-flex justify-content-between">
-          <a href="{% url 'petmedia:professional_advice' %}" class="btn btn-outline-success btn-sm">
-            <i class="fas fa-user-md"></i> Vet Advice
-          </a>
-          <a href="{% url 'petmedia:medications' %}" class="btn btn-outline-warning btn-sm">
-            <i class="fas fa-pills"></i> Medications
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6 mb-4">
-    <div class="card dashboard-card h-100">
-      <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-star text-warning me-2"></i>Recent Community Posts</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          {% for post in recent_blog_posts %}
-          <div class="list-group-item border-0 px-0">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <h6 class="mb-1">
-                  <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none">
-                    {{ post.title|truncatechars:50 }}
-                  </a>
-                </h6>
-                <p class="mb-1 small text-muted">
-                  {{ post.excerpt|truncatechars:80 }}
-                </p>
-                <small class="text-muted">
-                  by
-                  {{ post.author.get_full_name|default:post.author.username }}
-                  •
-                  {{ post.created_at|timesince }} ago
-                </small>
+      <!-- LEFT: main content -->
+      <section class="main-content">
+        <!-- Quick Actions -->
+        <div class="card glass card-teal mb-4">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-bolt me-2 themed-icon"></i> Quick Actions</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <a href="{% url 'appointments:book_appointment' %}" class="btn btn-accent w-100">
+                  <i class="fas fa-calendar-plus me-2"></i> New Appointment
+                </a>
               </div>
-              {% if post.is_professional_advice %}
-              <span class="badge bg-success">Professional</span>
-              {% endif %}
+              <div class="col-md-6">
+                <a href="{% url 'pets:pet_list' %}" class="btn btn-accent w-100">
+                  <i class="fas fa-paw me-2"></i> View Pets
+                </a>
+              </div>
+              <div class="col-md-6">
+                <a href="{% url 'pets:pet_create' %}" class="btn btn-accent w-100">
+                  <i class="fas fa-plus me-2"></i> Add Pet
+                </a>
+              </div>
+              <div class="col-md-6">
+                <a href="{% url 'records:my_pet_records' %}" class="btn btn-accent w-100">
+                  <i class="fas fa-file-medical me-2"></i> View Records
+                </a>
+              </div>
             </div>
           </div>
-          {% empty %}
-          <div class="list-group-item border-0 px-0">
-            <h6 class="mb-1">No recent posts yet</h6>
-            <small class="text-muted">Be the first to share your pet story!</small>
+        </div>
+
+        <!-- Feature cards row -->
+        <div class="row">
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-indigo">
+              <div class="card-body text-center">
+                <i class="fas fa-calendar-plus fa-2x themed-icon mb-3"></i>
+                <h5>Book Appointment</h5>
+                <p class="text-muted">Schedule a visit</p>
+                <a href="{% url 'appointments:book_appointment' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-plus me-1"></i> New Appointment
+                </a>
+              </div>
+            </div>
           </div>
-          {% endfor %}
+
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-success">
+              <div class="card-body text-center">
+                <i class="fas fa-paw fa-2x themed-icon mb-3"></i>
+                <h5>My Pets</h5>
+                <p class="text-muted">Manage pet profiles</p>
+                <div class="d-grid gap-2">
+                  <a href="{% url 'pets:pet_list' %}" class="btn btn-ghost btn-sm"><i class="fas fa-list me-1"></i> View Pets</a>
+                  <a href="{% url 'pets:pet_create' %}" class="btn btn-accent btn-sm"><i class="fas fa-plus me-1"></i> Add Pet</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-amber">
+              <div class="card-body text-center">
+                <i class="fas fa-file-medical fa-2x themed-icon mb-3"></i>
+                <h5>Medical Records</h5>
+                <p class="text-muted">View health history</p>
+                <a href="{% url 'records:my_pet_records' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-eye me-1"></i> View Records
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-olive">
+              <div class="card-body text-center">
+                <i class="fas fa-receipt fa-2x themed-icon mb-3"></i>
+                <h5>Billing</h5>
+                <p class="text-muted">View invoices</p>
+                <a href="{% url 'billing:view_bills' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-dollar-sign me-1"></i> View Bills
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="text-center mt-3">
-          <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-primary btn-sm">
-            View All Posts <i class="fas fa-arrow-right ms-1"></i>
-          </a>
+
+        <!-- Blog section -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card glass h-100 card-teal">
+              <div class="card-header soft-accent-bg">
+                <h5 class="mb-0"><i class="fas fa-blog me-2 themed-icon"></i> PetMedia Blog</h5>
+              </div>
+              <div class="card-body">
+                <p class="text-muted">Share your pet experiences and learn from others</p>
+
+                {% if user_blog_posts_count > 0 %}
+                <div class="alert alert-success small mb-3">
+                  <i class="fas fa-check-circle me-1"></i>
+                  You have <strong>
+                    {{ user_blog_posts_count }}</strong> published post
+                  {{ user_blog_posts_count|pluralize }}
+                </div>
+                {% endif %}
+
+                <div class="d-grid gap-2">
+                  <a href="{% url 'petmedia:blog_list' %}" class="btn btn-ghost btn-sm">
+                    <i class="fas fa-list me-1"></i> Browse Posts
+                  </a>
+                  <a href="{% url 'petmedia:create_post' %}" class="btn btn-accent btn-sm">
+                    <i class="fas fa-plus me-1"></i> Share Your Story
+                  </a>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+                  <a href="{% url 'petmedia:professional_advice' %}" class="btn btn-ghost btn-sm">
+                    <i class="fas fa-user-md me-1"></i> Vet Advice
+                  </a>
+                  <a href="{% url 'petmedia:medications' %}" class="btn btn-ghost btn-sm">
+                    <i class="fas fa-pills me-1"></i> Medications
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card glass h-100 card-indigo">
+              <div class="card-header soft-accent-bg">
+                <h5 class="mb-0"><i class="fas fa-star me-2 themed-icon"></i> Recent Community Posts</h5>
+              </div>
+              <div class="card-body">
+                <div class="list-group list-group-flush">
+                  {% for post in recent_blog_posts %}
+                  <div class="list-group-item border-0 px-0">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <h6 class="mb-1">
+                          <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none hover-lift">
+                            {{ post.title|truncatechars:50 }}
+                          </a>
+                        </h6>
+                        <p class="mb-1 small text-muted">
+                          {{ post.excerpt|truncatechars:80 }}
+                        </p>
+                        <small class="text-muted">by
+                          {{ post.author.get_full_name|default:post.author.username }} •
+                          {{ post.created_at|timesince }} ago</small>
+                      </div>
+                      {% if post.is_professional_advice %}
+                      <span class="badge badge-solid">Professional</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% empty %}
+                  <div class="list-group-item border-0 px-0">
+                    <h6 class="mb-1">No recent posts yet</h6>
+                    <small class="text-muted">Be the first to share your pet story!</small>
+                  </div>
+                  {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                  <a href="{% url 'petmedia:blog_list' %}" class="btn btn-ghost btn-sm">
+                    View All Posts <i class="fas fa-arrow-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <!-- Appointments + Recent Activity -->
+        <div class="card glass card-amber mb-4">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-calendar-alt me-2 themed-icon"></i> Upcoming Appointments</h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>January 25, 2025 - 10:30 AM</strong><br>
+                  Fluffy - Annual Checkup with Dr. Smith<br>
+                  <small class="text-muted">Regular examination and vaccinations</small>
+                </div>
+                <div class="text-end">
+                  <span class="badge badge-solid">Confirmed</span><br>
+                  <small><a href="#" class="hover-lift">Reschedule</a></small>
+                </div>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>February 2, 2025 - 2:00 PM</strong><br>
+                  Max - Follow-up with Dr. Johnson<br>
+                  <small class="text-muted">Post-surgery check</small>
+                </div>
+                <div class="text-end">
+                  <span class="badge badge-outline">Pending</span><br>
+                  <small><a href="#" class="hover-lift">Confirm</a></small>
+                </div>
+              </div>
+            </div>
+            <div class="text-center mt-3">
+              <a href="#" class="btn btn-ghost">View All Appointments</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass card-olive">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-history me-2 themed-icon"></i> Recent Activity</h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div><i class="fas fa-stethoscope me-2 themed-icon"></i> Fluffy's checkup completed</div>
+                <small class="text-muted">3 days ago</small>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div><i class="fas fa-syringe me-2 themed-icon"></i> Max received vaccinations</div>
+                <small class="text-muted">1 week ago</small>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div><i class="fas fa-pills me-2 themed-icon"></i> Prescription refilled for Bella</div>
+                <small class="text-muted">2 weeks ago</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </section>
+
+      <!-- RIGHT: sticky rail -->
+      <aside class="right-rail">
+        <!-- My Pets -->
+        <div class="card glass card-success">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-paw me-2 themed-icon"></i> My Pets</h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <div class="list-group-item d-flex align-items-center">
+                <div class="avatar me-3" style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:none;">
+                  <div class="bg-success w-100 h-100 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-cat text-white"></i>
+                  </div>
+                </div>
+                <div>
+                  <strong>Fluffy</strong><br>
+                  <small class="text-muted">Persian Cat, 3 years</small>
+                </div>
+              </div>
+              <div class="list-group-item d-flex align-items-center">
+                <div class="avatar me-3" style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:none;">
+                  <div class="bg-info w-100 h-100 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-dog text-white"></i>
+                  </div>
+                </div>
+                <div>
+                  <strong>Max</strong><br>
+                  <small class="text-muted">Golden Retriever, 5 years</small>
+                </div>
+              </div>
+              <div class="list-group-item d-flex align-items-center">
+                <div class="avatar me-3" style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:none;">
+                  <div class="bg-warning w-100 h-100 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-dog text-white"></i>
+                  </div>
+                </div>
+                <div>
+                  <strong>Bella</strong><br>
+                  <small class="text-muted">Beagle, 2 years</small>
+                </div>
+              </div>
+            </div>
+            <div class="text-center mt-3">
+              <a href="{% url 'pets:pet_create' %}" class="btn btn-ghost btn-sm">Add New Pet</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reminders -->
+        <div class="card glass card-amber mt-3">
+          <div class="card-header soft-accent-bg">
+            <h6 class="m-0"><i class="fas fa-bell me-2 themed-icon"></i> Reminders</h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled m-0">
+              <li class="mb-2 small"><i class="fas fa-syringe me-2"></i> Max's vaccination due next month</li>
+              <li class="mb-2 small"><i class="fas fa-pills me-2"></i> Refill Bella's medication</li>
+              <li class="small"><i class="fas fa-calendar me-2"></i> Schedule Fluffy's dental cleaning</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="card glass card-rose mt-3">
+          <div class="card-header soft-accent-bg">
+            <h6 class="m-0"><i class="fas fa-phone me-2 themed-icon"></i> Emergency Contact</h6>
+          </div>
+          <div class="card-body text-center">
+            <h4 class="solid-accent-text">(555) 123-PETS</h4>
+            <p class="mb-0"><small>24/7 Emergency Line</small></p>
+          </div>
+        </div>
+      </aside>
     </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-header">
-        <h5><i class="fas fa-calendar-alt"></i> Upcoming Appointments</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>January 25, 2025 - 10:30 AM</strong>
-              <br>Fluffy - Annual Checkup with Dr. Smith
-              <br><small class="text-muted">Regular examination and vaccinations</small>
-            </div>
-            <div>
-              <span class="badge bg-success mb-1">Confirmed</span>
-              <br><small><a href="#" class="text-primary">Reschedule</a></small>
-            </div>
-          </div>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>February 2, 2025 - 2:00 PM</strong>
-              <br>Max - Follow-up with Dr. Johnson
-              <br><small class="text-muted">Post-surgery check</small>
-            </div>
-            <div>
-              <span class="badge bg-warning mb-1">Pending</span>
-              <br><small><a href="#" class="text-primary">Confirm</a></small>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center mt-3">
-          <a href="#" class="btn btn-outline-info">View All Appointments</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-4">
-      <div class="card-header">
-        <h5><i class="fas fa-history"></i> Recent Activity</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <i class="fas fa-stethoscope text-success me-2"></i>
-              Fluffy's checkup completed
-            </div>
-            <small class="text-muted">3 days ago</small>
-          </div>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <i class="fas fa-syringe text-info me-2"></i>
-              Max received vaccinations
-            </div>
-            <small class="text-muted">1 week ago</small>
-          </div>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <i class="fas fa-pills text-warning me-2"></i>
-              Prescription refilled for Bella
-            </div>
-            <small class="text-muted">2 weeks ago</small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">
-        <h5><i class="fas fa-paw"></i> My Pets</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          <div class="list-group-item d-flex align-items-center">
-            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-              <i class="fas fa-cat text-white"></i>
-            </div>
-            <div>
-              <strong>Fluffy</strong>
-              <br><small class="text-muted">Persian Cat, 3 years</small>
-            </div>
-          </div>
-          <div class="list-group-item d-flex align-items-center">
-            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-              <i class="fas fa-dog text-white"></i>
-            </div>
-            <div>
-              <strong>Max</strong>
-              <br><small class="text-muted">Golden Retriever, 5 years</small>
-            </div>
-          </div>
-          <div class="list-group-item d-flex align-items-center">
-            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-              <i class="fas fa-dog text-white"></i>
-            </div>
-            <div>
-              <strong>Bella</strong>
-              <br><small class="text-muted">Beagle, 2 years</small>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center mt-3">
-          <a href="#" class="btn btn-outline-success btn-sm">Add New Pet</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card-header">
-        <h6><i class="fas fa-bell"></i> Reminders</h6>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          <div class="list-group-item px-0">
-            <small class="text-info">
-              <i class="fas fa-syringe"></i> Max's vaccination due next month
-            </small>
-          </div>
-          <div class="list-group-item px-0">
-            <small class="text-warning">
-              <i class="fas fa-pills"></i> Refill Bella's medication
-            </small>
-          </div>
-          <div class="list-group-item px-0">
-            <small class="text-success">
-              <i class="fas fa-calendar"></i> Schedule Fluffy's dental cleaning
-            </small>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card-header">
-        <h6><i class="fas fa-phone"></i> Emergency Contact</h6>
-      </div>
-      <div class="card-body text-center">
-        <h4 class="text-danger">(555) 123-PETS</h4>
-        <p class="mb-0"><small>24/7 Emergency Line</small></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row mt-4">
-  <div class="col-12">
-    <div class="alert alert-info">
-      <h5><i class="fas fa-info-circle"></i> Welcome to Pawsitive Care!</h5>
-      <p class="mb-0">We're here to provide the best care for your beloved pets. Book appointments, manage your pets' health records, and stay connected with our veterinary team.</p>
-    </div>
-  </div>
+  </main>
 </div>
 {% endblock %}

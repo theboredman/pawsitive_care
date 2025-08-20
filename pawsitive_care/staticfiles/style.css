@@ -1,0 +1,204 @@
+/* ========= Tokens (medium–dark) ========= */
+:root {
+    --pc-bg-start: #432E54;
+    /* deep purple */
+    --pc-bg-end: #4B4376;
+    /* slate purple */
+    --pc-surface: #3A2E55;
+    /* card/nav surface */
+    --pc-surface-2: #2F2548;
+    /* inputs / deeper surface */
+    --pc-text: #F7F7FC;
+    /* primary text */
+    --pc-muted: #CFC8E2;
+    /* secondary text */
+    --pc-primary: #AE445A;
+    /* accent (rose) */
+    --pc-brand: #E8BCB9;
+    /* brand highlight (peach) */
+    --pc-border: rgba(255, 255, 255, .08);
+}
+
+/* ========= App base ========= */
+html,
+body {
+    height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, var(--pc-bg-start) 0%, var(--pc-bg-end) 100%) fixed;
+    color: var(--pc-text);
+}
+
+main {
+    flex: 1;
+}
+
+/* ========= Navbar: medium, full-width, sticky, transparent on scroll ========= */
+.app-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    width: 100%;
+    background: var(--pc-surface);
+    /* solid at top */
+    border-bottom: 1px solid var(--pc-border);
+    transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
+    min-height: 64px;
+    /* medium height */
+}
+
+.app-navbar.nav-scrolled {
+    background: transparent;
+    /* becomes transparent when scrolling */
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.nav-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Brand */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--pc-brand) !important;
+    letter-spacing: .25px;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+/* Links */
+.app-navbar .nav-link {
+    font-size: .95rem;
+    padding: .5rem .75rem;
+    color: var(--pc-muted) !important;
+}
+
+.app-navbar .nav-link:hover,
+.app-navbar .nav-link.active,
+.app-navbar .nav-link:focus {
+    color: var(--pc-text) !important;
+    background: rgba(174, 68, 90, .18);
+    /* rose tint */
+    border-radius: 999px;
+}
+
+/* Dropdowns */
+.app-navbar .dropdown-menu {
+    background: var(--pc-surface);
+    border: 1px solid var(--pc-border);
+}
+
+.app-navbar .dropdown-item {
+    color: var(--pc-text);
+}
+
+.app-navbar .dropdown-item:hover {
+    background: rgba(174, 68, 90, .18);
+    color: var(--pc-text);
+}
+
+/* Search pill */
+.nav-search {
+    width: min(560px, 60vw);
+}
+
+.nav-search .form-control {
+    background: var(--pc-surface-2);
+    color: var(--pc-text);
+    border: 1px solid var(--pc-border);
+    border-radius: 999px;
+}
+
+.nav-search .form-control::placeholder {
+    color: #B9B3CD;
+}
+
+.input-group-text {
+    background: var(--pc-surface-2);
+    color: #B9B3CD;
+    border: 1px solid var(--pc-border);
+    border-right: 0;
+    border-radius: 999px 0 0 999px;
+}
+
+/* Buttons */
+.btn-success {
+    background-color: var(--pc-primary);
+    border-color: var(--pc-primary);
+}
+
+.btn-success:hover {
+    background-color: #973b4f;
+    border-color: #973b4f;
+}
+
+.btn-outline-success {
+    color: var(--pc-brand);
+    border-color: var(--pc-brand);
+}
+
+.btn-outline-success:hover {
+    background-color: var(--pc-brand);
+    color: #432E54;
+}
+
+/* Alerts/close button visibility on dark bg */
+.alert {
+    border: 1px solid var(--pc-border);
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%);
+}
+
+/* Badges & avatars */
+.role-badge {
+    font-size: .78rem;
+    background: #E8BCB9;
+    color: #432E54;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Scroll progress bar */
+#scrollProgress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: var(--pc-primary);
+    z-index: 1040;
+    transition: width .06s linear;
+}
+
+/* Footer */
+footer {
+    background: transparent;
+}
+
+footer p {
+    color: var(--pc-muted);
+}
+
+/* Motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+    .app-navbar,
+    #scrollProgress {
+        transition: none;
+    }
+}

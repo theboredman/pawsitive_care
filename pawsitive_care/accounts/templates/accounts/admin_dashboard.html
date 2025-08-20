@@ -3,448 +3,492 @@
 {% block title %}Admin Dashboard - Pawsitive Care{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h2><i class="fas fa-user-shield text-primary"></i> Administrator Dashboard</h2>
-        <p class="text-muted">Manage your veterinary clinic system</p>
-      </div>
-      <div>
-        <span class="badge bg-primary fs-6">
-          {{ user.get_role_display }}</span>
-      </div>
-    </div>
-  </div>
-</div>
+<div id="scrollProgress"></div>
 
-<div class="row">
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-primary">
-      <div class="card-body text-center">
-        <i class="fas fa-users fa-2x text-primary mb-3"></i>
-        <h5>User Management</h5>
-        <p class="text-muted">Manage all system users</p>
-        <a href="{% url 'accounts:user_management' %}" class="btn btn-primary btn-sm">
-          <i class="fas fa-cog"></i> Manage Users
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="app-sidebar glass" aria-label="Primary">
+    <div class="sidebar-header">
+      <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="sidebar-title">Admin</span>
+    </div>
+
+    <!-- Sections -->
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Users</div>
+        <a href="{% url 'accounts:user_management' %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_management' %}active{% endif %}">
+          <i class="fas fa-users"></i><span>Manage Users</span>
+        </a>
+        <a href="{% url 'accounts:promote_clients' %}" class="sidebar-link {% if request.resolver_match.url_name == 'promote_clients' %}active{% endif %}">
+          <i class="fas fa-user-plus"></i><span>Promote Clients</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-user-tie"></i><span>Add Staff</span>
         </a>
       </div>
-    </div>
-  </div>
 
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-success">
-      <div class="card-body text-center">
-        <i class="fas fa-user-plus fa-2x text-success mb-3"></i>
-        <h5>Staff Promotion</h5>
-        <p class="text-muted">Promote clients to staff</p>
-        <a href="{% url 'accounts:promote_clients' %}" class="btn btn-success btn-sm">
-          <i class="fas fa-arrow-up"></i> Promote Users
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Inventory</div>
+        <a href="{% url 'inventory:item_list' %}" class="sidebar-link">
+          <i class="fas fa-boxes"></i><span>All Items</span>
+        </a>
+        <a href="{% url 'inventory:item_list' %}?low_stock=1" class="sidebar-link">
+          <i class="fas fa-triangle-exclamation"></i><span>Low Stock</span>
+        </a>
+        <a href="{% url 'inventory:item_create' %}" class="sidebar-link">
+          <i class="fas fa-plus"></i><span>Add Item</span>
+        </a>
+        <a href="{% url 'inventory:reports' %}" class="sidebar-link">
+          <i class="fas fa-chart-line"></i><span>Reports</span>
         </a>
       </div>
-    </div>
-  </div>
 
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-warning">
-      <div class="card-body text-center">
-        <i class="fas fa-user-tie fa-2x text-warning mb-3"></i>
-        <h5>Staff Members</h5>
-        <p class="text-muted">Manage staff accounts</p>
-        <a href="#" class="btn btn-warning btn-sm">
-          <i class="fas fa-plus"></i> Add Staff
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Blog</div>
+        <a href="/admin/petmedia/blogpost/" class="sidebar-link">
+          <i class="fas fa-edit"></i><span>Posts</span>
+        </a>
+        <a href="/admin/petmedia/blogcomment/" class="sidebar-link">
+          <i class="fas fa-comments"></i><span>Comments</span>
+        </a>
+        <a href="/admin/petmedia/blogpost/?is_featured__exact=1" class="sidebar-link">
+          <i class="fas fa-star"></i><span>Featured</span>
+        </a>
+        <a href="/admin/petmedia/bloglike/" class="sidebar-link">
+          <i class="fas fa-heart"></i><span>Engagement</span>
         </a>
       </div>
-    </div>
-  </div>
 
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-info">
-      <div class="card-body text-center">
-        <i class="fas fa-chart-bar fa-2x text-info mb-3"></i>
-        <h5>Reports</h5>
-        <p class="text-muted">System analytics</p>
-        <a href="#" class="btn btn-info btn-sm">
-          <i class="fas fa-chart-line"></i> View Reports
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">System</div>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-chart-bar"></i><span>Reports</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-gear"></i><span>Settings</span>
         </a>
       </div>
-    </div>
-  </div>
-</div>
+    </nav>
+  </aside>
 
-<!-- Inventory Management Section -->
-<div class="row mt-4">
-  <div class="col-12">
-    <h4><i class="fas fa-boxes text-warning"></i> Inventory Management</h4>
-    <p class="text-muted">Monitor and manage clinic inventory</p>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-warning">
-      <div class="card-body text-center">
-        <i class="fas fa-box fa-2x text-warning mb-3"></i>
-        <h5>Total Items</h5>
-        <h2 class="text-warning">
-          {{ inventory_stats.total_items|default:0 }}
-        </h2>
-        <a href="{% url 'inventory:item_list' %}" class="btn btn-warning btn-sm">
-          <i class="fas fa-list"></i> View All
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-danger">
-      <div class="card-body text-center">
-        <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
-        <h5>Low Stock</h5>
-        <h2 class="text-danger">
-          {{ inventory_stats.low_stock_items|default:0 }}
-        </h2>
-        <a href="{% url 'inventory:item_list' %}?low_stock=1" class="btn btn-danger btn-sm">
-          <i class="fas fa-warning"></i> View Alerts
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-success">
-      <div class="card-body text-center">
-        <i class="fas fa-plus fa-2x text-success mb-3"></i>
-        <h5>Add Items</h5>
-        <p class="text-muted">Stock management</p>
-        <a href="{% url 'inventory:item_create' %}" class="btn btn-success btn-sm">
-          <i class="fas fa-plus"></i> Add Item
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-info">
-      <div class="card-body text-center">
-        <i class="fas fa-chart-line fa-2x text-info mb-3"></i>
-        <h5>Reports</h5>
-        <p class="text-muted">Inventory analytics</p>
-        <a href="{% url 'inventory:reports' %}" class="btn btn-info btn-sm">
-          <i class="fas fa-chart-bar"></i> View Reports
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Blog Management Section -->
-<div class="row mt-4">
-  <div class="col-12">
-    <h4><i class="fas fa-blog text-primary"></i> Blog Management</h4>
-    <p class="text-muted">Manage all blog posts, comments, and content</p>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-primary">
-      <div class="card-body text-center">
-        <i class="fas fa-edit fa-2x text-primary mb-3"></i>
-        <h5>All Posts</h5>
-        <div class="row text-center mb-3">
-          <div class="col-6">
-            <strong class="text-success">
-              {{ blog_stats.published_posts }}</strong>
-            <small class="d-block text-muted">Published</small>
+  <!-- MAIN CONTENT -->
+  <main class="app-main">
+    <!-- Header -->
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2><i class="fas fa-user-shield me-2"></i> Administrator Dashboard</h2>
+            <p class="text-muted">Manage your veterinary clinic system</p>
           </div>
-          <div class="col-6">
-            <strong class="text-warning">
-              {{ blog_stats.unpublished_posts }}</strong>
-            <small class="d-block text-muted">Drafts</small>
+          <div>
+            <span class="badge badge-secondary hover-lift">
+              {{ user.get_role_display }}</span>
           </div>
         </div>
-        <a href="/admin/petmedia/blogpost/" class="btn btn-primary btn-sm">
-          <i class="fas fa-cog"></i> Manage Posts
-        </a>
       </div>
     </div>
-  </div>
 
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-success">
-      <div class="card-body text-center">
-        <i class="fas fa-comments fa-2x text-success mb-3"></i>
-        <h5>Comments</h5>
-        <div class="text-center mb-3">
-          <strong class="text-primary fs-4">
-            {{ blog_stats.total_comments }}</strong>
-          <small class="d-block text-muted">Total Comments</small>
-          {% if blog_stats.pending_comments > 0 %}
-          <span class="badge bg-warning">
-            {{ blog_stats.pending_comments }} pending</span>
-          {% endif %}
-        </div>
-        <a href="/admin/petmedia/blogcomment/" class="btn btn-success btn-sm">
-          <i class="fas fa-eye"></i> Review Comments
-        </a>
-      </div>
-    </div>
-  </div>
+    {# === RIGHT RAIL LAYOUT: left content + right System Stats === #}
+    <div class="main-grid mt-3">
+      <!-- LEFT: main content -->
+      <section class="main-content">
 
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-warning">
-      <div class="card-body text-center">
-        <i class="fas fa-star fa-2x text-warning mb-3"></i>
-        <h5>Featured Content</h5>
-        <div class="text-center mb-3">
-          <strong class="text-primary fs-4">
-            {{ blog_stats.featured_posts }}</strong>
-          <small class="d-block text-muted">Featured Posts</small>
-          <small class="text-muted">
-            {{ blog_stats.professional_posts }} Professional</small>
-        </div>
-        <a href="/admin/petmedia/blogpost/?is_featured__exact=1" class="btn btn-warning btn-sm">
-          <i class="fas fa-crown"></i> Manage Featured
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-danger">
-      <div class="card-body text-center">
-        <i class="fas fa-heart fa-2x text-danger mb-3"></i>
-        <h5>Engagement</h5>
-        <div class="text-center mb-3">
-          <strong class="text-primary fs-4">
-            {{ blog_stats.total_likes }}</strong>
-          <small class="d-block text-muted">Total Likes</small>
-          <small class="text-success">
-            {{ blog_stats.posts_this_week }} posts this week</small>
-        </div>
-        <a href="/admin/petmedia/bloglike/" class="btn btn-danger btn-sm">
-          <i class="fas fa-thumbs-up"></i> View Likes
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h5><i class="fas fa-activity"></i> Recent System Activity</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          {% for user in recent_users %}
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <i class="fas fa-user-plus text-success me-2"></i>
-              New user registration:
-              {{ user.get_full_name|default:user.username }}
-              <small class="text-muted">(
-                {{ user.get_role_display }})</small>
+        <!-- Quick Actions -->
+        <div class="card glass card-teal mb-4">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-bolt me-2 themed-icon"></i> Quick Actions</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <a href="/admin/petmedia/blogpost/add/" class="btn btn-accent w-100">
+                  <i class="fas fa-plus me-2"></i>Create New Post
+                </a>
+              </div>
+              <div class="col-md-6 mb-3">
+                <a href="/admin/petmedia/blogpost/?is_published__exact=0" class="btn btn-accent w-100">
+                  <i class="fas fa-eye me-2"></i>Review Drafts
+                </a>
+              </div>
+              <div class="col-md-6 mb-3">
+                <a href="/admin/petmedia/blogcomment/?is_approved__exact=0" class="btn btn-accent w-100">
+                  <i class="fas fa-comments me-2"></i>Pending Comments
+                </a>
+              </div>
+              <div class="col-md-6 mb-3">
+                <a href="/admin/petmedia/blogcategory/" class="btn btn-accent w-100">
+                  <i class="fas fa-tags me-2"></i>Manage Categories
+                </a>
+              </div>
             </div>
-            <small class="text-muted">
-              {{ user.date_joined|timesince }} ago</small>
           </div>
-          {% empty %}
-          <div class="list-group-item text-center text-muted">
-            <i class="fas fa-info-circle me-2"></i>
-            No recent user activity
-          </div>
-          {% endfor %}
         </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h5><i class="fas fa-blog"></i> Recent Blog Activity</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          {% for post in recent_posts %}
-          <div class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="flex-grow-1">
-              <div class="d-flex align-items-center">
-                {% if post.is_professional_advice %}
-                <i class="fas fa-user-md text-success me-2"></i>
-                {% else %}
-                <i class="fas fa-edit text-primary me-2"></i>
-                {% endif %}
-                <div>
-                  <a href="/admin/petmedia/blogpost/{{ post.id }}/change/" class="text-decoration-none">
-                    {{ post.title|truncatechars:40 }}
-                  </a>
-                  <small class="d-block text-muted">
-                    by
-                    {{ post.author.get_full_name|default:post.author.username }}
-                  </small>
+        {# ---- keep everything else (Top Cards, Inventory, Blog, Activity) below as-is ---- #}
+
+        <!-- Top Cards -->
+        <div class="row">
+          <!-- User Management -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-olive">
+              <div class="card-body text-center">
+                <i class="fas fa-users fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">User Management</h5>
+                <p class="text-muted">Manage all system users</p>
+                <a href="{% url 'accounts:user_management' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-cog me-1"></i> Manage Users
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Staff Promotion -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-gold">
+              <div class="card-body text-center">
+                <i class="fas fa-user-plus fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Staff Promotion</h5>
+                <p class="text-muted">Promote clients to staff</p>
+                <a href="{% url 'accounts:promote_clients' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-arrow-up me-1"></i> Promote Users
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Staff Members -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-sienna">
+              <div class="card-body text-center">
+                <i class="fas fa-user-tie fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Staff Members</h5>
+                <p class="text-muted">Manage staff accounts</p>
+                <a href="#" class="btn btn-accent btn-sm">
+                  <i class="fas fa-plus me-1"></i> Add Staff
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reports -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-indigo">
+              <div class="card-body text-center">
+                <i class="fas fa-chart-bar fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Reports</h5>
+                <p class="text-muted">System analytics</p>
+                <a href="#" class="btn btn-accent btn-sm">
+                  <i class="fas fa-chart-line me-1"></i> View Reports
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory Management Section -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4><i class="fas fa-boxes me-2"></i> Inventory Management</h4>
+            <p class="text-muted">Monitor and manage clinic inventory</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Total Items -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-teal">
+              <div class="card-body text-center">
+                <i class="fas fa-box fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Total Items</h5>
+                <h2 class="solid-accent-text">
+                  {{ inventory_stats.total_items|default:0 }}
+                </h2>
+                <a href="{% url 'inventory:item_list' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-list me-1"></i> View All
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Low Stock -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-amber">
+              <div class="card-body text-center">
+                <i class="fas fa-triangle-exclamation fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Low Stock</h5>
+                <h2 class="solid-accent-text">
+                  {{ inventory_stats.low_stock_items|default:0 }}
+                </h2>
+                <a href="{% url 'inventory:item_list' %}?low_stock=1" class="btn btn-accent btn-sm">
+                  <i class="fas fa-triangle-exclamation me-1"></i> View Alerts
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Items -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-success">
+              <div class="card-body text-center">
+                <i class="fas fa-plus fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Add Items</h5>
+                <p class="text-muted">Stock management</p>
+                <a href="{% url 'inventory:item_create' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-plus me-1"></i> Add Item
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory Reports -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-rose">
+              <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Reports</h5>
+                <p class="text-muted">Inventory analytics</p>
+                <a href="{% url 'inventory:reports' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-chart-bar me-1"></i> View Reports
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog Management Section -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4><i class="fas fa-blog me-2"></i> Blog Management</h4>
+            <p class="text-muted">Manage all blog posts, comments, and content</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- All Posts -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-gold">
+              <div class="card-body text-center">
+                <i class="fas fa-edit fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">All Posts</h5>
+                <div class="row text-center mb-3">
+                  <div class="col-6">
+                    <strong class="solid-accent-text">
+                      {{ blog_stats.published_posts }}</strong>
+                    <small class="d-block text-muted">Published</small>
+                  </div>
+                  <div class="col-6">
+                    <strong class="solid-accent-text">
+                      {{ blog_stats.unpublished_posts }}</strong>
+                    <small class="d-block text-muted">Drafts</small>
+                  </div>
+                </div>
+                <a href="/admin/petmedia/blogpost/" class="btn btn-accent btn-sm">
+                  <i class="fas fa-cog me-1"></i> Manage Posts
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-teal">
+              <div class="card-body text-center">
+                <i class="fas fa-comments fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Comments</h5>
+                <div class="text-center mb-3">
+                  <strong class="solid-accent-text fs-4">
+                    {{ blog_stats.total_comments }}</strong>
+                  <small class="d-block text-muted">Total Comments</small>
+                  {% if blog_stats.pending_comments > 0 %}
+                  <span class="badge badge-solid">
+                    {{ blog_stats.pending_comments }} pending</span>
+                  {% endif %}
+                </div>
+                <a href="/admin/petmedia/blogcomment/" class="btn btn-accent btn-sm">
+                  <i class="fas fa-eye me-1"></i> Review Comments
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Featured -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-rose">
+              <div class="card-body text-center">
+                <i class="fas fa-star fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Featured Content</h5>
+                <div class="text-center mb-3">
+                  <strong class="solid-accent-text fs-4">
+                    {{ blog_stats.featured_posts }}</strong>
+                  <small class="d-block text-muted">Featured Posts</small>
+                  <small class="text-muted">
+                    {{ blog_stats.professional_posts }} Professional</small>
+                </div>
+                <a href="/admin/petmedia/blogpost/?is_featured__exact=1" class="btn btn-accent btn-sm">
+                  <i class="fas fa-crown me-1"></i> Manage Featured
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Engagement -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-indigo">
+              <div class="card-body text-center">
+                <i class="fas fa-heart fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Engagement</h5>
+                <div class="text-center mb-3">
+                  <strong class="solid-accent-text fs-4">
+                    {{ blog_stats.total_likes }}</strong>
+                  <small class="d-block text-muted">Total Likes</small>
+                  <small class="text-success">
+                    {{ blog_stats.posts_this_week }} posts this week</small>
+                </div>
+                <a href="/admin/petmedia/bloglike/" class="btn btn-accent btn-sm">
+                  <i class="fas fa-thumbs-up me-1"></i> View Likes
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Rows -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card glass card-olive">
+              <div class="card-header soft-accent-bg">
+                <h5 class="m-0"><i class="fas fa-bolt me-2 themed-icon"></i> Recent System Activity</h5>
+              </div>
+              <div class="card-body">
+                <div class="list-group list-group-flush">
+                  {% for user in recent_users %}
+                  <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <i class="fas fa-user-plus me-2"></i>
+                      New user registration:
+                      {{ user.get_full_name|default:user.username }}
+                      <small class="text-muted">(
+                        {{ user.get_role_display }})</small>
+                    </div>
+                    <small class="text-muted">
+                      {{ user.date_joined|timesince }} ago</small>
+                  </div>
+                  {% empty %}
+                  <div class="list-group-item text-center text-muted">
+                    <i class="fas fa-info-circle me-2"></i> No recent user activity
+                  </div>
+                  {% endfor %}
                 </div>
               </div>
             </div>
-            <div class="text-end">
-              {% if post.is_published %}
-              <span class="badge bg-success">Published</span>
-              {% else %}
-              <span class="badge bg-warning">Draft</span>
-              {% endif %}
-              <small class="d-block text-muted">
-                {{ post.created_at|timesince }} ago
-              </small>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card glass card-sienna">
+              <div class="card-header soft-accent-bg">
+                <h5 class="m-0"><i class="fas fa-blog me-2 themed-icon"></i> Recent Blog Activity</h5>
+              </div>
+              <div class="card-body">
+                <div class="list-group list-group-flush">
+                  {% for post in recent_posts %}
+                  <div class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                      <div class="d-flex align-items-center">
+                        {% if post.is_professional_advice %}
+                        <i class="fas fa-user-md text-success me-2"></i>
+                        {% else %}
+                        <i class="fas fa-edit me-2"></i>
+                        {% endif %}
+                        <div>
+                          <a href="/admin/petmedia/blogpost/{{ post.id }}/change/" class="text-decoration-none hover-lift">
+                            {{ post.title|truncatechars:40 }}
+                          </a>
+                          <small class="d-block text-muted">by
+                            {{ post.author.get_full_name|default:post.author.username }}</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      {% if post.is_published %}
+                      <span class="badge badge-solid">Published</span>
+                      {% else %}
+                      <span class="badge badge-outline">Draft</span>
+                      {% endif %}
+                      <small class="text-muted d-block">
+                        {{ post.created_at|timesince }} ago</small>
+                    </div>
+                  </div>
+                  {% empty %}
+                  <div class="list-group-item text-center text-muted">
+                    <i class="fas fa-info-circle me-2"></i> No recent blog posts
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
             </div>
           </div>
-          {% empty %}
-          <div class="list-group-item text-center text-muted">
-            <i class="fas fa-info-circle me-2"></i>
-            No recent blog posts
-          </div>
-          {% endfor %}
         </div>
-      </div>
+
+      </section>
+
+      <!-- RIGHT: sticky System Stats -->
+      <aside class="right-rail">
+        <div class="card glass card-gold">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-tachometer-alt me-2 themed-icon"></i> System Stats</h5>
+          </div>
+          <div class="card-body">
+            <h6 class="text-muted mb-3">User Statistics</h6>
+            <div class="mb-2 d-flex justify-content-between"><span>Total Users</span><strong>
+                {{ stats.total_users }}</strong></div>
+            <div class="mb-2 d-flex justify-content-between"><span>Administrators</span><strong>
+                {{ stats.admin_count }}</strong></div>
+            <div class="mb-2 d-flex justify-content-between"><span>Veterinarians</span><strong>
+                {{ stats.vet_count }}</strong></div>
+            <div class="mb-2 d-flex justify-content-between"><span>Staff Members</span><strong>
+                {{ stats.staff_count }}</strong></div>
+            <div class="mb-3 d-flex justify-content-between"><span>Clients</span><strong>
+                {{ stats.client_count }}</strong></div>
+
+            <hr>
+
+            <h6 class="text-muted mb-3">Content Statistics</h6>
+            <div class="mb-2 d-flex justify-content-between"><span>Total Posts</span><strong>
+                {{ blog_stats.total_posts }}</strong></div>
+            <div class="mb-2 d-flex justify-content-between"><span>Total Comments</span><strong>
+                {{ blog_stats.total_comments }}</strong></div>
+            <div class="mb-3 d-flex justify-content-between"><span>Total Likes</span><strong>
+                {{ blog_stats.total_likes }}</strong></div>
+
+            {% if top_categories %}
+            <hr>
+            <h6 class="text-muted mb-3">Top Categories</h6>
+            {% for category in top_categories %}
+            <div class="mb-2 d-flex justify-content-between">
+              <span>
+                {{ category.get_name_display|truncatechars:15 }}</span>
+              <strong>
+                {{ category.post_count }}</strong>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <hr>
+            <div class="d-flex justify-content-between align-items-center">
+              <span><strong>System Health</strong></span>
+              <span class="badge badge-solid">Excellent</span>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
-  </div>
-</div>
 
-<div class="row mt-4">
-  <div class="col-md-8">
-    <!-- Quick Actions Card -->
-    <div class="card">
-      <div class="card-header">
-        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <a href="/admin/petmedia/blogpost/add/" class="btn btn-outline-primary w-100">
-              <i class="fas fa-plus me-2"></i>Create New Post
-            </a>
-          </div>
-          <div class="col-md-6 mb-3">
-            <a href="/admin/petmedia/blogpost/?is_published__exact=0" class="btn btn-outline-warning w-100">
-              <i class="fas fa-eye me-2"></i>Review Drafts
-            </a>
-          </div>
-          <div class="col-md-6 mb-3">
-            <a href="/admin/petmedia/blogcomment/?is_approved__exact=0" class="btn btn-outline-info w-100">
-              <i class="fas fa-comments me-2"></i>Pending Comments
-            </a>
-          </div>
-          <div class="col-md-6 mb-3">
-            <a href="/admin/petmedia/blogcategory/" class="btn btn-outline-success w-100">
-              <i class="fas fa-tags me-2"></i>Manage Categories
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">
-        <h5><i class="fas fa-tachometer-alt"></i> System Stats</h5>
-      </div>
-      <div class="card-body">
-        <h6 class="text-muted mb-3">User Statistics</h6>
-        <div class="mb-2">
-          <div class="d-flex justify-content-between">
-            <span>Total Users</span>
-            <strong>
-              {{ stats.total_users }}</strong>
-          </div>
-        </div>
-        <div class="mb-2">
-          <div class="d-flex justify-content-between">
-            <span>Administrators</span>
-            <strong>
-              {{ stats.admin_count }}</strong>
-          </div>
-        </div>
-        <div class="mb-2">
-          <div class="d-flex justify-content-between">
-            <span>Veterinarians</span>
-            <strong>
-              {{ stats.vet_count }}</strong>
-          </div>
-        </div>
-        <div class="mb-2">
-          <div class="d-flex justify-content-between">
-            <span>Staff Members</span>
-            <strong>
-              {{ stats.staff_count }}</strong>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span>Clients</span>
-            <strong>
-              {{ stats.client_count }}</strong>
-          </div>
-        </div>
 
-        <hr>
-
-        <h6 class="text-muted mb-3">Content Statistics</h6>
-        <div class="mb-2">
-          <div class="d-flex justify-content-between">
-            <span>Total Posts</span>
-            <strong>
-              {{ blog_stats.total_posts }}</strong>
-          </div>
-        </div>
-        <div class="mb-2">
-          <div class="d-flex justify-content-between">
-            <span>Total Comments</span>
-            <strong>
-              {{ blog_stats.total_comments }}</strong>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span>Total Likes</span>
-            <strong>
-              {{ blog_stats.total_likes }}</strong>
-          </div>
-        </div>
-
-        {% if top_categories %}
-        <hr>
-        <h6 class="text-muted mb-3">Top Categories</h6>
-        {% for category in top_categories %}
-        <div class="mb-2">
-          <div class="d-flex justify-content-between">
-            <span>
-              {{ category.get_name_display|truncatechars:15 }}</span>
-            <strong>
-              {{ category.post_count }}</strong>
-          </div>
-        </div>
-        {% endfor %}
-        {% endif %}
-
-        <hr>
-        <div class="d-flex justify-content-between">
-          <span><strong>System Health</strong></span>
-          <span class="badge bg-success">Excellent</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row mt-4">
-  <div class="col-12">
-    <div class="alert alert-info">
-      <h5><i class="fas fa-info-circle"></i> Administrator Privileges</h5>
-      <p class="mb-0">As an administrator, you have full access to all system features including user management, system settings, reports, and data management. Use these privileges responsibly.</p>
-    </div>
-  </div>
+  </main>
 </div>
 {% endblock %}

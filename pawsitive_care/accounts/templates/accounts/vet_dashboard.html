@@ -3,358 +3,353 @@
 {% block title %}Veterinarian Dashboard - Pawsitive Care{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
+<div class="app-shell">
+  {# ============== LEFT SIDEBAR ============== #}
+  <aside class="app-sidebar glass" aria-label="Primary">
+    <div class="sidebar-header">
+      <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="sidebar-title">Veterinarian</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Overview</div>
+        <a href="{% url 'accounts:vet_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'vet_dashboard' %}active{% endif %}">
+          <i class="fas fa-stethoscope"></i><span>Dashboard</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Appointments</div>
+        <a href="{% url 'appointments:vet_schedule' %}" class="sidebar-link">
+          <i class="fas fa-calendar-check"></i><span>My Schedule</span>
+        </a>
+        <a href="{% url 'appointments:create_appointment' %}" class="sidebar-link">
+          <i class="fas fa-calendar-plus"></i><span>New Appointment</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Patients</div>
+        <a href="{% url 'records:view_records' %}" class="sidebar-link">
+          <i class="fas fa-paw"></i><span>Find Patient</span>
+        </a>
+        <a href="{% url 'records:add_record' %}" class="sidebar-link">
+          <i class="fas fa-file-medical"></i><span>New Record</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-prescription-bottle"></i><span>Prescriptions</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Inventory</div>
+        <a href="{% url 'inventory:dashboard' %}" class="sidebar-link">
+          <i class="fas fa-tachometer-alt"></i><span>Inventory</span>
+        </a>
+        <a href="{% url 'inventory:item_list' %}?category=MEDICINE" class="sidebar-link">
+          <i class="fas fa-pills"></i><span>Medications</span>
+        </a>
+        <a href="{% url 'inventory:item_list' %}?alerts=1" class="sidebar-link">
+          <i class="fas fa-triangle-exclamation"></i><span>Alerts</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Community</div>
+        <a href="{% url 'petmedia:professional_advice' %}" class="sidebar-link">
+          <i class="fas fa-user-md"></i><span>Professional Posts</span>
+        </a>
+        <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link">
+          <i class="fas fa-comments"></i><span>Community</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  {# ============== MAIN ============== #}
+  <main class="app-main">
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h2><i class="fas fa-stethoscope text-success"></i> Veterinarian Dashboard</h2>
+        <h2><i class="fas fa-stethoscope me-2 themed-icon"></i> Veterinarian Dashboard</h2>
         <p class="text-muted">Manage your patients and appointments</p>
       </div>
-      <div>
-        <span class="badge bg-success fs-6">
-          {{ user.get_role_display }}</span>
-      </div>
+      
     </div>
-  </div>
-</div>
 
-<div class="row">
-  <!-- Quick Actions -->
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-success">
-      <div class="card-body text-center">
-        <i class="fas fa-calendar-plus fa-2x text-success mb-3"></i>
-        <h5>Appointments</h5>
-        <p class="text-muted">Manage your schedule</p>
-        <a href="{% url 'appointments:vet_schedule' %}" class="btn btn-success btn-sm">
-          <i class="fas fa-calendar"></i> View Schedule
-        </a>
-      </div>
-    </div>
-  </div>
+    <!-- Two-column app content -->
+    <div class="main-grid">
 
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-info">
-      <div class="card-body text-center">
-        <i class="fas fa-paw fa-2x text-info mb-3"></i>
-        <h5>Patients</h5>
-        <p class="text-muted">View patient records</p>
-        <a href="{% url 'records:view_records' %}" class="btn btn-info btn-sm">
-          <i class="fas fa-search"></i> Find Patient
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-warning">
-      <div class="card-body text-center">
-        <i class="fas fa-file-medical-alt fa-2x text-warning mb-3"></i>
-        <h5>Medical Records</h5>
-        <p class="text-muted">Update patient files</p>
-        <a href="{% url 'records:add_record' %}" class="btn btn-warning btn-sm">
-          <i class="fas fa-plus"></i> New Record
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3 mb-4">
-    <div class="card dashboard-card h-100 border-primary">
-      <div class="card-body text-center">
-        <i class="fas fa-pills fa-2x text-primary mb-3"></i>
-        <h5>Prescriptions</h5>
-        <p class="text-muted">Manage medications</p>
-        <a href="#" class="btn btn-primary btn-sm">
-          <i class="fas fa-prescription-bottle"></i> Prescribe
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Inventory Status for Veterinarians -->
-<div class="row mb-4">
-  <div class="col-md-6 mb-4">
-    <div class="card dashboard-card h-100 border-warning">
-      <div class="card-header bg-warning text-dark">
-        <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>Medical Inventory Status</h5>
-      </div>
-      <div class="card-body">
-        <p class="text-muted">Quick access to medical supplies and medications</p>
-        <div class="row g-2 mb-3">
-          <div class="col-6">
-            <div class="card border-0 bg-light">
-              <div class="card-body p-2 text-center">
-                <i class="fas fa-pills text-primary"></i>
-                <div class="small mt-1">Medications</div>
-                <div class="h6 mb-0">
-                  {{ inventory_stats.medicine_count|default:0 }}
-                </div>
+      <!-- LEFT COLUMN -->
+      <section class="main-content">
+        <!-- TOP: Quick Actions + Vet Access -->
+        <div class="row">
+          <div class="col-12 mb-4">
+            <div class="card glass card-success h-100">
+              <div class="card-header soft-accent-bg">
+                <h5 class="m-0"><i class="fas fa-bolt me-2 themed-icon"></i> Quick Actions</h5>
               </div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="card border-0 bg-light">
-              <div class="card-body p-2 text-center">
-                <i class="fas fa-band-aid text-success"></i>
-                <div class="small mt-1">Supplies</div>
-                <div class="h6 mb-0">
-                  {{ inventory_stats.supply_count|default:0 }}
+              <div class="card-body">
+                <div class="row g-2">
+                  <div class="col-md-6">
+                    <a href="{% url 'appointments:vet_schedule' %}" class="btn btn-accent w-100">
+                      <i class="fas fa-calendar me-2"></i> View Schedule
+                    </a>
+                  </div>
+                  <div class="col-md-6">
+                    <a href="{% url 'records:view_records' %}" class="btn btn-ghost w-100">
+                      <i class="fas fa-search me-2"></i> Find Patient
+                    </a>
+                  </div>
+                  <div class="col-md-6">
+                    <a href="{% url 'records:add_record' %}" class="btn btn-ghost w-100">
+                      <i class="fas fa-file-medical me-2"></i> New Record
+                    </a>
+                  </div>
+                  <div class="col-md-6">
+                    <a href="#" class="btn btn-ghost w-100">
+                      <i class="fas fa-prescription-bottle me-2"></i> Prescribe
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        {% if inventory_stats.low_stock_items %}
-        <div class="alert alert-warning alert-sm mb-3">
-          <i class="fas fa-exclamation-triangle me-1"></i>
-          <strong>
-            {{ inventory_stats.low_stock_items }}</strong> items are low in stock
-        </div>
-        {% endif %}
-        <div class="d-grid gap-2">
-          <a href="{% url 'inventory:dashboard' %}" class="btn btn-warning btn-sm">
-            <i class="fas fa-tachometer-alt me-1"></i> View Inventory
-          </a>
-          <a href="{% url 'inventory:item_list' %}?category=MEDICINE" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-pills me-1"></i> Medications
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="col-md-6 mb-4">
-    <div class="card dashboard-card h-100 border-danger">
-      <div class="card-header bg-danger text-white">
-        <h5 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i>Inventory Alerts</h5>
-      </div>
-      <div class="card-body">
-        <p class="text-muted">Items requiring immediate attention</p>
-        {% if inventory_alerts %}
-        <div class="list-group list-group-flush">
-          {% for alert in inventory_alerts %}
-          <div class="list-group-item border-0 px-0 py-2">
-            {% if alert.type == 'low_stock' %}
-            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-            {% elif alert.type == 'expiring' %}
-            <i class="fas fa-clock text-danger me-2"></i>
-            {% else %}
-            <i class="fas fa-ban text-danger me-2"></i>
-            {% endif %}
-            <span class="small">
-              {{ alert.message }}</span>
-          </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center text-muted">
-          <i class="fas fa-check-circle fa-2x mb-2"></i>
-          <div>All inventory items are in good status</div>
-        </div>
-        {% endif %}
-        <div class="text-center mt-3">
-          <a href="{% url 'inventory:item_list' %}?alerts=1" class="btn btn-outline-danger btn-sm">
-            View All Alerts <i class="fas fa-arrow-right ms-1"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PetMedia Professional Section -->
-<div class="row">
-  <div class="col-md-6 mb-4">
-    <div class="card dashboard-card h-100 border-success">
-      <div class="card-header bg-success text-white">
-        <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>PetMedia Professional</h5>
-      </div>
-      <div class="card-body">
-        <p class="text-muted">Share your professional expertise with the pet community</p>
-        <div class="d-grid gap-2">
-          <a href="{% url 'petmedia:create_professional_post' %}" class="btn btn-success btn-sm">
-            <i class="fas fa-stethoscope me-1"></i> Share Professional Advice
-          </a>
-          <a href="{% url 'petmedia:create_medication_post' %}" class="btn btn-warning btn-sm">
-            <i class="fas fa-pills me-1"></i> Create Medication Guide
-          </a>
-        </div>
-        <hr>
-        <div class="d-flex justify-content-between">
-          <a href="{% url 'petmedia:professional_advice' %}" class="btn btn-outline-success btn-sm">
-            <i class="fas fa-list"></i> View Professional Posts
-          </a>
-          <a href="{% url 'petmedia:user_posts' %}" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-user-edit"></i> My Posts
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6 mb-4">
-    <div class="card dashboard-card h-100">
-      <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-question-circle text-info me-2"></i>Community Questions</h5>
-      </div>
-      <div class="card-body">
-        <p class="text-muted">Recent community questions and discussions</p>
-        <div class="list-group list-group-flush">
-          {% for post in recent_blog_posts %}
-          <div class="list-group-item border-0 px-0">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <h6 class="mb-1">
-                  <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none">
-                    {{ post.title|truncatechars:45 }}
+        <!-- Inventory Status + Inventory Alerts -->
+        <div class="row mb-4">
+          <!-- Medical Inventory Status -->
+          <div class="col-md-6 mb-4">
+            <div class="card glass h-100 card-teal">
+              <div class="card-header soft-accent-bg">
+                <h5 class="mb-0"><i class="fas fa-boxes me-2 themed-icon"></i> Medical Inventory Status</h5>
+              </div>
+              <div class="card-body">
+                <p class="text-muted">Quick access to medical supplies and medications</p>
+                <div class="row g-2 mb-3 text-center">
+                  <div class="col-6">
+                    <i class="fas fa-pills fa-2x themed-icon"></i>
+                    <div class="small mt-1">Medications</div>
+                    <div class="h6 mb-0">
+                      {{ inventory_stats.medicine_count|default:0 }}
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <i class="fas fa-band-aid fa-2x themed-icon"></i>
+                    <div class="small mt-1">Supplies</div>
+                    <div class="h6 mb-0">
+                      {{ inventory_stats.supply_count|default:0 }}
+                    </div>
+                  </div>
+                </div>
+                {% if inventory_stats.low_stock_items %}
+                <div class="alert alert-warning alert-sm mb-3">
+                  <i class="fas fa-triangle-exclamation me-1"></i>
+                  <strong>
+                    {{ inventory_stats.low_stock_items }}</strong> items are low in stock
+                </div>
+                {% endif %}
+                <div class="d-grid gap-2">
+                  <a href="{% url 'inventory:dashboard' %}" class="btn btn-ghost btn-sm">
+                    <i class="fas fa-tachometer-alt me-1"></i> View Inventory
                   </a>
-                </h6>
-                <p class="mb-1 small text-muted">
-                  {{ post.excerpt|truncatechars:70 }}
-                </p>
-                <small class="text-muted">
-                  by
-                  {{ post.author.get_full_name|default:post.author.username }}
-                  •
-                  {{ post.created_at|timesince }} ago
-                </small>
+                  <a href="{% url 'inventory:item_list' %}?category=MEDICINE" class="btn btn-accent btn-sm">
+                    <i class="fas fa-pills me-1"></i> Medications
+                  </a>
+                </div>
               </div>
-              {% if not post.is_professional_advice %}
-              <span class="badge bg-info">Community</span>
-              {% endif %}
             </div>
           </div>
-          {% empty %}
-          <div class="list-group-item border-0 px-0">
-            <h6 class="mb-1">No recent community posts</h6>
-            <small class="text-muted">Share your professional expertise to help pet owners</small>
-          </div>
-          {% endfor %}
-        </div>
-        <div class="text-center mt-3">
-          <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-info btn-sm">
-            Browse Community <i class="fas fa-arrow-right ms-1"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="row">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-header">
-        <h5><i class="fas fa-clock"></i> Today's Appointments</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>9:00 AM</strong> - Fluffy (Annual Checkup)
-              <br><small class="text-muted">Owner: Sarah Johnson</small>
+          <!-- Inventory Alerts -->
+          <div class="col-md-6 mb-4">
+            <div class="card glass h-100 card-rose">
+              <div class="card-header soft-accent-bg">
+                <h5 class="mb-0"><i class="fas fa-exclamation-circle me-2 themed-icon"></i> Inventory Alerts</h5>
+              </div>
+              <div class="card-body">
+                <p class="text-muted">Items requiring immediate attention</p>
+                {% if inventory_alerts %}
+                <div class="list-group list-group-flush">
+                  {% for alert in inventory_alerts %}
+                  <div class="list-group-item border-0 px-0 py-2">
+                    <i class="fas {% if alert.type == 'low_stock' %}fa-triangle-exclamation{% elif alert.type == 'expiring' %}fa-clock{% else %}fa-ban{% endif %} me-2 themed-icon"></i>
+                    <span class="small">
+                      {{ alert.message }}</span>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted">
+                  <i class="fas fa-check-circle fa-2x mb-2"></i>
+                  <div>All inventory items are in good status</div>
+                </div>
+                {% endif %}
+                <div class="text-center mt-3">
+                  <a href="{% url 'inventory:item_list' %}?alerts=1" class="btn btn-ghost btn-sm">
+                    View All Alerts <i class="fas fa-arrow-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
             </div>
-            <span class="badge bg-success">Confirmed</span>
-          </div>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>10:30 AM</strong> - Max (Vaccination)
-              <br><small class="text-muted">Owner: Mike Wilson</small>
-            </div>
-            <span class="badge bg-warning">Pending</span>
-          </div>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>2:00 PM</strong> - Bella (Emergency)
-              <br><small class="text-muted">Owner: Emma Davis</small>
-            </div>
-            <span class="badge bg-danger">Urgent</span>
-          </div>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>3:30 PM</strong> - Charlie (Follow-up)
-              <br><small class="text-muted">Owner: John Smith</small>
-            </div>
-            <span class="badge bg-info">Follow-up</span>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">
-        <h5><i class="fas fa-chart-pie"></i> Patient Summary</h5>
-      </div>
-      <div class="card-body">
-        <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span>Total Patients</span>
-            <strong>87</strong>
+        <!-- PetMedia Professional + Community Questions -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card glass h-100 card-success">
+              <div class="card-header soft-accent-bg">
+                <h5 class="mb-0"><i class="fas fa-user-md me-2 themed-icon"></i> PetMedia Professional</h5>
+              </div>
+              <div class="card-body">
+                <p class="text-muted">Share your professional expertise with the pet community</p>
+                <div class="d-grid gap-2">
+                  <a href="{% url 'petmedia:create_professional_post' %}" class="btn btn-accent btn-sm">
+                    <i class="fas fa-stethoscope me-1"></i> Share Professional Advice
+                  </a>
+                  <a href="{% url 'petmedia:create_medication_post' %}" class="btn btn-ghost btn-sm">
+                    <i class="fas fa-pills me-1"></i> Create Medication Guide
+                  </a>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                  <a href="{% url 'petmedia:professional_advice' %}" class="btn btn-ghost btn-sm">
+                    <i class="fas fa-list me-1"></i> View Professional Posts
+                  </a>
+                  <a href="{% url 'petmedia:user_posts' %}" class="btn btn-ghost btn-sm">
+                    <i class="fas fa-user-edit me-1"></i> My Posts
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span>Dogs</span>
-            <strong>52</strong>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span>Cats</span>
-            <strong>28</strong>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span>Other Pets</span>
-            <strong>7</strong>
-          </div>
-        </div>
-        <hr>
-        <div class="d-flex justify-content-between">
-          <span><strong>This Month</strong></span>
-          <span class="badge bg-success">+12 new</span>
-        </div>
-      </div>
-    </div>
 
-    <div class="card mt-3">
-      <div class="card-header">
-        <h5><i class="fas fa-exclamation-triangle"></i> Urgent Tasks</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          <div class="list-group-item px-0">
-            <small class="text-danger">
-              <i class="fas fa-circle"></i> Review lab results for Fluffy
-            </small>
-          </div>
-          <div class="list-group-item px-0">
-            <small class="text-warning">
-              <i class="fas fa-circle"></i> Update vaccination schedule
-            </small>
-          </div>
-          <div class="list-group-item px-0">
-            <small class="text-info">
-              <i class="fas fa-circle"></i> Call owner about Max's condition
-            </small>
+          <div class="col-md-6 mb-4">
+            <div class="card glass h-100 card-indigo">
+              <div class="card-header soft-accent-bg">
+                <h5 class="mb-0"><i class="fas fa-question-circle me-2 themed-icon"></i> Community Questions</h5>
+              </div>
+              <div class="card-body">
+                <p class="text-muted">Recent community questions and discussions</p>
+                <div class="list-group list-group-flush">
+                  {% for post in recent_blog_posts %}
+                  <div class="list-group-item border-0 px-0">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <h6 class="mb-1">
+                          <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none hover-lift">
+                            {{ post.title|truncatechars:45 }}
+                          </a>
+                        </h6>
+                        <p class="mb-1 small text-muted">
+                          {{ post.excerpt|truncatechars:70 }}
+                        </p>
+                        <small class="text-muted">by
+                          {{ post.author.get_full_name|default:post.author.username }} •
+                          {{ post.created_at|timesince }} ago</small>
+                      </div>
+                      {% if not post.is_professional_advice %}
+                      <span class="badge badge-solid">Community</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% empty %}
+                  <div class="list-group-item border-0 px-0">
+                    <h6 class="mb-1">No recent community posts</h6>
+                    <small class="text-muted">Share your professional expertise to help pet owners</small>
+                  </div>
+                  {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                  <a href="{% url 'petmedia:blog_list' %}" class="btn btn-ghost btn-sm">
+                    Browse Community <i class="fas fa-arrow-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
+      </section>
 
-<div class="row mt-4">
-  <div class="col-12">
-    <div class="alert alert-success">
-      <h5><i class="fas fa-user-md"></i> Veterinarian Access</h5>
-      <p class="mb-0">You have access to patient management, medical records, appointment scheduling, and prescription management. All actions are logged for compliance.</p>
+      <!-- RIGHT STICKY RAIL -->
+      <aside class="right-rail">
+        <!-- Today's Appointments -->
+        <div class="card glass card-olive">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-clock me-2 themed-icon"></i> Today's Appointments</h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>9:00 AM</strong> — Fluffy (Annual Checkup)
+                  <br><small class="text-muted">Owner: Sarah Johnson</small>
+                </div>
+                <span class="badge badge-solid">Confirmed</span>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>10:30 AM</strong> — Max (Vaccination)
+                  <br><small class="text-muted">Owner: Mike Wilson</small>
+                </div>
+                <span class="badge badge-outline">Pending</span>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>2:00 PM</strong> — Bella (Emergency)
+                  <br><small class="text-muted">Owner: Emma Davis</small>
+                </div>
+                <span class="badge badge-outline">Urgent</span>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>3:30 PM</strong> — Charlie (Follow-up)
+                  <br><small class="text-muted">Owner: John Smith</small>
+                </div>
+                <span class="badge badge-outline">Follow-up</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient Summary -->
+        <div class="card glass card-teal mt-3">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-chart-pie me-2 themed-icon"></i> Patient Summary</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-2 d-flex justify-content-between"><span>Total Patients</span><strong>87</strong></div>
+            <div class="mb-2 d-flex justify-content-between"><span>Dogs</span><strong>52</strong></div>
+            <div class="mb-2 d-flex justify-content-between"><span>Cats</span><strong>28</strong></div>
+            <div class="mb-3 d-flex justify-content-between"><span>Other Pets</span><strong>7</strong></div>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center">
+              <span><strong>This Month</strong></span>
+              <span class="badge badge-solid">+12 new</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Urgent Tasks -->
+        <div class="card glass card-amber mt-3">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-exclamation-triangle me-2 themed-icon"></i> Urgent Tasks</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled m-0">
+              <li class="mb-2 small"><i class="fas fa-circle me-2"></i> Review lab results for Fluffy</li>
+              <li class="mb-2 small"><i class="fas fa-circle me-2"></i> Update vaccination schedule</li>
+              <li class="small"><i class="fas fa-circle me-2"></i> Call owner about Max's condition</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
     </div>
-  </div>
+  </main>
 </div>
 {% endblock %}
