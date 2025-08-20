@@ -3,87 +3,126 @@
 {% block title %}Login - Pawsitive Care{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card shadow">
-      <div class="card-body">
-        <div class="text-center mb-4">
-          <i class="fas fa-paw fa-3x text-success"></i>
-          <h3 class="mt-3">Welcome Back</h3>
-          <p class="text-muted">Sign in to your Pawsitive Care account</p>
-        </div>
+<div class="container">
+  <div class="row justify-content-center min-vh-100 align-items-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card glass-effect border-0 shadow-lg fade-in-up">
+        <div class="card-body p-5">
+          <div class="text-center mb-5">
+            <div class="mb-4">
+              <i class="fas fa-paw" style="font-size: 4rem; background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+            </div>
+            <h2 class="fw-bold mb-2">Welcome Back</h2>
+            <p class="text-muted">Sign in to your Pawsitive Care account</p>
+          </div>
 
-        <form method="post">
-          {% csrf_token %}
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
 
-          <div class="mb-3">
-            <label for="{{ form.username.id_for_label }}" class="form-label">
-              <i class="fas fa-user"></i> Username
-            </label>
-            {{ form.username.as_widget }}
-            {% if form.username.errors %}
-            <div class="text-danger small">
-              {{ form.username.errors.0 }}
+            <div class="mb-4">
+              <label for="{{ form.username.id_for_label }}" class="form-label">
+                <i class="fas fa-user me-2"></i>Username
+              </label>
+              <div class="position-relative">
+                {{ form.username.as_widget }}
+                <div class="position-absolute top-50 end-0 translate-middle-y me-3">
+                  <i class="fas fa-user text-muted"></i>
+                </div>
+              </div>
+              {% if form.username.errors %}
+              <div class="text-danger small mt-2">
+                <i class="fas fa-exclamation-circle me-1"></i>
+                {{ form.username.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.password.id_for_label }}" class="form-label">
+                <i class="fas fa-lock me-2"></i>Password
+              </label>
+              <div class="position-relative">
+                {{ form.password.as_widget }}
+                <div class="position-absolute top-50 end-0 translate-middle-y me-3">
+                  <i class="fas fa-lock text-muted"></i>
+                </div>
+              </div>
+              {% if form.password.errors %}
+              <div class="text-danger small mt-2">
+                <i class="fas fa-exclamation-circle me-1"></i>
+                {{ form.password.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              {{ form.non_field_errors.0 }}
             </div>
             {% endif %}
-          </div>
 
-          <div class="mb-3">
-            <label for="{{ form.password.id_for_label }}" class="form-label">
-              <i class="fas fa-lock"></i> Password
-            </label>
-            {{ form.password.as_widget }}
-            {% if form.password.errors %}
-            <div class="text-danger small">
-              {{ form.password.errors.0 }}
+            <button type="submit" class="btn btn-primary w-100 mb-4 py-3">
+              <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </button>
+
+            <div class="text-center">
+              <p class="mb-0">
+                Don't have an account?
+                <a href="{% url 'accounts:register' %}" class="text-decoration-none" style="color: var(--primary-accent); font-weight: 500;">
+                  Register here
+                </a>
+              </p>
             </div>
-            {% endif %}
-          </div>
-
-          {% if form.non_field_errors %}
-          <div class="alert alert-danger">
-            {{ form.non_field_errors.0 }}
-          </div>
-          {% endif %}
-
-          <button type="submit" class="btn btn-success w-100 mb-3">
-            <i class="fas fa-sign-in-alt"></i> Sign In
-          </button>
-
-          <div class="text-center">
-            <p class="mb-0">
-              Don't have an account?
-              <a href="{% url 'accounts:register' %}" class="text-success">Register here</a>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Demo accounts info -->
-    <div class="card mt-4 border-info">
-      <div class="card-header bg-info text-white">
-        <h6 class="mb-0"><i class="fas fa-info-circle"></i> Demo Accounts</h6>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <h6>Admin Access:</h6>
-            <small class="text-muted">Username: admin | Password: admin123</small>
-          </div>
-          <div class="col-md-6">
-            <h6>Veterinarian:</h6>
-            <small class="text-muted">Username: vet | Password: vet123</small>
-          </div>
+          </form>
         </div>
-        <div class="row mt-2">
-          <div class="col-md-6">
-            <h6>Staff Member:</h6>
-            <small class="text-muted">Username: staff | Password: staff123</small>
-          </div>
-          <div class="col-md-6">
-            <h6>Client:</h6>
-            <small class="text-muted">Username: client | Password: client123</small>
+      </div>
+
+      <!-- Demo accounts info -->
+      <div class="card glass-effect border-0 mt-4 slide-in-right">
+        <div class="card-header text-center">
+          <h6 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Demo Accounts
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="demo-account-card">
+                <h6 class="text-primary">
+                  <i class="fas fa-user-shield me-2"></i>Admin Access
+                </h6>
+                <small class="text-muted d-block">Username: <code>admin</code></small>
+                <small class="text-muted">Password: <code>admin123</code></small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="demo-account-card">
+                <h6 class="text-success">
+                  <i class="fas fa-stethoscope me-2"></i>Veterinarian
+                </h6>
+                <small class="text-muted d-block">Username: <code>vet</code></small>
+                <small class="text-muted">Password: <code>vet123</code></small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="demo-account-card">
+                <h6 class="text-warning">
+                  <i class="fas fa-user-tie me-2"></i>Staff Member
+                </h6>
+                <small class="text-muted d-block">Username: <code>staff</code></small>
+                <small class="text-muted">Password: <code>staff123</code></small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="demo-account-card">
+                <h6 class="text-info">
+                  <i class="fas fa-user me-2"></i>Client
+                </h6>
+                <small class="text-muted d-block">Username: <code>client</code></small>
+                <small class="text-muted">Password: <code>client123</code></small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -92,26 +131,45 @@
 </div>
 
 <style>
+  .demo-account-card {
+    background: var(--tertiary-bg);
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+    transition: var(--transition-fast);
+    height: 100%;
+  }
+
+  .demo-account-card:hover {
+    background: var(--accent-bg);
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+
+  .demo-account-card code {
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  /* Enhanced form styling */
   .form-control {
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    padding: 12px;
+    padding-right: 3rem !important;
   }
 
-  .form-control:focus {
-    border-color: #28a745;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  .position-relative .fas {
+    pointer-events: none;
   }
 
-  .btn-success {
-    border-radius: 10px;
-    padding: 12px;
-    font-weight: 600;
-  }
-
+  /* Login page specific animations */
   .card {
-    border-radius: 15px;
-    border: none;
+    animation-delay: 0.2s;
+  }
+
+  .slide-in-right {
+    animation-delay: 0.4s;
   }
 </style>
 {% endblock %}

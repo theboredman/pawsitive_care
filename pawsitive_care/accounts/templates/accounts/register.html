@@ -3,179 +3,289 @@
 {% block title %}Register - Pawsitive Care{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-8">
-    <div class="card shadow">
-      <div class="card-body">
-        <div class="text-center mb-4">
-          <i class="fas fa-user-plus fa-3x text-success"></i>
-          <h3 class="mt-3">Join Pawsitive Care</h3>
-          <p class="text-muted">Create your account to get started</p>
-        </div>
-
-        <form method="post">
-          {% csrf_token %}
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                <i class="fas fa-user"></i> First Name
-              </label>
-              {{ form.first_name.as_widget }}
-              {% if form.first_name.errors %}
-              <div class="text-danger small">
-                {{ form.first_name.errors.0 }}
-              </div>
-              {% endif %}
+<div class="container">
+  <div class="row justify-content-center min-vh-100 align-items-center py-5">
+    <div class="col-md-8 col-lg-6">
+      <div class="card glass-effect border-0 shadow-lg fade-in-up">
+        <div class="card-body p-5">
+          <div class="text-center mb-5">
+            <div class="mb-4">
+              <i class="fas fa-user-plus" style="font-size: 4rem; background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
             </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                <i class="fas fa-user"></i> Last Name
-              </label>
-              {{ form.last_name.as_widget }}
-              {% if form.last_name.errors %}
-              <div class="text-danger small">
-                {{ form.last_name.errors.0 }}
-              </div>
-              {% endif %}
-            </div>
+            <h2 class="fw-bold mb-2">Join Pawsitive Care</h2>
+            <p class="text-muted">Create your account to get started</p>
           </div>
 
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="{{ form.username.id_for_label }}" class="form-label">
-                <i class="fas fa-at"></i> Username
-              </label>
-              {{ form.username.as_widget }}
-              {% if form.username.errors %}
-              <div class="text-danger small">
-                {{ form.username.errors.0 }}
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <!-- Name Fields -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                  <i class="fas fa-user me-2"></i>First Name
+                </label>
+                {{ form.first_name.as_widget }}
+                {% if form.first_name.errors %}
+                <div class="text-danger small mt-2">
+                  <i class="fas fa-exclamation-circle me-1"></i>
+                  {{ form.first_name.errors.0 }}
+                </div>
+                {% endif %}
               </div>
-              {% endif %}
+
+              <div class="col-md-6">
+                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                  <i class="fas fa-user me-2"></i>Last Name
+                </label>
+                {{ form.last_name.as_widget }}
+                {% if form.last_name.errors %}
+                <div class="text-danger small mt-2">
+                  <i class="fas fa-exclamation-circle me-1"></i>
+                  {{ form.last_name.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
             </div>
 
-            <div class="col-md-6 mb-3">
-              <label for="{{ form.email.id_for_label }}" class="form-label">
-                <i class="fas fa-envelope"></i> Email
-              </label>
-              {{ form.email.as_widget }}
-              {% if form.email.errors %}
-              <div class="text-danger small">
-                {{ form.email.errors.0 }}
+            <!-- Username and Email -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="{{ form.username.id_for_label }}" class="form-label">
+                  <i class="fas fa-at me-2"></i>Username
+                </label>
+                {{ form.username.as_widget }}
+                {% if form.username.errors %}
+                <div class="text-danger small mt-2">
+                  <i class="fas fa-exclamation-circle me-1"></i>
+                  {{ form.username.errors.0 }}
+                </div>
+                {% endif %}
               </div>
-              {% endif %}
-            </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-6 mb-3">
+              <div class="col-md-6">
+                <label for="{{ form.email.id_for_label }}" class="form-label">
+                  <i class="fas fa-envelope me-2"></i>Email
+                </label>
+                {{ form.email.as_widget }}
+                {% if form.email.errors %}
+                <div class="text-danger small mt-2">
+                  <i class="fas fa-exclamation-circle me-1"></i>
+                  {{ form.email.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-4">
               <label for="{{ form.phone.id_for_label }}" class="form-label">
-                <i class="fas fa-phone"></i> Phone Number
+                <i class="fas fa-phone me-2"></i>Phone Number
               </label>
               {{ form.phone.as_widget }}
               {% if form.phone.errors %}
-              <div class="text-danger small">
+              <div class="text-danger small mt-2">
+                <i class="fas fa-exclamation-circle me-1"></i>
                 {{ form.phone.errors.0 }}
               </div>
               {% endif %}
             </div>
-          </div>
 
-          <div class="mb-3">
-            <label for="{{ form.address.id_for_label }}" class="form-label">
-              <i class="fas fa-map-marker-alt"></i> Address
-            </label>
-            {{ form.address.as_widget }}
-            {% if form.address.errors %}
-            <div class="text-danger small">
-              {{ form.address.errors.0 }}
+            <!-- Address -->
+            <div class="mb-4">
+              <label for="{{ form.address.id_for_label }}" class="form-label">
+                <i class="fas fa-map-marker-alt me-2"></i>Address
+              </label>
+              {{ form.address.as_widget }}
+              {% if form.address.errors %}
+              <div class="text-danger small mt-2">
+                <i class="fas fa-exclamation-circle me-1"></i>
+                {{ form.address.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Account Type Notice -->
+            <div class="mb-4">
+              <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-info-circle fa-2x me-3"></i>
+                  <div>
+                    <strong>Account Type:</strong> Your account will be created as a Client.
+                    <br>
+                    <small>Contact an administrator if you need different access permissions.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Password Fields -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                  <i class="fas fa-lock me-2"></i>Password
+                </label>
+                {{ form.password1.as_widget }}
+                {% if form.password1.errors %}
+                <div class="text-danger small mt-2">
+                  <i class="fas fa-exclamation-circle me-1"></i>
+                  {{ form.password1.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                  <i class="fas fa-lock me-2"></i>Confirm Password
+                </label>
+                {{ form.password2.as_widget }}
+                {% if form.password2.errors %}
+                <div class="text-danger small mt-2">
+                  <i class="fas fa-exclamation-circle me-1"></i>
+                  {{ form.password2.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              {% for error in form.non_field_errors %}
+              {{ error }}
+              {% endfor %}
             </div>
             {% endif %}
-          </div>
 
-          <!-- Note about account type -->
-          <div class="mb-3">
-            <div class="alert alert-info">
-              <i class="fas fa-info-circle"></i>
-              <strong>Account Type:</strong> Your account will be created as a Client.
-              Contact an administrator if you need different access permissions.
+            <button type="submit" class="btn btn-primary w-100 mb-4 py-3">
+              <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+
+            <div class="text-center">
+              <p class="mb-0">
+                Already have an account?
+                <a href="{% url 'accounts:login' %}" class="text-decoration-none" style="color: var(--primary-accent); font-weight: 500;">
+                  Sign in here
+                </a>
+              </p>
             </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="{{ form.password1.id_for_label }}" class="form-label">
-                <i class="fas fa-lock"></i> Password
-              </label>
-              {{ form.password1.as_widget }}
-              {% if form.password1.errors %}
-              <div class="text-danger small">
-                {{ form.password1.errors.0 }}
-              </div>
-              {% endif %}
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="{{ form.password2.id_for_label }}" class="form-label">
-                <i class="fas fa-lock"></i> Confirm Password
-              </label>
-              {{ form.password2.as_widget }}
-              {% if form.password2.errors %}
-              <div class="text-danger small">
-                {{ form.password2.errors.0 }}
-              </div>
-              {% endif %}
-            </div>
-          </div>
-
-          {% if form.non_field_errors %}
-          <div class="alert alert-danger">
-            {% for error in form.non_field_errors %}
-            {{ error }}
-            {% endfor %}
-          </div>
-          {% endif %}
-
-          <button type="submit" class="btn btn-success w-100 mb-3">
-            <i class="fas fa-user-plus"></i> Create Account
-          </button>
-
-          <div class="text-center">
-            <p class="mb-0">
-              Already have an account?
-              <a href="{% url 'accounts:login' %}" class="text-success">Sign in here</a>
-            </p>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  .form-control,
-  .form-select {
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    padding: 12px;
+  /* Enhanced form styling for registration */
+  .form-control {
+    padding: 0.875rem 1rem !important;
+    font-size: 1rem;
   }
 
-  .form-control:focus,
-  .form-select:focus {
-    border-color: #28a745;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-  }
-
-  .btn-success {
-    border-radius: 10px;
-    padding: 12px;
+  .form-label {
     font-weight: 600;
+    margin-bottom: 0.75rem;
   }
 
-  .card {
-    border-radius: 15px;
-    border: none;
+  .form-label i {
+    color: var(--primary-accent);
+  }
+
+  /* Password strength indicator */
+  .password-strength {
+    height: 4px;
+    background: var(--tertiary-bg);
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+  }
+
+  .password-strength-bar {
+    height: 100%;
+    transition: var(--transition-normal);
+    border-radius: 2px;
+  }
+
+  .strength-weak { background: var(--danger-accent); width: 25%; }
+  .strength-fair { background: var(--warning-accent); width: 50%; }
+  .strength-good { background: var(--primary-accent); width: 75%; }
+  .strength-strong { background: var(--success-accent); width: 100%; }
+
+  /* Form validation styling */
+  .was-validated .form-control:valid {
+    border-color: var(--success-accent) !important;
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25) !important;
+  }
+
+  .was-validated .form-control:invalid {
+    border-color: var(--danger-accent) !important;
+    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
+  }
+
+  /* Enhanced responsive design */
+  @media (max-width: 768px) {
+    .card-body {
+      padding: 2rem !important;
+    }
+    
+    .display-6 {
+      font-size: 2rem;
+    }
   }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+    const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+
+    // Password strength indicator
+    if (password1) {
+      const strengthIndicator = document.createElement('div');
+      strengthIndicator.className = 'password-strength';
+      strengthIndicator.innerHTML = '<div class="password-strength-bar"></div>';
+      password1.parentNode.appendChild(strengthIndicator);
+
+      password1.addEventListener('input', function() {
+        const password = this.value;
+        const strengthBar = strengthIndicator.querySelector('.password-strength-bar');
+        
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+        strengthBar.className = 'password-strength-bar';
+        if (strength === 1) strengthBar.classList.add('strength-weak');
+        else if (strength === 2) strengthBar.classList.add('strength-fair');
+        else if (strength === 3) strengthBar.classList.add('strength-good');
+        else if (strength === 4) strengthBar.classList.add('strength-strong');
+      });
+    }
+
+    // Real-time password confirmation
+    if (password2) {
+      password2.addEventListener('input', function() {
+        if (password1.value !== this.value) {
+          this.setCustomValidity('Passwords do not match');
+        } else {
+          this.setCustomValidity('');
+        }
+      });
+    }
+
+    // Form submission
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    });
+  });
+</script>
 {% endblock %}

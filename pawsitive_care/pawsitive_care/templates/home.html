@@ -4,33 +4,289 @@
 
 {% block extra_css %}
 <style>
+  /* Hero Section */
   .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 50%, var(--tertiary-bg) 100%);
     color: white;
-    padding: 100px 0;
+    padding: 120px 0;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%2310b981" stop-opacity="0.1"/><stop offset="100%" stop-color="%2310b981" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+    opacity: 0.3;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    box-shadow: var(--shadow-xl);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .hero-title {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-text), var(--accent-text));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 3rem;
+    color: var(--secondary-text);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: var(--border-radius-xl);
+    text-decoration: none;
+    transition: var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-btn-primary {
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    color: white;
+    border: none;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .hero-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+    color: white;
+  }
+
+  .hero-btn-outline {
+    background: transparent;
+    color: var(--primary-text);
+    border: 2px solid var(--primary-accent);
+  }
+
+  .hero-btn-outline:hover {
+    background: var(--primary-accent);
+    color: white;
+    transform: translateY(-3px);
+  }
+
+  /* Features Section */
+  .features-section {
+    padding: 100px 0;
+    background: var(--secondary-bg);
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .section-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--primary-text);
+  }
+
+  .section-subtitle {
+    font-size: 1.25rem;
+    color: var(--secondary-text);
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   .feature-card {
-    transition: transform 0.3s ease;
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: var(--tertiary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-xl);
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: var(--transition-normal);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+    opacity: 0;
+    transition: var(--transition-normal);
   }
 
   .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--border-hover);
+  }
+
+  .feature-card:hover::before {
+    opacity: 1;
   }
 
   .feature-icon {
-    font-size: 3rem;
-    color: #667eea;
-    margin-bottom: 1rem;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    box-shadow: var(--shadow-md);
   }
 
+  .feature-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary-text);
+  }
+
+  .feature-description {
+    color: var(--secondary-text);
+    line-height: 1.6;
+  }
+
+  /* CTA Section */
   .cta-section {
-    background-color: #f8f9fa;
-    padding: 80px 0;
+    padding: 100px 0;
+    background: linear-gradient(135deg, var(--tertiary-bg), var(--accent-bg));
+    text-align: center;
+  }
+
+  .cta-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--primary-text);
+  }
+
+  .cta-subtitle {
+    font-size: 1.25rem;
+    color: var(--secondary-text);
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Services Section */
+  .services-section {
+    padding: 100px 0;
+    background: var(--primary-bg);
+  }
+
+  .service-item {
+    text-align: center;
+    padding: 2rem 1rem;
+    transition: var(--transition-normal);
+  }
+
+  .service-item:hover {
+    transform: translateY(-4px);
+  }
+
+  .service-icon {
+    font-size: 3rem;
+    color: var(--primary-accent);
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .service-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--primary-text);
+  }
+
+  .service-description {
+    color: var(--secondary-text);
+    font-size: 0.95rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.125rem;
+    }
+    
+    .hero-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .hero-btn {
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+    }
+    
+    .cta-title {
+      font-size: 2rem;
+    }
+    
+    .feature-card {
+      padding: 2rem 1.5rem;
+    }
   }
 </style>
 {% endblock %}
@@ -39,105 +295,103 @@
 <!-- Hero Section -->
 <section class="hero-section">
   <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <img src="https://i.ibb.co.com/Jwsn6Prb/pawsitive-logo-png.png" alt="Pawsitive Care Logo" class="mb-4" style="height: 80px;">
-        <h1 class="display-4 fw-bold mb-4">Welcome to Pawsitive Care</h1>
-        <p class="lead mb-4">
-          Your trusted partner in comprehensive pet care. We provide professional veterinary services,
-          pet management tools, and a community platform for pet owners.
-        </p>
-        <div class="d-flex justify-content-center gap-3">
-          <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-4">
-            <i class="fas fa-user-plus me-2"></i>Get Started
-          </a>
-          <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4">
-            <i class="fas fa-sign-in-alt me-2"></i>Login
-          </a>
-        </div>
+    <div class="hero-content fade-in-up">
+      <div class="hero-logo">
+        <i class="fas fa-paw"></i>
+      </div>
+      <h1 class="hero-title">Welcome to Pawsitive Care</h1>
+      <p class="hero-subtitle">
+        Your trusted partner in comprehensive pet care. We provide professional veterinary services,
+        pet management tools, and a community platform for pet owners.
+      </p>
+      <div class="hero-buttons">
+        <a href="{% url 'accounts:register' %}" class="hero-btn hero-btn-primary">
+          <i class="fas fa-user-plus me-2"></i>Get Started
+        </a>
+        <a href="{% url 'accounts:login' %}" class="hero-btn hero-btn-outline">
+          <i class="fas fa-sign-in-alt me-2"></i>Login
+        </a>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Features Section -->
-<section class="py-5">
+<section class="features-section">
   <div class="container">
-    <div class="row text-center mb-5">
-      <div class="col-lg-12">
-        <h2 class="fw-bold mb-3">Why Choose Pawsitive Care?</h2>
-        <p class="text-muted">Comprehensive pet care solutions designed with love</p>
-      </div>
+    <div class="section-header fade-in-up">
+      <h2 class="section-title">Why Choose Pawsitive Care?</h2>
+      <p class="section-subtitle">Comprehensive pet care solutions designed with love</p>
     </div>
 
     <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card fade-in-up" style="animation-delay: 0.1s;">
           <div class="feature-icon">
             <i class="fas fa-stethoscope"></i>
           </div>
-          <h5 class="fw-bold mb-3">Professional Care</h5>
-          <p class="text-muted">
+          <h3 class="feature-title">Professional Care</h3>
+          <p class="feature-description">
             Expert veterinary services with experienced professionals who care about your pet's health and wellbeing.
           </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card fade-in-up" style="animation-delay: 0.2s;">
           <div class="feature-icon">
             <i class="fas fa-calendar-check"></i>
           </div>
-          <h5 class="fw-bold mb-3">Easy Appointments</h5>
-          <p class="text-muted">
+          <h3 class="feature-title">Easy Appointments</h3>
+          <p class="feature-description">
             Book and manage appointments online with our user-friendly scheduling system.
           </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card fade-in-up" style="animation-delay: 0.3s;">
           <div class="feature-icon">
             <i class="fas fa-heart"></i>
           </div>
-          <h5 class="fw-bold mb-3">Pet Management</h5>
-          <p class="text-muted">
+          <h3 class="feature-title">Pet Management</h3>
+          <p class="feature-description">
             Keep track of your pet's health records, medications, and important milestones all in one place.
           </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card fade-in-up" style="animation-delay: 0.4s;">
           <div class="feature-icon">
             <i class="fas fa-users"></i>
           </div>
-          <h5 class="fw-bold mb-3">Community</h5>
-          <p class="text-muted">
+          <h3 class="feature-title">Community</h3>
+          <p class="feature-description">
             Connect with other pet owners, share experiences, and get advice from our professional community.
           </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card fade-in-up" style="animation-delay: 0.5s;">
           <div class="feature-icon">
             <i class="fas fa-shield-alt"></i>
           </div>
-          <h5 class="fw-bold mb-3">Secure & Reliable</h5>
-          <p class="text-muted">
+          <h3 class="feature-title">Secure & Reliable</h3>
+          <p class="feature-description">
             Your pet's information is protected with industry-standard security measures.
           </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card fade-in-up" style="animation-delay: 0.6s;">
           <div class="feature-icon">
             <i class="fas fa-mobile-alt"></i>
           </div>
-          <h5 class="fw-bold mb-3">Always Accessible</h5>
-          <p class="text-muted">
+          <h3 class="feature-title">Always Accessible</h3>
+          <p class="feature-description">
             Access your pet's information and our services anytime, anywhere with our responsive platform.
           </p>
         </div>
@@ -149,60 +403,56 @@
 <!-- Call to Action Section -->
 <section class="cta-section">
   <div class="container">
-    <div class="row justify-content-center text-center">
-      <div class="col-lg-8">
-        <h2 class="fw-bold mb-4">Ready to Give Your Pet the Best Care?</h2>
-        <p class="lead text-muted mb-4">
-          Join thousands of pet owners who trust Pawsitive Care for their furry family members.
-        </p>
-        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-5">
-          <i class="fas fa-paw me-2"></i>Start Your Journey
-        </a>
-      </div>
+    <div class="fade-in-up">
+      <h2 class="cta-title">Ready to Give Your Pet the Best Care?</h2>
+      <p class="cta-subtitle">
+        Join thousands of pet owners who trust Pawsitive Care for their furry family members.
+      </p>
+      <a href="{% url 'accounts:register' %}" class="hero-btn hero-btn-primary">
+        <i class="fas fa-paw me-2"></i>Start Your Journey
+      </a>
     </div>
   </div>
 </section>
 
 <!-- Services Overview -->
-<section class="py-5 bg-light">
+<section class="services-section">
   <div class="container">
-    <div class="row text-center mb-5">
-      <div class="col-lg-12">
-        <h2 class="fw-bold mb-3">Our Services</h2>
-        <p class="text-muted">Everything your pet needs, all in one place</p>
-      </div>
+    <div class="section-header fade-in-up">
+      <h2 class="section-title">Our Services</h2>
+      <p class="section-subtitle">Everything your pet needs, all in one place</p>
     </div>
 
     <div class="row g-4">
       <div class="col-md-6 col-lg-3">
-        <div class="text-center">
-          <i class="fas fa-user-md text-primary mb-3" style="font-size: 2.5rem;"></i>
-          <h6 class="fw-bold">Veterinary Care</h6>
-          <p class="text-muted small">Professional medical care for your pets</p>
+        <div class="service-item fade-in-up" style="animation-delay: 0.1s;">
+          <i class="fas fa-user-md service-icon"></i>
+          <h4 class="service-title">Veterinary Care</h4>
+          <p class="service-description">Professional medical care for your pets</p>
         </div>
       </div>
 
       <div class="col-md-6 col-lg-3">
-        <div class="text-center">
-          <i class="fas fa-pills text-primary mb-3" style="font-size: 2.5rem;"></i>
-          <h6 class="fw-bold">Medication Management</h6>
-          <p class="text-muted small">Track and manage your pet's medications</p>
+        <div class="service-item fade-in-up" style="animation-delay: 0.2s;">
+          <i class="fas fa-pills service-icon"></i>
+          <h4 class="service-title">Medication Management</h4>
+          <p class="service-description">Track and manage your pet's medications</p>
         </div>
       </div>
 
       <div class="col-md-6 col-lg-3">
-        <div class="text-center">
-          <i class="fas fa-file-medical text-primary mb-3" style="font-size: 2.5rem;"></i>
-          <h6 class="fw-bold">Health Records</h6>
-          <p class="text-muted small">Digital health records and history</p>
+        <div class="service-item fade-in-up" style="animation-delay: 0.3s;">
+          <i class="fas fa-file-medical service-icon"></i>
+          <h4 class="service-title">Health Records</h4>
+          <p class="service-description">Digital health records and history</p>
         </div>
       </div>
 
       <div class="col-md-6 col-lg-3">
-        <div class="text-center">
-          <i class="fas fa-blog text-primary mb-3" style="font-size: 2.5rem;"></i>
-          <h6 class="fw-bold">Pet Media</h6>
-          <p class="text-muted small">Educational content and community posts</p>
+        <div class="service-item fade-in-up" style="animation-delay: 0.4s;">
+          <i class="fas fa-blog service-icon"></i>
+          <h4 class="service-title">Pet Media</h4>
+          <p class="service-description">Educational content and community posts</p>
         </div>
       </div>
     </div>

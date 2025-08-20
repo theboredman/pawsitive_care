@@ -1,10 +1,151 @@
 {% if messages %}
-<div class="messages mb-4">
+<div class="messages-container mb-4">
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show modern-alert" role="alert">
+        <div class="d-flex align-items-center">
+            {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle fa-lg me-3"></i>
+            {% elif message.tags == 'error' or message.tags == 'danger' %}
+            <i class="fas fa-exclamation-circle fa-lg me-3"></i>
+            {% elif message.tags == 'warning' %}
+            <i class="fas fa-exclamation-triangle fa-lg me-3"></i>
+            {% elif message.tags == 'info' %}
+            <i class="fas fa-info-circle fa-lg me-3"></i>
+            {% else %}
+            <i class="fas fa-bell fa-lg me-3"></i>
+            {% endif %}
+            <div class="flex-grow-1">
+                {{ message }}
+            </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
 </div>
+
+<style>
+.modern-alert {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.modern-alert::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: currentColor;
+}
+
+.alert-success {
+    background: rgba(34, 197, 94, 0.15) !important;
+    color: var(--success-accent) !important;
+    border-left: 4px solid var(--success-accent);
+}
+
+.alert-danger,
+.alert-error {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: var(--danger-accent) !important;
+    border-left: 4px solid var(--danger-accent);
+}
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: var(--warning-accent) !important;
+    border-left: 4px solid var(--warning-accent);
+}
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: var(--secondary-accent) !important;
+    border-left: 4px solid var(--secondary-accent);
+}
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.7;
+    transition: var(--transition-fast);
+}
+
+.btn-close-white:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.messages-container {
+    position: relative;
+    z-index: 100;
+}
+
+/* Animation for new messages */
+.modern-alert {
+    animation: slideInDown 0.5s ease-out;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Auto-hide animation */
+.alert.fade-out {
+    animation: fadeOutUp 0.5s ease-in forwards;
+}
+
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide success messages after 5 seconds
+    const successAlerts = document.querySelectorAll('.alert-success');
+    successAlerts.forEach(alert => {
+        setTimeout(() => {
+            alert.classList.add('fade-out');
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 500);
+        }, 5000);
+    });
+
+    // Enhanced close button functionality
+    document.querySelectorAll('.btn-close').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const alert = this.closest('.alert');
+            alert.classList.add('fade-out');
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 500);
+        });
+    });
+});
+</script>
 {% endif %}
