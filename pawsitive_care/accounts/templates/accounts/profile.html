@@ -3,185 +3,264 @@
 {% block title %}Profile - Pawsitive Care{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-8">
-    <div class="card shadow">
-      <div class="card-header bg-success text-white">
-        <h4 class="mb-0"><i class="fas fa-user-edit"></i> My Profile</h4>
+<div class="app-shell">
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="app-sidebar glass" aria-label="Primary">
+    <div class="sidebar-header">
+      <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="sidebar-title">Account</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Me</div>
+        <a href="{% url 'accounts:profile' %}" class="sidebar-link active">
+          <i class="fas fa-user-edit"></i><span>My Profile</span>
+        </a>
+        <a href="{% url 'accounts:client_dashboard' %}" class="sidebar-link">
+          <i class="fas fa-home"></i><span>Dashboard</span>
+        </a>
+        <a href="{% url 'pets:pet_list' %}" class="sidebar-link">
+          <i class="fas fa-paw"></i><span>My Pets</span>
+        </a>
+        <a href="{% url 'appointments:book_appointment' %}" class="sidebar-link">
+          <i class="fas fa-calendar-check"></i><span>Appointments</span>
+        </a>
+        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
+          <i class="fas fa-receipt"></i><span>Billing</span>
+        </a>
       </div>
-      <div class="card-body">
-        <div class="row mb-4">
-          <div class="col-md-3 text-center">
-            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
-              <i class="fas fa-user fa-2x text-white"></i>
-            </div>
-            <h5>
-              {{ user.get_full_name|default:user.username }}
-            </h5>
-            <span class="badge bg-{{ user.role|default:'secondary' }} fs-6">
-              {{ user.get_role_display }}
-            </span>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Community</div>
+        <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link">
+          <i class="fas fa-blog"></i><span>Posts</span>
+        </a>
+        <a href="{% url 'petmedia:professional_advice' %}" class="sidebar-link">
+          <i class="fas fa-user-md"></i><span>Vet Advice</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ========== MAIN ========== -->
+  <main class="app-main">
+    <div class="row justify-content-center">
+      <div class="col-xl-9 col-lg-10">
+
+        <!-- Profile card -->
+        <div class="card glass card-teal mb-4">
+          <div class="card-header soft-accent-bg">
+            <h4 class="m-0"><i class="fas fa-user-edit me-2 themed-icon"></i> My Profile</h4>
           </div>
 
-          <div class="col-md-9">
-            <form method="post">
-              {% csrf_token %}
+          <div class="card-body">
+            <div class="row gy-4">
+              <!-- Avatar + Role -->
+              <div class="col-md-3 text-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 88px; height: 88px; background:#fff; border:2px solid var(--border-light); box-shadow:var(--shadow-sm);">
+                  <i class="fas fa-user fa-2x" style="color:var(--sand-dark)"></i>
+                </div>
+                <h5 class="mb-1">
+                  {{ user.get_full_name|default:user.username }}
+                </h5>
+                <span class="badge badge-solid">
+                  {{ user.get_role_display }}</span>
+              </div>
 
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                    <i class="fas fa-user"></i> First Name
-                  </label>
-                  {{ form.first_name.as_widget }}
-                  {% if form.first_name.errors %}
-                  <div class="text-danger small">
-                    {{ form.first_name.errors.0 }}
+              <!-- Form -->
+              <div class="col-md-9">
+                <form method="post" novalidate>
+                  {% csrf_token %}
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                      <div class="input-group input-icon">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        {{ form.first_name.as_widget }}
+                      </div>
+                      {% if form.first_name.errors %}
+                      <div class="text-danger small mt-1">
+                        {{ form.first_name.errors.0 }}
+                      </div>
+                      {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                      <div class="input-group input-icon">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        {{ form.last_name.as_widget }}
+                      </div>
+                      {% if form.last_name.errors %}
+                      <div class="text-danger small mt-1">
+                        {{ form.last_name.errors.0 }}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                      <div class="input-group input-icon">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        {{ form.email.as_widget }}
+                      </div>
+                      {% if form.email.errors %}
+                      <div class="text-danger small mt-1">
+                        {{ form.email.errors.0 }}
+                      </div>
+                      {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="{{ form.phone.id_for_label }}" class="form-label">Phone Number</label>
+                      <div class="input-group input-icon">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        {{ form.phone.as_widget }}
+                      </div>
+                      {% if form.phone.errors %}
+                      <div class="text-danger small mt-1">
+                        {{ form.phone.errors.0 }}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
+                    <div class="input-group input-icon">
+                      <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                      {{ form.address.as_widget }}
+                    </div>
+                    {% if form.address.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ form.address.errors.0 }}
+                    </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Role</label>
+                      <input type="text" class="form-control" value="{{ user.get_role_display }}" readonly>
+                      <small class="text-muted">Contact an administrator to change your role.</small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Member Since</label>
+                      <input type="text" class="form-control" value="{{ user.date_joined|date:'F d, Y' }}" readonly>
+                    </div>
+                  </div>
+
+                  {% if form.non_field_errors %}
+                  <div class="alert alert-error mt-2">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}{% endfor %}
                   </div>
                   {% endif %}
-                </div>
 
-                <div class="col-md-6 mb-3">
-                  <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                    <i class="fas fa-user"></i> Last Name
-                  </label>
-                  {{ form.last_name.as_widget }}
-                  {% if form.last_name.errors %}
-                  <div class="text-danger small">
-                    {{ form.last_name.errors.0 }}
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'accounts:client_dashboard' %}" class="btn btn-ghost me-md-2">
+                      <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-accent">
+                      <i class="fas fa-save me-1"></i> Update Profile
+                    </button>
                   </div>
-                  {% endif %}
-                </div>
+                </form>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="{{ form.email.id_for_label }}" class="form-label">
-                    <i class="fas fa-envelope"></i> Email
-                  </label>
-                  {{ form.email.as_widget }}
-                  {% if form.email.errors %}
-                  <div class="text-danger small">
-                    {{ form.email.errors.0 }}
-                  </div>
-                  {% endif %}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                  <label for="{{ form.phone.id_for_label }}" class="form-label">
-                    <i class="fas fa-phone"></i> Phone Number
-                  </label>
-                  {{ form.phone.as_widget }}
-                  {% if form.phone.errors %}
-                  <div class="text-danger small">
-                    {{ form.phone.errors.0 }}
-                  </div>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ form.address.id_for_label }}" class="form-label">
-                  <i class="fas fa-map-marker-alt"></i> Address
-                </label>
-                {{ form.address.as_widget }}
-                {% if form.address.errors %}
-                <div class="text-danger small">
-                  {{ form.address.errors.0 }}
-                </div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">
-                  <i class="fas fa-user-tag"></i> Role
-                </label>
-                <input type="text" class="form-control" value="{{ user.get_role_display }}" readonly>
-                <small class="text-muted">Contact an administrator to change your role.</small>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">
-                  <i class="fas fa-calendar"></i> Member Since
-                </label>
-                <input type="text" class="form-control" value="{{ user.date_joined|date:'F d, Y' }}" readonly>
-              </div>
-
-              {% if form.non_field_errors %}
-              <div class="alert alert-danger">
-                {% for error in form.non_field_errors %}
-                {{ error }}
-                {% endfor %}
-              </div>
-              {% endif %}
-
-              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="{% url 'accounts:client_dashboard' %}" class="btn btn-outline-secondary me-md-2">
-                  <i class="fas fa-times"></i> Cancel
+        <!-- Account Security -->
+        <div class="card glass card-amber">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-shield-alt me-2 themed-icon"></i> Account Security</h5>
+          </div>
+          <div class="card-body">
+            <div class="row gy-3">
+              <div class="col-md-6">
+                <h6 class="mb-1"><i class="fas fa-key me-1"></i> Password</h6>
+                <p class="text-muted mb-2">Keep your account secure by using a strong password.</p>
+                <a href="#" class="btn btn-accent btn-sm">
+                  <i class="fas fa-edit me-1"></i> Change Password
                 </a>
-                <button type="submit" class="btn btn-success">
-                  <i class="fas fa-save"></i> Update Profile
-                </button>
               </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Account Security Section -->
-    <div class="card mt-4 shadow">
-      <div class="card-header bg-warning text-dark">
-        <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Account Security</h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <h6><i class="fas fa-key"></i> Password</h6>
-            <p class="text-muted">Keep your account secure by using a strong password.</p>
-            <a href="#" class="btn btn-warning btn-sm">
-              <i class="fas fa-edit"></i> Change Password
-            </a>
-          </div>
-
-          <div class="col-md-6">
-            <h6><i class="fas fa-sign-out-alt"></i> Account Access</h6>
-            <p class="text-muted">Last login:
-              {{ user.last_login|date:'F d, Y g:i A'|default:'Never' }}
-            </p>
-            <div class="small">
-              <strong>Username:</strong>
-              {{ user.username }}<br>
-              <strong>Active:</strong>
-              {% if user.is_active %}
-              <span class="text-success">Yes</span>
-              {% else %}
-              <span class="text-danger">No</span>
-              {% endif %}
+              <div class="col-md-6">
+                <h6 class="mb-1"><i class="fas fa-sign-out-alt me-1"></i> Account Access</h6>
+                <p class="text-muted mb-2">Last login:
+                  {{ user.last_login|date:'F d, Y g:i A'|default:'Never' }}
+                </p>
+                <div class="small">
+                  <strong>Username:</strong>
+                  {{ user.username }}<br>
+                  <strong>Active:</strong>
+                  {% if user.is_active %}<span class="text-success">Yes</span>{% else %}<span class="text-danger">No</span>{% endif %}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+
+      </div><!-- /col -->
+    </div><!-- /row -->
+  </main>
 </div>
 
+{% block scripts %}
+<script>
+  (function() {
+    // Sidebar collapse
+    const shell = document.querySelector('.app-shell');
+    const toggle = document.querySelector('.sidebar-toggle');
+    if (toggle && shell) toggle.addEventListener('click', () => shell.classList.toggle('sidebar-collapsed'));
+
+    // Ensure Django widgets styled + sensible placeholders
+    document.querySelectorAll('form input, form textarea, form select').forEach(function(el) {
+      el.classList.add('form-control');
+      if (el.name === 'email') {
+        el.setAttribute('autocomplete', 'email');
+        el.placeholder || = 'you@example.com';
+      }
+      if (el.name === 'phone') {
+        el.setAttribute('inputmode', 'tel');
+        el.placeholder || = '+1 555 123 4567';
+      }
+      if (el.name === 'first_name' && !el.placeholder) el.placeholder = 'First name';
+      if (el.name === 'last_name' && !el.placeholder) el.placeholder = 'Last name';
+      if (el.name === 'address' && !el.placeholder) el.placeholder = 'Street, City, State';
+    });
+  })();
+</script>
+{% endblock %}
+
 <style>
-  .form-control,
-  .form-select {
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    padding: 10px;
+  /* Input groups themed to Night Sands */
+  .input-group-text {
+    background: var(--surface-card);
+    border: 2px solid var(--border-light);
+    border-right: 0;
   }
 
-  .form-control:focus,
-  .form-select:focus {
-    border-color: #28a745;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  .input-group .form-control {
+    border: 2px solid var(--border-light);
+    border-left: 0;
   }
 
-  .card {
-    border-radius: 12px;
-    border: none;
+  .badge.badge-solid {
+    background: var(--sand-medium);
+    color: #fff;
+    border-radius: var(--radius-pill);
+    padding: .35rem .6rem;
+    font-weight: 700;
+    letter-spacing: .2px;
   }
 </style>
 {% endblock %}

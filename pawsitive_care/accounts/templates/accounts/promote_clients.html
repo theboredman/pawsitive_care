@@ -3,376 +3,471 @@
 {% block title %}Promote Clients - Pawsitive Care{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
+<div class="app-shell">
+  <!-- ========= SIDEBAR ========= -->
+   <aside class="app-sidebar glass" aria-label="Primary">
+     <div class="sidebar-header">
+       <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+         <i class="fas fa-bars"></i>
+       </button>
+       <span class="sidebar-title">Admin</span>
+     </div>
+
+     <!-- Sections -->
+     <nav class="sidebar-nav">
+       <div class="sidebar-section">
+         <div class="sidebar-section-label">Users</div>
+         <a href="{% url 'accounts:user_management' %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_management' %}active{% endif %}">
+           <i class="fas fa-users"></i><span>Manage Users</span>
+         </a>
+         <a href="{% url 'accounts:promote_clients' %}" class="sidebar-link {% if request.resolver_match.url_name == 'promote_clients' %}active{% endif %}">
+           <i class="fas fa-user-plus"></i><span>Promote Clients</span>
+         </a>
+         <a href="#" class="sidebar-link">
+           <i class="fas fa-user-tie"></i><span>Add Staff</span>
+         </a>
+       </div>
+
+       <div class="sidebar-section">
+         <div class="sidebar-section-label">Inventory</div>
+         <a href="{% url 'inventory:item_list' %}" class="sidebar-link">
+           <i class="fas fa-boxes"></i><span>All Items</span>
+         </a>
+         <a href="{% url 'inventory:item_list' %}?low_stock=1" class="sidebar-link">
+           <i class="fas fa-triangle-exclamation"></i><span>Low Stock</span>
+         </a>
+         <a href="{% url 'inventory:item_create' %}" class="sidebar-link">
+           <i class="fas fa-plus"></i><span>Add Item</span>
+         </a>
+         <a href="{% url 'inventory:reports' %}" class="sidebar-link">
+           <i class="fas fa-chart-line"></i><span>Reports</span>
+         </a>
+       </div>
+
+       <div class="sidebar-section">
+         <div class="sidebar-section-label">Blog</div>
+         <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link">
+           <i class="fas fa-edit"></i><span>All Posts</span>
+         </a>
+         <a href="{% url 'petmedia:create_post' %}" class="sidebar-link">
+           <i class="fas fa-plus"></i><span>Create Post</span>
+         </a>
+         <a href="{% url 'petmedia:create_professional_post' %}" class="sidebar-link">
+           <i class="fas fa-user-md"></i><span>Professional Post</span>
+         </a>
+         <a href="{% url 'petmedia:user_posts' %}" class="sidebar-link">
+           <i class="fas fa-star"></i><span>My Posts</span>
+         </a>
+       </div>
+
+       <div class="sidebar-section">
+         <div class="sidebar-section-label">System</div>
+         <a href="{% url 'appointments:staff_calendar' %}" class="sidebar-link">
+           <i class="fas fa-calendar"></i><span>Appointments</span>
+         </a>
+         <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
+           <i class="fas fa-receipt"></i><span>Billing</span>
+         </a>
+         <a href="{% url 'pets:pet_list' %}" class="sidebar-link">
+           <i class="fas fa-paw"></i><span>Pets</span>
+         </a>
+         <a href="{% url 'communication:communication_list' %}" class="sidebar-link">
+           <i class="fas fa-comments"></i><span>Communications</span>
+         </a>
+         <a href="#" class="sidebar-link">
+           <i class="fas fa-chart-bar"></i><span>Reports</span>
+         </a>
+         <a href="#" class="sidebar-link">
+           <i class="fas fa-gear"></i><span>Settings</span>
+         </a>
+       </div>
+     </nav>
+   </aside>
+  <!-- ========= MAIN ========= -->
+  <main class="app-main">
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h2><i class="fas fa-user-plus text-primary"></i> Staff Promotion</h2>
-        <p class="text-muted">Promote clients to staff members and veterinarians</p>
+        <h2 class="mb-1"><i class="fas fa-user-plus me-2" style="color:var(--sand-dark)"></i> Staff Promotion</h2>
+        <p class="text-muted mb-0">Promote clients to staff members and veterinarians</p>
       </div>
       <div>
-        <a href="{% url 'accounts:user_management' %}" class="btn btn-outline-secondary">
-          <i class="fas fa-users"></i> All Users
+        <a href="{% url 'accounts:user_management' %}" class="btn btn-ghost">
+          <i class="fas fa-users me-1"></i> All Users
         </a>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Statistics Cards -->
-<div class="row mb-4">
-  <div class="col-md-3">
-    <div class="card border-info">
-      <div class="card-body text-center">
-        <h3 class="text-info">
-          {{ stats.client_count }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-user"></i> Clients</p>
+    <!-- Statistic Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card glass h-100 card-teal text-center">
+          <div class="card-body">
+            <div class="solid-accent-text h3 mb-1">
+              {{ stats.client_count }}
+            </div>
+            <div class="small"><i class="fas fa-user me-1"></i>Clients</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card glass h-100 card-amber text-center">
+          <div class="card-body">
+            <div class="solid-accent-text h3 mb-1">
+              {{ stats.staff_count }}
+            </div>
+            <div class="small"><i class="fas fa-user-tie me-1"></i>Staff Members</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card glass h-100 card-success text-center">
+          <div class="card-body">
+            <div class="solid-accent-text h3 mb-1">
+              {{ stats.vet_count }}
+            </div>
+            <div class="small"><i class="fas fa-user-md me-1"></i>Veterinarians</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card glass h-100 card-indigo text-center">
+          <div class="card-body">
+            <div class="solid-accent-text h3 mb-1">
+              {{ stats.total_promotable }}
+            </div>
+            <div class="small"><i class="fas fa-arrow-up me-1"></i>Available to Promote</div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card border-warning">
-      <div class="card-body text-center">
-        <h3 class="text-warning">
-          {{ stats.staff_count }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-user-tie"></i> Staff Members</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card border-success">
-      <div class="card-body text-center">
-        <h3 class="text-success">
-          {{ stats.vet_count }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-user-md"></i> Veterinarians</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card border-primary">
-      <div class="card-body text-center">
-        <h3 class="text-primary">
-          {{ stats.total_promotable }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-arrow-up"></i> Available to Promote</p>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- Promotion Tabs -->
-<ul class="nav nav-tabs" id="promotionTabs" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="clients-tab" data-bs-toggle="tab" data-bs-target="#clients-pane" type="button" role="tab" aria-controls="clients-pane" aria-selected="true">
-      <i class="fas fa-user"></i> Clients (
-      {{ stats.client_count }})
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-pane" type="button" role="tab" aria-controls="staff-pane" aria-selected="false">
-      <i class="fas fa-user-tie"></i> Staff (
-      {{ stats.staff_count }})
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="vets-tab" data-bs-toggle="tab" data-bs-target="#vets-pane" type="button" role="tab" aria-controls="vets-pane" aria-selected="false">
-      <i class="fas fa-user-md"></i> Veterinarians (
-      {{ stats.vet_count }})
-    </button>
-  </li>
-</ul>
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="promotionTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="clients-tab" data-bs-toggle="tab" data-bs-target="#clients-pane" type="button" role="tab" aria-controls="clients-pane" aria-selected="true">
+          <i class="fas fa-user me-1"></i> Clients (
+          {{ stats.client_count }})
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-pane" type="button" role="tab" aria-controls="staff-pane" aria-selected="false">
+          <i class="fas fa-user-tie me-1"></i> Staff (
+          {{ stats.staff_count }})
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="vets-tab" data-bs-toggle="tab" data-bs-target="#vets-pane" type="button" role="tab" aria-controls="vets-pane" aria-selected="false">
+          <i class="fas fa-user-md me-1"></i> Veterinarians (
+          {{ stats.vet_count }})
+        </button>
+      </li>
+    </ul>
 
-<div class="tab-content" id="promotionTabContent">
-
-  <!-- Clients Tab -->
-  <div class="tab-pane fade show active" id="clients-pane" role="tabpanel" aria-labelledby="clients-tab">
-    <div class="card shadow">
-      <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-user"></i> Clients Available for Promotion</h5>
-      </div>
-      <div class="card-body p-0">
-        {% if clients %}
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead class="bg-light">
-              <tr>
-                <th>Client</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Joined</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for client in clients %}
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
-                      <i class="fas fa-user text-white"></i>
-                    </div>
-                    <div>
-                      <strong>
-                        {{ client.get_full_name|default:client.username }}</strong>
-                      {% if not client.get_full_name %}
-                      <br><small class="text-muted">@
-                        {{ client.username }}</small>
+    <div class="tab-content" id="promotionTabContent">
+      <!-- Clients Tab -->
+      <div class="tab-pane fade show active" id="clients-pane" role="tabpanel" aria-labelledby="clients-tab">
+        <div class="card glass card-olive mt-3">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-user me-2 themed-icon"></i> Clients Available for Promotion</h5>
+          </div>
+          <div class="card-body p-0">
+            {% if clients %}
+            <div class="table-responsive">
+              <table class="table table-hover table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Joined</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for client in clients %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; background: var(--sand-medium);">
+                          <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                          <strong>
+                            {{ client.get_full_name|default:client.username }}</strong>
+                          {% if not client.get_full_name %}
+                          <br><small class="text-muted">@
+                            {{ client.username }}</small>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if client.email %}
+                      {{ client.email }}
+                      {% else %}
+                      <span class="text-muted">Not provided</span>
                       {% endif %}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  {{ client.email|default:"<span class='text-muted'>Not provided</span>" }}
-                </td>
-                <td>
-                  {{ client.phone|default:"<span class='text-muted'>Not provided</span>" }}
-                </td>
-                <td>
-                  {{ client.date_joined|date:'M d, Y' }}
-                </td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <form method="post" class="d-inline promotion-form">
-                      {% csrf_token %}
-                      <input type="hidden" name="user_id" value="{{ client.id }}">
-                      <input type="hidden" name="action" value="promote_to_staff">
-                      <button type="submit" class="btn btn-warning" title="Promote to Staff">
-                        <i class="fas fa-arrow-up"></i> Staff
-                      </button>
-                    </form>
-                    <form method="post" class="d-inline promotion-form">
-                      {% csrf_token %}
-                      <input type="hidden" name="user_id" value="{{ client.id }}">
-                      <input type="hidden" name="action" value="promote_to_vet">
-                      <button type="submit" class="btn btn-success" title="Promote to Veterinarian">
-                        <i class="fas fa-user-md"></i> Vet
-                      </button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-          <i class="fas fa-user fa-3x text-muted mb-3"></i>
-          <h5 class="text-muted">No clients available for promotion</h5>
-          <p class="text-muted">All users have been assigned appropriate roles.</p>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-
-  <!-- Staff Tab -->
-  <div class="tab-pane fade" id="staff-pane" role="tabpanel" aria-labelledby="staff-tab">
-    <div class="card shadow">
-      <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-user-tie"></i> Current Staff Members</h5>
-      </div>
-      <div class="card-body p-0">
-        {% if staff_members %}
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead class="bg-light">
-              <tr>
-                <th>Staff Member</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Promoted</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for staff in staff_members %}
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
-                      <i class="fas fa-user-tie text-white"></i>
-                    </div>
-                    <div>
-                      <strong>
-                        {{ staff.get_full_name|default:staff.username }}</strong>
-                      {% if not staff.get_full_name %}
-                      <br><small class="text-muted">@
-                        {{ staff.username }}</small>
+                    </td>
+                    <td>
+                      {% if client.phone %}
+                      {{ client.phone }}
+                      {% else %}
+                      <span class="text-muted">Not provided</span>
                       {% endif %}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  {{ staff.email|default:"<span class='text-muted'>Not provided</span>" }}
-                </td>
-                <td>
-                  {{ staff.phone|default:"<span class='text-muted'>Not provided</span>" }}
-                </td>
-                <td>
-                  {{ staff.date_joined|date:'M d, Y' }}
-                </td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <form method="post" class="d-inline promotion-form">
-                      {% csrf_token %}
-                      <input type="hidden" name="user_id" value="{{ staff.id }}">
-                      <input type="hidden" name="action" value="promote_to_vet">
-                      <button type="submit" class="btn btn-success" title="Promote to Veterinarian">
-                        <i class="fas fa-arrow-up"></i> Vet
-                      </button>
-                    </form>
-                    <form method="post" class="d-inline promotion-form">
-                      {% csrf_token %}
-                      <input type="hidden" name="user_id" value="{{ staff.id }}">
-                      <input type="hidden" name="action" value="demote_to_client">
-                      <button type="submit" class="btn btn-outline-secondary" title="Demote to Client">
-                        <i class="fas fa-arrow-down"></i> Client
-                      </button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+                    </td>
+                    <td>
+                      {{ client.date_joined|date:'M d, Y' }}
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm">
+                        <form method="post" class="d-inline promotion-form">
+                          {% csrf_token %}
+                          <input type="hidden" name="user_id" value="{{ client.id }}">
+                          <input type="hidden" name="action" value="promote_to_staff">
+                          <button type="submit" class="btn btn-accent" title="Promote to Staff">
+                            <i class="fas fa-arrow-up me-1"></i> Staff
+                          </button>
+                        </form>
+                        <form method="post" class="d-inline promotion-form">
+                          {% csrf_token %}
+                          <input type="hidden" name="user_id" value="{{ client.id }}">
+                          <input type="hidden" name="action" value="promote_to_vet">
+                          <button type="submit" class="btn btn-ghost" title="Promote to Veterinarian">
+                            <i class="fas fa-user-md me-1"></i> Vet
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-user fa-3x text-muted mb-3"></i>
+              <h5 class="text-muted mb-0">No clients available for promotion</h5>
+              <small class="text-muted">All users have been assigned appropriate roles.</small>
+            </div>
+            {% endif %}
+          </div>
         </div>
-        {% else %}
-        <div class="text-center py-5">
-          <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
-          <h5 class="text-muted">No staff members</h5>
-          <p class="text-muted">Promote clients to create staff members.</p>
+      </div>
+
+      <!-- Staff Tab -->
+      <div class="tab-pane fade" id="staff-pane" role="tabpanel" aria-labelledby="staff-tab">
+        <div class="card glass card-amber mt-3">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-user-tie me-2 themed-icon"></i> Current Staff Members</h5>
+          </div>
+          <div class="card-body p-0">
+            {% if staff_members %}
+            <div class="table-responsive">
+              <table class="table table-hover table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Staff Member</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Promoted</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for staff in staff_members %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; background: var(--accent-warning);">
+                          <i class="fas fa-user-tie text-white"></i>
+                        </div>
+                        <div>
+                          <strong>
+                            {{ staff.get_full_name|default:staff.username }}</strong>
+                          {% if not staff.get_full_name %}
+                          <br><small class="text-muted">@
+                            {{ staff.username }}</small>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if staff.email %}
+                      {{ staff.email }}{% else %}<span class="text-muted">Not provided</span>{% endif %}
+                    </td>
+                    <td>
+                      {% if staff.phone %}
+                      {{ staff.phone }}{% else %}<span class="text-muted">Not provided</span>{% endif %}
+                    </td>
+                    <td>
+                      {{ staff.date_joined|date:'M d, Y' }}
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm">
+                        <form method="post" class="d-inline promotion-form">
+                          {% csrf_token %}
+                          <input type="hidden" name="user_id" value="{{ staff.id }}">
+                          <input type="hidden" name="action" value="promote_to_vet">
+                          <button type="submit" class="btn btn-accent" title="Promote to Veterinarian">
+                            <i class="fas fa-arrow-up me-1"></i> Vet
+                          </button>
+                        </form>
+                        <form method="post" class="d-inline promotion-form">
+                          {% csrf_token %}
+                          <input type="hidden" name="user_id" value="{{ staff.id }}">
+                          <input type="hidden" name="action" value="demote_to_client">
+                          <button type="submit" class="btn btn-ghost" title="Demote to Client">
+                            <i class="fas fa-arrow-down me-1"></i> Client
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
+              <h5 class="text-muted mb-0">No staff members</h5>
+              <small class="text-muted">Promote clients to create staff members.</small>
+            </div>
+            {% endif %}
+          </div>
         </div>
-        {% endif %}
+      </div>
+
+      <!-- Veterinarians Tab -->
+      <div class="tab-pane fade" id="vets-pane" role="tabpanel" aria-labelledby="vets-tab">
+        <div class="card glass card-success mt-3">
+          <div class="card-header soft-accent-bg">
+            <h5 class="m-0"><i class="fas fa-user-md me-2 themed-icon"></i> Current Veterinarians</h5>
+          </div>
+          <div class="card-body p-0">
+            {% if vets %}
+            <div class="table-responsive">
+              <table class="table table-hover table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Veterinarian</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Joined</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for vet in vets %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; background: var(--accent-success);">
+                          <i class="fas fa-user-md text-white"></i>
+                        </div>
+                        <div>
+                          <strong>
+                            {{ vet.get_full_name|default:vet.username }}</strong>
+                          {% if not vet.get_full_name %}
+                          <br><small class="text-muted">@
+                            {{ vet.username }}</small>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if vet.email %}
+                      {{ vet.email }}{% else %}<span class="text-muted">Not provided</span>{% endif %}
+                    </td>
+                    <td>
+                      {% if vet.phone %}
+                      {{ vet.phone }}{% else %}<span class="text-muted">Not provided</span>{% endif %}
+                    </td>
+                    <td>
+                      {{ vet.date_joined|date:'M d, Y' }}
+                    </td>
+                    <td class="text-end">
+                      <form method="post" class="d-inline promotion-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ vet.id }}">
+                        <input type="hidden" name="action" value="demote_to_client">
+                        <button type="submit" class="btn btn-ghost btn-sm" title="Demote to Client">
+                          <i class="fas fa-arrow-down me-1"></i> Demote
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+              <h5 class="text-muted mb-0">No veterinarians</h5>
+              <small class="text-muted">Promote clients to create veterinarians.</small>
+            </div>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Veterinarians Tab -->
-  <div class="tab-pane fade" id="vets-pane" role="tabpanel" aria-labelledby="vets-tab">
-    <div class="card shadow">
-      <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-user-md"></i> Current Veterinarians</h5>
-      </div>
-      <div class="card-body p-0">
-        {% if vets %}
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead class="bg-light">
-              <tr>
-                <th>Veterinarian</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Joined</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for vet in vets %}
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
-                      <i class="fas fa-user-md text-white"></i>
-                    </div>
-                    <div>
-                      <strong>
-                        {{ vet.get_full_name|default:vet.username }}</strong>
-                      {% if not vet.get_full_name %}
-                      <br><small class="text-muted">@
-                        {{ vet.username }}</small>
-                      {% endif %}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  {{ vet.email|default:"<span class='text-muted'>Not provided</span>" }}
-                </td>
-                <td>
-                  {{ vet.phone|default:"<span class='text-muted'>Not provided</span>" }}
-                </td>
-                <td>
-                  {{ vet.date_joined|date:'M d, Y' }}
-                </td>
-                <td>
-                  <form method="post" class="d-inline promotion-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="user_id" value="{{ vet.id }}">
-                    <input type="hidden" name="action" value="demote_to_client">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Demote to Client">
-                      <i class="fas fa-arrow-down"></i> Demote
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-          <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
-          <h5 class="text-muted">No veterinarians</h5>
-          <p class="text-muted">Promote clients to create veterinarians.</p>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Promotion Guidelines -->
-<div class="row mt-4">
-  <div class="col-12">
-    <div class="card border-info">
-      <div class="card-header bg-info text-white">
-        <h6 class="mb-0"><i class="fas fa-info-circle"></i> Promotion Guidelines</h6>
+    <!-- Promotion Guidelines -->
+    <div class="card glass card-indigo mt-4">
+      <div class="card-header soft-accent-bg">
+        <h6 class="m-0"><i class="fas fa-info-circle me-2 themed-icon"></i> Promotion Guidelines</h6>
       </div>
       <div class="card-body">
-        <div class="row">
+        <div class="row g-3">
           <div class="col-md-4">
-            <h6><strong>Staff Members</strong></h6>
-            <ul class="small">
+            <h6 class="mb-2"><strong>Staff Members</strong></h6>
+            <ul class="small mb-0">
               <li>Handle appointment scheduling</li>
               <li>Manage client communications</li>
-              <li>Basic reception duties</li>
-              <li>Access to client management tools</li>
+              <li>Reception duties</li>
+              <li>Access to client tools</li>
             </ul>
           </div>
           <div class="col-md-4">
-            <h6><strong>Veterinarians</strong></h6>
-            <ul class="small">
+            <h6 class="mb-2"><strong>Veterinarians</strong></h6>
+            <ul class="small mb-0">
               <li>Full medical record access</li>
               <li>Prescription management</li>
               <li>Treatment planning</li>
-              <li>Advanced diagnostic tools</li>
+              <li>Diagnostic tools</li>
             </ul>
           </div>
           <div class="col-md-4">
-            <h6><strong>Important Notes</strong></h6>
-            <ul class="small">
+            <h6 class="mb-2"><strong>Important Notes</strong></h6>
+            <ul class="small mb-0">
               <li>Role changes are immediate</li>
               <li>Users are notified of promotions</li>
-              <li>Access permissions update automatically</li>
+              <li>Permissions update automatically</li>
               <li>Changes are logged for audit</li>
             </ul>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 
+{% block scripts %}
 <script>
-  // Add confirmation for role changes
+  // Sidebar collapse
+  (function() {
+    const shell = document.querySelector('.app-shell');
+    const toggle = document.querySelector('.sidebar-toggle');
+    if (toggle && shell) toggle.addEventListener('click', () => shell.classList.toggle('sidebar-collapsed'));
+  })();
+
+  // Confirm role changes
   document.querySelectorAll('.promotion-form').forEach(form => {
     form.addEventListener('submit', function(e) {
       const action = this.querySelector('input[name="action"]').value;
-      const userName = this.closest('tr').querySelector('strong').textContent;
-
+      const userName = this.closest('tr')?.querySelector('strong')?.textContent?.trim() || 'this user';
       let message = '';
       switch (action) {
         case 'promote_to_staff':
@@ -385,11 +480,9 @@
           message = `Demote ${userName} to Client?`;
           break;
       }
-
-      if (!confirm(message)) {
-        e.preventDefault();
-      }
+      if (!confirm(message)) e.preventDefault();
     });
   });
 </script>
+{% endblock %}
 {% endblock %}

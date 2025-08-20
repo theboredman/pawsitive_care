@@ -180,7 +180,110 @@
 
   {# optional per-page JS hook #}
   {% block extra_js %}{% endblock %}
-  {% block scripts %}{% endblock %}
+  {% block scripts %}
+  <script>
+    (function() {
+      const table = document.getElementById('usersTable');
+      if (!table) return;
+
+      const tbody = table.tBodies[0];
+      const searchInput = document.getElementById('userSearch');
+      const roleFilter = document.getElementById('roleFilter');
+      const statusFilter = document.getElementById('statusFilter');
+      const densityToggle = document.getElementById('densityToggle');
+      const selectAll = document.getElementById('selectAll');
+
+      // Density toggle
+      densityToggle?.addEventListener('click', () => {
+        const rootCard = table.closest('.table-card');
+        rootCard.classList.toggle('table-compact');
+        const active = rootCard.classList.contains('table-compact');
+        densityToggle.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+
+      // Search + filters
+      const filterRows = () => {
+        const q = (searchInput?.value || '').trim().toLowerCase();
+        const role = roleFilter?.value || '';
+        const status = statusFilter?.value || '';
+
+        [...tbody.rows].forEach(row => {
+          const txt = row.textContent.toLowerCase();
+          const rowRole = row.dataset.role || '';
+          const rowStatus = row.dataset.status || '';
+          const visible =
+            (!q || txt.includes(q)) &&
+            (!role || rowRole === role) &&
+            (!status || rowStatus === status);
+          row.style.display = visible ? '' : 'none';
+        });
+      };
+      searchInput?.addEventListener('input', filterRows);
+      roleFilter?.addEventListener('change', filterRows);
+      statusFilter?.addEventListener('change', filterRows);
+
+      // Sort
+      const getCellValue = (row, key) => {
+        const cell = row.querySelector(`[data-value]${key ? '' : ''}`);
+        // Column-specific lookup:
+        switch (key) {
+          case 'user':
+            return row.querySelector('td:nth-child(2)')?.dataset.value || '';
+          case 'email':
+            return row.querySelector('td:nth-child(3)')?.dataset.value || '';
+          case 'phone':
+            return row.querySelector('td:nth-child(4)')?.dataset.value || '';
+          case 'role':
+            return row.querySelector('td:nth-child(5)')?.dataset.value || '';
+          case 'status':
+            return row.querySelector('td:nth-child(6)')?.dataset.value || '';
+          case 'joined':
+            return +(row.dataset.joined || 0);
+          default:
+            return '';
+        }
+      };
+
+      const ths = table.tHead?.rows[0]?.cells || [];
+      [...ths].forEach(th => {
+        const key = th.dataset.sortkey;
+        if (!key) return;
+
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+          const rows = [...tbody.rows].filter(r => !r.classList.contains('table-empty'));
+          const isNumeric = key === 'joined';
+          const currentDir = th.classList.contains('sorted-asc') ? 'asc' :
+            th.classList.contains('sorted-desc') ? 'desc' : null;
+          const nextDir = currentDir === 'asc' ? 'desc' : 'asc';
+
+          // Clear indicators
+          [...ths].forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
+          th.classList.add(nextDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+
+          rows.sort((a, b) => {
+            const A = getCellValue(a, key);
+            const B = getCellValue(b, key);
+            if (isNumeric) return nextDir === 'asc' ? A - B : B - A;
+            return nextDir === 'asc' ?
+              String(A).localeCompare(String(B)) :
+              String(B).localeCompare(String(A));
+          });
+
+          rows.forEach(r => tbody.appendChild(r));
+        });
+      });
+
+      // Select all / per-row
+      selectAll?.addEventListener('change', function() {
+        const checked = this.checked;
+        tbody.querySelectorAll('.row-check').forEach(cb => cb.checked = checked);
+      });
+    })();
+  </script>
+  {% endblock %}
 </body>
+
+
 
 </html>

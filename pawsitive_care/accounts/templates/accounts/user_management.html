@@ -3,256 +3,390 @@
 {% block title %}User Management - Pawsitive Care{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h2><i class="fas fa-users text-primary"></i> User Management</h2>
-        <p class="text-muted">Manage all system users and their roles</p>
+<div class="app-shell" id="appShell">
+  <!-- ========= SIDEBAR ========= -->
+  <aside class="app-sidebar glass" aria-label="Primary">
+    <div class="sidebar-header">
+      <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="sidebar-title">Admin</span>
+    </div>
+
+    <!-- Sections -->
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Users</div>
+        <a href="{% url 'accounts:user_management' %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_management' %}active{% endif %}">
+          <i class="fas fa-users"></i><span>Manage Users</span>
+        </a>
+        <a href="{% url 'accounts:promote_clients' %}" class="sidebar-link {% if request.resolver_match.url_name == 'promote_clients' %}active{% endif %}">
+          <i class="fas fa-user-plus"></i><span>Promote Clients</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-user-tie"></i><span>Add Staff</span>
+        </a>
       </div>
-      <div>
-        <div class="btn-group" role="group">
-          <a href="{% url 'accounts:register' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add New User
-          </a>
-          <a href="{% url 'accounts:promote_clients' %}" class="btn btn-success">
-            <i class="fas fa-user-plus"></i> Promote Staff
-          </a>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Inventory</div>
+        <a href="{% url 'inventory:item_list' %}" class="sidebar-link">
+          <i class="fas fa-boxes"></i><span>All Items</span>
+        </a>
+        <a href="{% url 'inventory:item_list' %}?low_stock=1" class="sidebar-link">
+          <i class="fas fa-triangle-exclamation"></i><span>Low Stock</span>
+        </a>
+        <a href="{% url 'inventory:item_create' %}" class="sidebar-link">
+          <i class="fas fa-plus"></i><span>Add Item</span>
+        </a>
+        <a href="{% url 'inventory:reports' %}" class="sidebar-link">
+          <i class="fas fa-chart-line"></i><span>Reports</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Blog</div>
+        <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link">
+          <i class="fas fa-edit"></i><span>All Posts</span>
+        </a>
+        <a href="{% url 'petmedia:create_post' %}" class="sidebar-link">
+          <i class="fas fa-plus"></i><span>Create Post</span>
+        </a>
+        <a href="{% url 'petmedia:create_professional_post' %}" class="sidebar-link">
+          <i class="fas fa-user-md"></i><span>Professional Post</span>
+        </a>
+        <a href="{% url 'petmedia:user_posts' %}" class="sidebar-link">
+          <i class="fas fa-star"></i><span>My Posts</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">System</div>
+        <a href="{% url 'appointments:staff_calendar' %}" class="sidebar-link">
+          <i class="fas fa-calendar"></i><span>Appointments</span>
+        </a>
+        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
+          <i class="fas fa-receipt"></i><span>Billing</span>
+        </a>
+        <a href="{% url 'pets:pet_list' %}" class="sidebar-link">
+          <i class="fas fa-paw"></i><span>Pets</span>
+        </a>
+        <a href="{% url 'communication:communication_list' %}" class="sidebar-link">
+          <i class="fas fa-comments"></i><span>Communications</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-chart-bar"></i><span>Reports</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-gear"></i><span>Settings</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="app-main">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="m-0"><i class="fas fa-users me-2"></i> User Management</h2>
+            <p class="text-muted mb-0">Manage all system users and their roles</p>
+          </div>
+          <div class="btn-group" role="group" aria-label="User actions">
+            <a href="{% url 'accounts:register' %}" class="btn btn-accent">
+              <i class="fas fa-user-plus me-1"></i> Add New User
+            </a>
+            <a href="{% url 'accounts:promote_clients' %}" class="btn btn-ghost">
+              <i class="fas fa-arrow-up me-1"></i> Promote Staff
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- User Statistics -->
-<div class="row mb-4">
-  <!-- Total Users - Full width on mobile, half width on tablet+ -->
-  <div class="col-12 col-md-6 col-lg-12 mb-3">
-    <div class="card border-primary">
-      <div class="card-body text-center">
-        <h3 class="text-primary">
-          {{ stats.total_users }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-users"></i> Total Users</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Role Statistics -->
-<div class="row mb-4">
-  <div class="col-6 col-lg-3">
-    <div class="card border-danger">
-      <div class="card-body text-center">
-        <h3 class="text-danger">
-          {{ stats.admin_count }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-user-shield"></i> Administrators</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="card border-success">
-      <div class="card-body text-center">
-        <h3 class="text-success">
-          {{ stats.vet_count }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-user-md"></i> Veterinarians</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="card border-warning">
-      <div class="card-body text-center">
-        <h3 class="text-warning">
-          {{ stats.staff_count }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-user-tie"></i> Staff Members</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="card border-info">
-      <div class="card-body text-center">
-        <h3 class="text-info">
-          {{ stats.client_count }}
-        </h3>
-        <p class="mb-0"><i class="fas fa-user"></i> Clients</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Users Table -->
-<div class="card shadow">
-  <div class="card-header">
-    <div class="row align-items-center">
-      <div class="col">
-        <h5 class="mb-0"><i class="fas fa-list"></i> All Users</h5>
-      </div>
-      <div class="col-auto">
-        <div class="input-group">
-          <span class="input-group-text"><i class="fas fa-search"></i></span>
-          <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+    <!-- User Statistics -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card glass card-indigo h-100">
+          <div class="card-body text-center">
+            <h3 class="solid-accent-text mb-1">
+              {{ stats.total_users }}
+            </h3>
+            <small class="text-muted"><i class="fas fa-users me-1"></i>Total Users</small>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0" id="usersTable">
-        <thead class="bg-light">
-          <tr>
-            <th>User</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Joined</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in users %}
-          <tr>
-            <td>
-              <div class="d-flex align-items-center">
-                <div class="bg-{{ user.role|default:'secondary' }} rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
-                  {% if user.is_admin %}
-                  <i class="fas fa-user-shield text-white"></i>
-                  {% elif user.is_vet %}
-                  <i class="fas fa-stethoscope text-white"></i>
-                  {% elif user.is_staff_member %}
-                  <i class="fas fa-user-tie text-white"></i>
-                  {% else %}
-                  <i class="fas fa-user text-white"></i>
-                  {% endif %}
-                </div>
-                <div>
-                  <strong>
-                    {{ user.get_full_name|default:user.username }}</strong>
-                  {% if not user.get_full_name %}
-                  <br><small class="text-muted">@
-                    {{ user.username }}</small>
-                  {% endif %}
-                </div>
+
+    <!-- Role Statistics -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="card glass card-rose h-100">
+          <div class="card-body text-center">
+            <h3 class="solid-accent-text mb-1">
+              {{ stats.admin_count }}
+            </h3>
+            <small class="text-muted"><i class="fas fa-user-shield me-1"></i>Administrators</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card glass card-success h-100">
+          <div class="card-body text-center">
+            <h3 class="solid-accent-text mb-1">
+              {{ stats.vet_count }}
+            </h3>
+            <small class="text-muted"><i class="fas fa-user-md me-1"></i>Veterinarians</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card glass card-amber h-100">
+          <div class="card-body text-center">
+            <h3 class="solid-accent-text mb-1">
+              {{ stats.staff_count }}
+            </h3>
+            <small class="text-muted"><i class="fas fa-user-tie me-1"></i>Staff Members</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card glass card-teal h-100">
+          <div class="card-body text-center">
+            <h3 class="solid-accent-text mb-1">
+              {{ stats.client_count }}
+            </h3>
+            <small class="text-muted"><i class="fas fa-user me-1"></i>Clients</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   <!-- Users Table (Modern) -->
+   <div class="card glass table-card">
+     <div class="card-header soft-accent-bg">
+       <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+         <div class="d-flex align-items-center gap-2">
+           <h5 class="m-0"><i class="fas fa-list me-2"></i> All Users</h5>
+         </div>
+
+         <div class="d-flex flex-wrap align-items-center gap-2">
+           <!-- Search -->
+           <div class="input-group input-group-sm table-toolbar-search">
+             <span class="input-group-text bg-transparent border-0 ps-0">
+               <i class="fas fa-search"></i>
+             </span>
+             <input type="text" class="form-control" placeholder="Search users…" id="userSearch" aria-label="Search users">
+           </div>
+
+           <!-- Role Filter -->
+           <select id="roleFilter" class="form-select form-select-sm">
+             <option value="">Role: All</option>
+             <option value="Admin">Admin</option>
+             <option value="Veterinarian">Veterinarian</option>
+             <option value="Staff">Staff</option>
+             <option value="Client">Client</option>
+           </select>
+
+           <!-- Status Filter -->
+           <select id="statusFilter" class="form-select form-select-sm">
+             <option value="">Status: All</option>
+             <option value="Active">Active</option>
+             <option value="Inactive">Inactive</option>
+           </select>
+
+           <!-- Density -->
+           <button class="btn btn-ghost btn-sm" id="densityToggle" type="button" aria-pressed="false" title="Toggle density">
+             <i class="fas fa-compress-arrows-alt me-1"></i> Compact
+           </button>
+         </div>
+       </div>
+     </div>
+
+     <div class="table-wrap table-responsive">
+       <table class="table table-modern align-middle mb-0" id="usersTable">
+         <thead>
+           <tr>
+             <th style="width:42px;">
+               <input class="form-check-input" type="checkbox" id="selectAll">
+             </th>
+
+             <th data-sortkey="user">
+               User <i class="fas fa-sort sort-indicator"></i>
+             </th>
+
+             <th data-sortkey="email">
+               Email <i class="fas fa-sort sort-indicator"></i>
+             </th>
+
+             <th data-sortkey="phone">
+               Phone <i class="fas fa-sort sort-indicator"></i>
+             </th>
+
+             <th data-sortkey="role">
+               Role <i class="fas fa-sort sort-indicator"></i>
+             </th>
+
+             <th data-sortkey="status">
+               Status <i class="fas fa-sort sort-indicator"></i>
+             </th>
+
+             <th data-sortkey="joined" style="min-width: 120px;">
+               Joined <i class="fas fa-sort sort-indicator"></i>
+             </th>
+
+             <th class="text-end" style="width:120px;">Actions</th>
+           </tr>
+         </thead>
+<tbody>
+  {% for user in users %}
+  <tr data-role="{% if user.is_admin %}Admin{% elif user.is_vet %}Veterinarian{% elif user.is_staff_member %}Staff{% else %}Client{% endif %}" data-status="{% if user.is_active %}Active{% else %}Inactive{% endif %}" data-joined="{{ user.date_joined|date:'U' }}">
+    <td>
+      <input class="form-check-input row-check" type="checkbox">
+    </td>
+
+    <!-- User + avatar/handle -->
+    <td data-value="{{ user.get_full_name|default:user.username }}">
+      <div class="user-cell d-flex align-items-center gap-2">
+        <img class="avatar-sm rounded-circle" src="https://api.dicebear.com/7.x/identicon/svg?seed={{ user.username }}" alt="{{ user.username }} avatar" width="32" height="32" />
+        <div class="user-meta">
+          <div class="user-name fw-semibold">
+            {{ user.get_full_name|default:user.username }}
+          </div>
+          {% if not user.get_full_name %}
+          <div class="user-handle text-muted small">@
+            {{ user.username }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </td>
+
+    <!-- Email -->
+    <td data-value="{{ user.email|default:'' }}">
+      {% if user.email %}
+      <a href="mailto:{{ user.email }}" class="text-decoration-none">
+        {{ user.email }}</a>
+      {% else %}
+      <span class="text-muted">Not provided</span>
+      {% endif %}
+    </td>
+
+    <!-- Phone -->
+    <td data-value="{{ user.phone|default:'' }}">
+      {% if user.phone %}
+      <a href="tel:{{ user.phone }}" class="text-decoration-none">
+        {{ user.phone }}</a>
+      {% else %}
+      <span class="text-muted">Not provided</span>
+      {% endif %}
+    </td>
+
+    <!-- Role chip -->
+    <td data-value="{% if user.is_admin %}Admin{% elif user.is_vet %}Veterinarian{% elif user.is_staff_member %}Staff{% else %}Client{% endif %}">
+      {% if user.is_admin %}
+      <span class="chip chip-admin"><i class="fas fa-user-shield me-1"></i> Admin</span>
+      {% elif user.is_vet %}
+      <span class="chip chip-vet"><i class="fas fa-user-md me-1"></i> Veterinarian</span>
+      {% elif user.is_staff_member %}
+      <span class="chip chip-staff"><i class="fas fa-user-tie me-1"></i> Staff</span>
+      {% else %}
+      <span class="chip chip-client"><i class="fas fa-user me-1"></i> Client</span>
+      {% endif %}
+    </td>
+
+    <!-- Status pill -->
+    <td data-value="{% if user.is_active %}Active{% else %}Inactive{% endif %}">
+      {% if user.is_active %}
+      <span class="status-pill status-active"><span class="dot"></span> Active</span>
+      {% else %}
+      <span class="status-pill status-inactive"><span class="dot"></span> Inactive</span>
+      {% endif %}
+    </td>
+
+    <!-- Joined (sortable by timestamp) -->
+    <td data-value="{{ user.date_joined|date:'U' }}">
+      <small>
+        {{ user.date_joined|date:'M d, Y' }}</small>
+    </td>
+
+    <!-- Actions -->
+    <td class="text-end">
+      <div class="btn-group btn-group-sm" role="group" aria-label="Row actions">
+        <a class="btn btn-ghost" title="View"><i class="fas fa-eye"></i></a>
+        <a class="btn btn-accent" title="Edit"><i class="fas fa-edit"></i></a>
+        {% if user != request.user %}
+        <button type="button" class="btn btn-ghost" title="Delete"><i class="fas fa-trash"></i></button>
+        {% endif %}
+      </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr class="table-empty">
+    <td colspan="8" class="text-center py-4">
+      <i class="fas fa-users fa-2x text-muted mb-2 d-block"></i>
+      <p class="text-muted mb-0">No users found.</p>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+         
+       </table>
+     </div>
+   </div>
+
+    
+
+    <!-- Role Legend -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card glass card-teal">
+          <div class="card-header soft-accent-bg">
+            <h6 class="m-0"><i class="fas fa-info-circle me-2"></i> Role Permissions</h6>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <h6><span class="badge badge-solid" style="background:#ef4444;color:#fff;">Admin</span></h6>
+                <ul class="small mb-0">
+                  <li>Full system access</li>
+                  <li>User management</li>
+                  <li>System configuration</li>
+                </ul>
               </div>
-            </td>
-            <td>
-              {{ user.email|default:"<span class='text-muted'>Not provided</span>" }}
-            </td>
-            <td>
-              {{ user.phone|default:"<span class='text-muted'>Not provided</span>" }}
-            </td>
-            <td>
-              <span class="badge bg-{{ user.role|default:'secondary' }}">
-                {{ user.get_role_display }}
-              </span>
-            </td>
-            <td>
-              {% if user.is_active %}
-              <span class="badge bg-success">Active</span>
-              {% else %}
-              <span class="badge bg-danger">Inactive</span>
-              {% endif %}
-            </td>
-            <td>
-              <small>
-                {{ user.date_joined|date:'M d, Y' }}</small>
-            </td>
-            <td>
-              <div class="btn-group btn-group-sm" role="group">
-                <button type="button" class="btn btn-outline-primary" title="View Details">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <button type="button" class="btn btn-outline-warning" title="Edit User">
-                  <i class="fas fa-edit"></i>
-                </button>
-                {% if user != request.user %}
-                <button type="button" class="btn btn-outline-danger" title="Delete User">
-                  <i class="fas fa-trash"></i>
-                </button>
-                {% endif %}
+              <div class="col-md-3">
+                <h6><span class="badge badge-solid" style="background:#22c55e;color:#fff;">Veterinarian</span></h6>
+                <ul class="small mb-0">
+                  <li>Patient management</li>
+                  <li>Medical records</li>
+                  <li>Prescriptions</li>
+                </ul>
               </div>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="text-center py-4">
-              <i class="fas fa-users fa-2x text-muted mb-2"></i>
-              <p class="text-muted">No users found.</p>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- Role Legend -->
-<div class="row mt-4">
-  <div class="col-12">
-    <div class="card border-info">
-      <div class="card-header bg-info text-white">
-        <h6 class="mb-0"><i class="fas fa-info-circle"></i> Role Permissions</h6>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-3">
-            <h6><span class="badge bg-danger">Admin</span></h6>
-            <ul class="small">
-              <li>Full system access</li>
-              <li>User management</li>
-              <li>System configuration</li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h6><span class="badge bg-success">Veterinarian</span></h6>
-            <ul class="small">
-              <li>Patient management</li>
-              <li>Medical records</li>
-              <li>Prescriptions</li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h6><span class="badge bg-warning">Staff</span></h6>
-            <ul class="small">
-              <li>Appointment scheduling</li>
-              <li>Client management</li>
-              <li>Basic reception</li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h6><span class="badge bg-info">Client</span></h6>
-            <ul class="small">
-              <li>Book appointments</li>
-              <li>View pet records</li>
-              <li>Manage profile</li>
-            </ul>
+              <div class="col-md-3">
+                <h6><span class="badge badge-solid" style="background:#f59e0b;color:#fff;">Staff</span></h6>
+                <ul class="small mb-0">
+                  <li>Appointment scheduling</li>
+                  <li>Client management</li>
+                  <li>Basic reception</li>
+                </ul>
+              </div>
+              <div class="col-md-3">
+                <h6><span class="badge badge-solid" style="background:#06b6d4;color:#fff;">Client</span></h6>
+                <ul class="small mb-0">
+                  <li>Book appointments</li>
+                  <li>View pet records</li>
+                  <li>Manage profile</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 
-<script>
-  document.getElementById('userSearch').addEventListener('keyup', function() {
-    var input = this.value.toLowerCase();
-    var table = document.getElementById('usersTable');
-    var rows = table.getElementsByTagName('tr');
 
-    for (var i = 1; i < rows.length; i++) {
-      var row = rows[i];
-      var text = row.textContent.toLowerCase();
-
-      if (text.includes(input)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
-    }
-  });
-</script>
 {% endblock %}
