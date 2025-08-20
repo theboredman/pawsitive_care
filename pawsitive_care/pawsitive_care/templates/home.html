@@ -2,207 +2,403 @@
 
 {% block title %}Welcome to Pawsitive Care{% endblock %}
 
-{% block extra_css %}
-<style>
-  .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 100px 0;
-    text-align: center;
-  }
-
-  .feature-card {
-    transition: transform 0.3s ease;
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  }
-
-  .feature-icon {
-    font-size: 3rem;
-    color: #667eea;
-    margin-bottom: 1rem;
-  }
-
-  .cta-section {
-    background-color: #f8f9fa;
-    padding: 80px 0;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <img src="https://i.ibb.co.com/Jwsn6Prb/pawsitive-logo-png.png" alt="Pawsitive Care Logo" class="mb-4" style="height: 80px;">
-        <h1 class="display-4 fw-bold mb-4">Welcome to Pawsitive Care</h1>
-        <p class="lead mb-4">
-          Your trusted partner in comprehensive pet care. We provide professional veterinary services,
-          pet management tools, and a community platform for pet owners.
+<!-- ============ HERO ============ -->
+<section class="hero-landing">
+  <div class="container-xxl position-relative">
+    <div class="row align-items-center gy-5 justify-content-between">
+      <!-- Left -->
+      <div class="col-lg-6">
+        <span class="hero-eyebrow mb-3" aria-label="Social proof">
+          <i class="fas fa-paw" aria-hidden="true"></i>
+          Loved by pet parents &amp; vets
+        </span>
+
+        <h1 class="display-5 fw-bolder hero-title mb-3">
+          All-in-one care for your furry family
+        </h1>
+
+        <p class="lead hero-subtitle mb-4">
+          Book vet visits, track health, manage meds, and join a friendly community—right from one clean dashboard.
         </p>
-        <div class="d-flex justify-content-center gap-3">
-          <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-4">
-            <i class="fas fa-user-plus me-2"></i>Get Started
+
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{% url 'accounts:register' %}" class="btn btn-accent" aria-label="Create your Pawsitive Care account">
+            <i class="fas fa-user-plus me-2" aria-hidden="true"></i>
+            Get Started
           </a>
-          <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4">
-            <i class="fas fa-sign-in-alt me-2"></i>Login
+
+          <a href="{% url 'accounts:login' %}" class="btn btn-ghost" aria-label="Log in to Pawsitive Care">
+            <i class="fas fa-sign-in-alt me-2" aria-hidden="true"></i>
+            Log In
           </a>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mt-4">
+          <div class="stack-avatars" aria-hidden="true">
+            <img class="avatar-sm" loading="lazy" src="https://api.dicebear.com/7.x/thumbs/svg?seed=Milo" alt="">
+            <img class="avatar-sm" loading="lazy" src="https://api.dicebear.com/7.x/thumbs/svg?seed=Luna" alt="">
+            <img class="avatar-sm" loading="lazy" src="https://api.dicebear.com/7.x/thumbs/svg?seed=Charlie" alt="">
+          </div>
+          <small class="opacity-75">Join 5,000+ happy pet owners</small>
+        </div>
+      </div>
+
+      <!-- Right -->
+<!-- Right -->
+<div class="col-lg-5 text-center">
+  <!-- Paw logo badge (replaces the PNG image) -->
+  <div class="hero-logo hover-lift" role="img" aria-label="Pawsitive Care">
+    <i class="fas fa-paw" aria-hidden="true"></i>
+  </div>
+
+  <!-- Stats mini-card -->
+  <div class="mt-4">
+    <div class="card glass card-gold">
+      <div class="card-body">
+        <div class="row g-3 text-center">
+          <div class="col-4">
+            <div class="stat-value">99.9%</div>
+            <small class="text-muted d-block">Uptime</small>
+          </div>
+          <div class="col-4">
+            <div class="stat-value">24/7</div>
+            <small class="text-muted d-block">Support</small>
+          </div>
+          <div class="col-4">
+            <div class="stat-value">A+</div>
+            <small class="text-muted d-block">Security</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <!-- /Right -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS STRIP (cards) ============ -->
+<section class="stats-strip py-4">
+  <div class="container-xxl">
+    <div class="row g-3">
+      <div class="col-6 col-lg-3">
+        <div class="card glass h-100 card-teal">
+          <div class="card-body d-flex align-items-center gap-3">
+            <i class="fas fa-calendar-check themed-icon" aria-hidden="true"></i>
+            <div>
+              <div class="stat-value">120k+</div>
+              <small class="text-muted">Appointments booked</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="card glass h-100 card-amber">
+          <div class="card-body d-flex align-items-center gap-3">
+            <i class="fas fa-pills themed-icon" aria-hidden="true"></i>
+            <div>
+              <div class="stat-value">80k+</div>
+              <small class="text-muted">Med reminders sent</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="card glass h-100 card-rose">
+          <div class="card-body d-flex align-items-center gap-3">
+            <i class="fas fa-heart themed-icon" aria-hidden="true"></i>
+            <div>
+              <div class="stat-value">4.9/5</div>
+              <small class="text-muted">Community rating</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="card glass h-100 card-gold">
+          <div class="card-body d-flex align-items-center gap-3">
+            <i class="fas fa-shield-alt themed-icon" aria-hidden="true"></i>
+            <div>
+              <div class="stat-value">SOC 2</div>
+              <small class="text-muted">Security ready</small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Features Section -->
+<!-- ============ FEATURES (cards) ============ -->
 <section class="py-5">
-  <div class="container">
-    <div class="row text-center mb-5">
-      <div class="col-lg-12">
-        <h2 class="fw-bold mb-3">Why Choose Pawsitive Care?</h2>
-        <p class="text-muted">Comprehensive pet care solutions designed with love</p>
-      </div>
+  <div class="container-xxl">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-2">Everything you need to care for your pet</h2>
+      <p class="text-muted mb-0">Powerful tools, friendly design</p>
     </div>
 
     <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
-          <div class="feature-icon">
-            <i class="fas fa-stethoscope"></i>
+      <div class="col-md-6 col-lg-4">
+        <div class="card glass hover-lift h-100 card-olive">
+          <div class="card-body">
+            <span class="feature-icon"><i class="fas fa-stethoscope themed-icon" aria-hidden="true"></i></span>
+            <h3 class="h5 fw-bold mb-2 mt-2">Professional Care</h3>
+            <p class="text-muted mb-0">Certified vets with visit notes, labs, and treatments in one place.</p>
           </div>
-          <h5 class="fw-bold mb-3">Professional Care</h5>
-          <p class="text-muted">
-            Expert veterinary services with experienced professionals who care about your pet's health and wellbeing.
-          </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
-          <div class="feature-icon">
-            <i class="fas fa-calendar-check"></i>
+      <div class="col-md-6 col-lg-4">
+        <div class="card glass hover-lift h-100 card-teal">
+          <div class="card-body">
+            <span class="feature-icon"><i class="fas fa-calendar-check themed-icon" aria-hidden="true"></i></span>
+            <h3 class="h5 fw-bold mb-2 mt-2">Easy Appointments</h3>
+            <p class="text-muted mb-0">Book, reschedule, and get reminders so you never miss a visit.</p>
           </div>
-          <h5 class="fw-bold mb-3">Easy Appointments</h5>
-          <p class="text-muted">
-            Book and manage appointments online with our user-friendly scheduling system.
-          </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
-          <div class="feature-icon">
-            <i class="fas fa-heart"></i>
+      <div class="col-md-6 col-lg-4">
+        <div class="card glass hover-lift h-100 card-indigo">
+          <div class="card-body">
+            <span class="feature-icon"><i class="fas fa-file-medical themed-icon" aria-hidden="true"></i></span>
+            <h3 class="h5 fw-bold mb-2 mt-2">Health Records</h3>
+            <p class="text-muted mb-0">Vaccinations, prescriptions, allergies—organized and accessible.</p>
           </div>
-          <h5 class="fw-bold mb-3">Pet Management</h5>
-          <p class="text-muted">
-            Keep track of your pet's health records, medications, and important milestones all in one place.
-          </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
-          <div class="feature-icon">
-            <i class="fas fa-users"></i>
+      <div class="col-md-6 col-lg-4">
+        <div class="card glass hover-lift h-100 card-amber">
+          <div class="card-body">
+            <span class="feature-icon"><i class="fas fa-heart themed-icon" aria-hidden="true"></i></span>
+            <h3 class="h5 fw-bold mb-2 mt-2">Pet Management</h3>
+            <p class="text-muted mb-0">Track weight, behavior, nutrition, and milestones with ease.</p>
           </div>
-          <h5 class="fw-bold mb-3">Community</h5>
-          <p class="text-muted">
-            Connect with other pet owners, share experiences, and get advice from our professional community.
-          </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
-          <div class="feature-icon">
-            <i class="fas fa-shield-alt"></i>
+      <div class="col-md-6 col-lg-4">
+        <div class="card glass hover-lift h-100 card-sienna">
+          <div class="card-body">
+            <span class="feature-icon"><i class="fas fa-users themed-icon" aria-hidden="true"></i></span>
+            <h3 class="h5 fw-bold mb-2 mt-2">Community</h3>
+            <p class="text-muted mb-0">Learn from vets and pet parents—ask questions, share tips.</p>
           </div>
-          <h5 class="fw-bold mb-3">Secure & Reliable</h5>
-          <p class="text-muted">
-            Your pet's information is protected with industry-standard security measures.
-          </p>
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card feature-card h-100 p-4 text-center">
-          <div class="feature-icon">
-            <i class="fas fa-mobile-alt"></i>
+      <div class="col-md-6 col-lg-4">
+        <div class="card glass hover-lift h-100 card-gold">
+          <div class="card-body">
+            <span class="feature-icon"><i class="fas fa-shield-alt themed-icon" aria-hidden="true"></i></span>
+            <h3 class="h5 fw-bold mb-2 mt-2">Secure &amp; Reliable</h3>
+            <p class="text-muted mb-0">Privacy-first, encrypted, dependable—family deserves the best.</p>
           </div>
-          <h5 class="fw-bold mb-3">Always Accessible</h5>
-          <p class="text-muted">
-            Access your pet's information and our services anytime, anywhere with our responsive platform.
-          </p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Call to Action Section -->
-<section class="cta-section">
-  <div class="container">
-    <div class="row justify-content-center text-center">
-      <div class="col-lg-8">
-        <h2 class="fw-bold mb-4">Ready to Give Your Pet the Best Care?</h2>
-        <p class="lead text-muted mb-4">
-          Join thousands of pet owners who trust Pawsitive Care for their furry family members.
-        </p>
-        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-5">
-          <i class="fas fa-paw me-2"></i>Start Your Journey
+<!-- ============ HOW IT WORKS + TESTIMONIALS ============ -->
+<section class="py-5">
+  <div class="container-xxl">
+    <div class="row align-items-center g-4">
+      <!-- Steps -->
+      <div class="col-lg-5">
+        <h2 class="fw-bold mb-3">How it works</h2>
+        <p class="text-muted mb-4">Getting started is quick and painless—just like your pet’s favorite belly rub.</p>
+
+        <div class="d-grid gap-3">
+          <div class="step">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div>
+              <h3 class="h6 fw-bold mb-1">Create your account</h3>
+              <p class="text-muted mb-0">Tell us about your pet(s) so we can personalize your dashboard.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div>
+              <h3 class="h6 fw-bold mb-1">Book or connect with a vet</h3>
+              <p class="text-muted mb-0">Choose in-clinic visits or tele-consults at your convenience.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div>
+              <h3 class="h6 fw-bold mb-1">Track, manage, relax</h3>
+              <p class="text-muted mb-0">We keep records, meds, and reminders perfectly organized.</p>
+            </div>
+          </div>
+        </div>
+
+        <a href="{% url 'accounts:register' %}" class="btn btn-accent mt-4">
+          <i class="fas fa-paw me-2" aria-hidden="true"></i>
+          Start Free
+        </a>
+      </div>
+
+      <!-- Testimonials (cards) -->
+      <div class="col-lg-7">
+        <div class="row g-3">
+
+          <div class="col-6">
+            <div class="card glass h-100 card-olive m-0 testimonial-card">
+              <div class="card-body d-flex flex-column">
+                <div class="stars mb-2" aria-label="4.5 out of 5 stars">
+                  <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star-half-alt" aria-hidden="true"></i>
+                </div>
+                <p class="mb-3">“Booking and records in one place? Game-changer. My vet loves it too.”</p>
+
+                <!-- Footer pinned to bottom -->
+                <div class="testimonial-footer mt-auto">
+                  <img class="avatar-sm" loading="lazy" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Olivia" alt="Olivia R.">
+                  <div>
+                    <strong class="testimonial-name">Olivia R.</strong><br>
+                    <small class="text-muted">Golden Retriever mom</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="card glass h-100 card-teal m-0 testimonial-card">
+              <div class="card-body d-flex flex-column">
+                <div class="stars mb-2" aria-label="4 out of 5 stars">
+                  <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="far fa-star" aria-hidden="true"></i>
+                </div>
+                <p class="mb-3">“Clean, secure, and efficient. Makes follow-ups and med tracking so much easier.”</p>
+
+                <div class="testimonial-footer mt-auto">
+                  <img class="avatar-sm" loading="lazy" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Leo" alt="Dr. Leo K.">
+                  <div>
+                    <strong class="testimonial-name">Dr. Leo K.</strong><br>
+                    <small class="text-muted">Veterinarian</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="card glass h-100 card-rose m-0 testimonial-card">
+              <div class="card-body d-flex flex-column">
+                <div class="stars mb-2" aria-label="5 out of 5 stars">
+                  <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                </div>
+                <p class="mb-3">“Reminders are clutch. No more scrambling before vaccines.”</p>
+
+                <div class="testimonial-footer mt-auto">
+                  <img class="avatar-sm" loading="lazy" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha" alt="Sasha M.">
+                  <div>
+                    <strong class="testimonial-name">Sasha M.</strong><br>
+                    <small class="text-muted">Cat &amp; bunny parent</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="card glass h-100 card-gold m-0 testimonial-card">
+              <div class="card-body d-flex flex-column">
+                <div class="stars mb-2" aria-label="4 out of 5 stars">
+                  <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i><i class="far fa-star" aria-hidden="true"></i>
+                </div>
+                <p class="mb-3">“The community tips helped our anxious pup settle in. Love the vibe.”</p>
+
+                <div class="testimonial-footer mt-auto">
+                  <img class="avatar-sm" loading="lazy" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Noah" alt="Noah P.">
+                  <div>
+                    <strong class="testimonial-name">Noah P.</strong><br>
+                    <small class="text-muted">Rescue foster</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- /Testimonials -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA (card) ============ -->
+<section class="py-5">
+  <div class="container-xxl">
+    <div class="card glass card-indigo mx-auto" style="max-width: 760px;">
+      <div class="card-body text-center">
+        <h2 class="fw-bold mb-2">Ready to give your pet the best care?</h2>
+        <p class="text-muted mb-4">Join thousands of pet owners who trust Pawsitive Care.</p>
+        <a href="{% url 'accounts:register' %}" class="btn btn-accent btn-lg">
+          <i class="fas fa-paw me-2" aria-hidden="true"></i>
+          Start Your Journey
         </a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Services Overview -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="row text-center mb-5">
-      <div class="col-lg-12">
-        <h2 class="fw-bold mb-3">Our Services</h2>
-        <p class="text-muted">Everything your pet needs, all in one place</p>
-      </div>
+<!-- ============ SERVICES (cards) ============ -->
+<section class="py-5" style="background: var(--surface-card);">
+  <div class="container-xxl">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-2">Our Services</h2>
+      <p class="text-muted mb-0">Everything your pet needs, all in one place</p>
     </div>
 
     <div class="row g-4">
       <div class="col-md-6 col-lg-3">
-        <div class="text-center">
-          <i class="fas fa-user-md text-primary mb-3" style="font-size: 2.5rem;"></i>
-          <h6 class="fw-bold">Veterinary Care</h6>
-          <p class="text-muted small">Professional medical care for your pets</p>
+        <div class="card glass text-center h-100 card-olive">
+          <div class="card-body">
+            <i class="fas fa-user-md fa-2x themed-icon mb-3" aria-hidden="true"></i>
+            <h3 class="h6 fw-bold">Veterinary Care</h3>
+            <p class="text-muted small mb-0">Professional medical care for your pets</p>
+          </div>
         </div>
       </div>
 
       <div class="col-md-6 col-lg-3">
-        <div class="text-center">
-          <i class="fas fa-pills text-primary mb-3" style="font-size: 2.5rem;"></i>
-          <h6 class="fw-bold">Medication Management</h6>
-          <p class="text-muted small">Track and manage your pet's medications</p>
+        <div class="card glass text-center h-100 card-amber">
+          <div class="card-body">
+            <i class="fas fa-pills fa-2x themed-icon mb-3" aria-hidden="true"></i>
+            <h3 class="h6 fw-bold">Medication Management</h3>
+            <p class="text-muted small mb-0">Track and manage your pet's medications</p>
+          </div>
         </div>
       </div>
 
       <div class="col-md-6 col-lg-3">
-        <div class="text-center">
-          <i class="fas fa-file-medical text-primary mb-3" style="font-size: 2.5rem;"></i>
-          <h6 class="fw-bold">Health Records</h6>
-          <p class="text-muted small">Digital health records and history</p>
+        <div class="card glass text-center h-100 card-indigo">
+          <div class="card-body">
+            <i class="fas fa-file-medical fa-2x themed-icon mb-3" aria-hidden="true"></i>
+            <h3 class="h6 fw-bold">Health Records</h3>
+            <p class="text-muted small mb-0">Digital health records and history</p>
+          </div>
         </div>
       </div>
 
       <div class="col-md-6 col-lg-3">
-        <div class="text-center">
-          <i class="fas fa-blog text-primary mb-3" style="font-size: 2.5rem;"></i>
-          <h6 class="fw-bold">Pet Media</h6>
-          <p class="text-muted small">Educational content and community posts</p>
+        <div class="card glass text-center h-100 card-teal">
+          <div class="card-body">
+            <i class="fas fa-blog fa-2x themed-icon mb-3" aria-hidden="true"></i>
+            <h3 class="h6 fw-bold">Pet Media</h3>
+            <p class="text-muted small mb-0">Educational content and community posts</p>
+          </div>
         </div>
       </div>
     </div>
