@@ -1,0 +1,182 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Search Pets - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col">
+      <h2><i class="fas fa-search me-2"></i>Search Pets</h2>
+      <p class="text-muted">Find pets by name, species, breed, owner information, or microchip ID</p>
+    </div>
+  </div>
+
+  <!-- Enhanced Search Form -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="m-0"><i class="fas fa-filter me-2"></i>Search & Filter</h5>
+    </div>
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-6">
+          <label for="{{ search_form.search.id_for_label }}" class="form-label">Search Terms</label>
+          {{ search_form.search }}
+          <div class="form-text">Search by pet name, breed, owner name/email, or microchip ID</div>
+        </div>
+        <div class="col-md-3">
+          <label for="{{ search_form.species.id_for_label }}" class="form-label">Species</label>
+          {{ search_form.species }}
+        </div>
+        <div class="col-md-3">
+          <label for="{{ search_form.sort_by.id_for_label }}" class="form-label">Sort By</label>
+          {{ search_form.sort_by }}
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary me-2">
+            <i class="fas fa-search me-1"></i> Search Pets
+          </button>
+          <a href="{% url 'pets:search_page' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-times me-1"></i> Clear
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  {% if search_performed %}
+  {% if pets %}
+  <div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    Found
+    {{ pets.paginator.count }} pet
+    {{ pets.paginator.count|pluralize }} matching your search.
+  </div>
+
+  <!-- Results Grid -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for pet in pets %}
+    <div class="col">
+      <div class="card h-100 hover-shadow">
+        {% if pet.photos.exists %}
+        <img src="{{ pet.photos.first.image.url }}" class="card-img-top" alt="{{ pet.name }}" style="height: 200px; object-fit: cover;">
+        {% else %}
+        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+          <i class="fas fa-paw fa-3x text-muted"></i>
+        </div>
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">
+            {{ pet.name }}
+          </h5>
+          <div class="mb-2">
+            <span class="badge bg-primary">
+              {{ pet.get_species_display }}</span>
+            {% if pet.breed %}
+            <span class="badge bg-secondary">
+              {{ pet.breed }}</span>
+            {% endif %}
+            {% if pet.gender %}
+            <span class="badge bg-info">
+              {{ pet.get_gender_display }}</span>
+            {% endif %}
+          </div>
+          <p class="card-text">
+            <small class="text-muted">
+              <i class="fas fa-user me-1"></i>Owner:
+              {{ pet.owner.get_full_name }}
+            </small>
+            {% if pet.age %}
+            <br><small class="text-muted">
+              <i class="fas fa-birthday-cake me-1"></i>
+              {{ pet.age }} years old
+            </small>
+            {% endif %}
+            {% if pet.microchip_id %}
+            <br><small class="text-muted">
+              <i class="fas fa-microchip me-1"></i>
+              {{ pet.microchip_id }}
+            </small>
+            {% endif %}
+          </p>
+        </div>
+        <div class="card-footer">
+          <a href="{% url 'pets:pet_detail' pet.pk %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-eye me-1"></i> View Details
+          </a>
+          {% if request.user.is_staff %}
+          <a href="{% url 'pets:pet_update' pet.pk %}" class="btn btn-outline-primary btn-sm ms-1">
+            <i class="fas fa-edit me-1"></i> Edit
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if pets.has_other_pages %}
+  <nav aria-label="Search results pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if pets.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ pets.previous_page_number }}">
+          <i class="fas fa-chevron-left"></i> Previous
+        </a>
+      </li>
+      {% endif %}
+
+      {% for num in pets.paginator.page_range %}
+      {% if pets.number == num %}
+      <li class="page-item active">
+        <span class="page-link">
+          {{ num }}</span>
+      </li>
+      {% elif num > pets.number|add:'-3' and num < pets.number|add:'3' %}
+      <li class="page-item">
+        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">
+          {{ num }}</a>
+      </li>
+      {% endif %}
+      {% endfor %}
+
+      {% if pets.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ pets.next_page_number }}">
+          Next <i class="fas fa-chevron-right"></i>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    No pets found matching your search criteria. Try adjusting your search terms or filters.
+  </div>
+  {% endif %}
+  {% else %}
+  <div class="card text-center">
+    <div class="card-body py-5">
+      <i class="fas fa-search fa-3x text-muted mb-3"></i>
+      <h5>Enter search criteria above to find pets</h5>
+      <p class="text-muted">You can search by pet name, species, breed, owner information, or microchip ID.</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .hover-shadow {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .hover-shadow:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+</style>
+{% endblock %}

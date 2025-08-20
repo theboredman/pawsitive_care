@@ -33,28 +33,37 @@
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">Clients</div>
-        <a href="#" class="sidebar-link">
-          <i class="fas fa-users"></i><span>Find Client</span>
+        <a href="{% url 'pets:search_page' %}" class="sidebar-link">
+          <i class="fas fa-search"></i><span>Find Pet</span>
         </a>
-        <a href="#" class="sidebar-link">
-          <i class="fas fa-id-card"></i><span>Client Services</span>
+        <a href="{% url 'pets:pet_list' %}" class="sidebar-link">
+          <i class="fas fa-paw"></i><span>All Pets</span>
+        </a>
+        <a href="{% url 'accounts:user_management' %}" class="sidebar-link">
+          <i class="fas fa-users"></i><span>Client Management</span>
         </a>
       </div>
 
       <div class="sidebar-section">
-        <div class="sidebar-section-label">Reception</div>
-        <a href="#" class="sidebar-link">
-          <i class="fas fa-headset"></i><span>Reception</span>
+        <div class="sidebar-section-label">Communication</div>
+        <a href="{% url 'communication:communication_list' %}" class="sidebar-link">
+          <i class="fas fa-comments"></i><span>Messages</span>
+        </a>
+        <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link">
+          <i class="fas fa-blog"></i><span>Blog Posts</span>
         </a>
       </div>
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">Billing</div>
-        <a href="#" class="sidebar-link">
-          <i class="fas fa-cash-register"></i><span>Billing</span>
+        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
+          <i class="fas fa-receipt"></i><span>View Bills</span>
+        </a>
+        <a href="{% url 'billing:add_bill' %}" class="sidebar-link">
+          <i class="fas fa-plus"></i><span>Create Bill</span>
         </a>
         <a href="{% url 'billing:servicecost_list' %}" class="sidebar-link">
-          <i class="fas fa-dollar-sign"></i><span>Service Cost List</span>
+          <i class="fas fa-dollar-sign"></i><span>Service Costs</span>
         </a>
       </div>
 
@@ -113,34 +122,43 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% if todays_appointments %}
+                  {% for appointment in todays_appointments %}
                   <tr>
-                    <td><strong>9:00 AM</strong></td>
-                    <td>Sarah Johnson</td>
-                    <td>Fluffy (Cat)</td>
-                    <td>Dr. Smith</td>
-                    <td><span class="badge badge-solid">In Progress</span></td>
+                    <td><strong>
+                        {{ appointment.time|time:"g:i A" }}</strong></td>
+                    <td>
+                      {{ appointment.client.get_full_name|default:appointment.client.username }}
+                    </td>
+                    <td>
+                      {{ appointment.pet.name }} (
+                      {{ appointment.pet.get_species_display }})
+                    </td>
+                    <td>Dr.
+                      {{ appointment.vet.get_full_name|default:appointment.vet.username }}
+                    </td>
+                    <td>
+                      {% if appointment.status == 'COMPLETED' %}
+                      <span class="badge badge-solid">Completed</span>
+                      {% elif appointment.status == 'SCHEDULED' %}
+                      <span class="badge badge-outline">Scheduled</span>
+                      {% elif appointment.status == 'PENDING' %}
+                      <span class="badge badge-outline">Waiting</span>
+                      {% else %}
+                      <span class="badge badge-outline">
+                        {{ appointment.get_status_display }}</span>
+                      {% endif %}
+                    </td>
                   </tr>
+                  {% endfor %}
+                  {% else %}
                   <tr>
-                    <td><strong>10:30 AM</strong></td>
-                    <td>Mike Wilson</td>
-                    <td>Max (Dog)</td>
-                    <td>Dr. Johnson</td>
-                    <td><span class="badge badge-outline">Waiting</span></td>
+                    <td colspan="5" class="text-center py-4">
+                      <i class="fas fa-calendar-times fa-2x text-muted mb-2"></i>
+                      <p class="text-muted mb-0">No appointments scheduled for today</p>
+                    </td>
                   </tr>
-                  <tr>
-                    <td><strong>11:00 AM</strong></td>
-                    <td>Emma Davis</td>
-                    <td>Bella (Dog)</td>
-                    <td>Dr. Smith</td>
-                    <td><span class="badge badge-outline">Scheduled</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>2:00 PM</strong></td>
-                    <td>John Smith</td>
-                    <td>Charlie (Cat)</td>
-                    <td>Dr. Johnson</td>
-                    <td><span class="badge badge-outline">Scheduled</span></td>
-                  </tr>
+                  {% endif %}
                 </tbody>
               </table>
             </div>
@@ -158,15 +176,21 @@
               <div class="card-body">
                 <div class="row text-center">
                   <div class="col-4">
-                    <h4 class="solid-accent-text">42</h4>
+                    <h4 class="solid-accent-text">
+                      {{ weekly_stats.appointments_this_week|default:0 }}
+                    </h4>
                     <small>Appointments</small>
                   </div>
                   <div class="col-4">
-                    <h4 class="solid-accent-text">38</h4>
+                    <h4 class="solid-accent-text">
+                      {{ weekly_stats.completed_appointments|default:0 }}
+                    </h4>
                     <small>Completed</small>
                   </div>
                   <div class="col-4">
-                    <h4 class="solid-accent-text">12</h4>
+                    <h4 class="solid-accent-text">
+                      {{ weekly_stats.new_clients_this_week|default:0 }}
+                    </h4>
                     <small>New Clients</small>
                   </div>
                 </div>
@@ -198,9 +222,14 @@
                 <i class="fas fa-users fa-2x themed-icon mb-3"></i>
                 <h5>Clients</h5>
                 <p class="text-muted">Manage client info</p>
-                <a href="#" class="btn btn-accent btn-sm">
-                  <i class="fas fa-search me-1"></i> Find Client
-                </a>
+                <div class="d-grid gap-2">
+                  <a href="{% url 'pets:search_page' %}" class="btn btn-accent btn-sm">
+                    <i class="fas fa-search me-1"></i> Find Pet
+                  </a>
+                  <a href="{% url 'accounts:user_management' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-users me-1"></i> Manage Clients
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -208,12 +237,17 @@
           <div class="col-md-3 mb-4">
             <div class="card glass hover-lift h-100 card-success">
               <div class="card-body text-center">
-                <i class="fas fa-phone fa-2x themed-icon mb-3"></i>
-                <h5>Reception</h5>
-                <p class="text-muted">Handle calls & walk-ins</p>
-                <a href="#" class="btn btn-accent btn-sm">
-                  <i class="fas fa-headset me-1"></i> Reception
-                </a>
+                <i class="fas fa-comments fa-2x themed-icon mb-3"></i>
+                <h5>Communication</h5>
+                <p class="text-muted">Messages & updates</p>
+                <div class="d-grid gap-2">
+                  <a href="{% url 'communication:communication_list' %}" class="btn btn-accent btn-sm">
+                    <i class="fas fa-comments me-1"></i> Messages
+                  </a>
+                  <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-blog me-1"></i> Blog Posts
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -234,12 +268,17 @@
           <div class="col-md-3 mb-4">
             <div class="card glass hover-lift h-100 card-primary card-sienna">
               <div class="card-body text-center">
-                <i class="fas fa-cash-register fa-2x themed-icon mb-3"></i>
+                <i class="fas fa-receipt fa-2x themed-icon mb-3"></i>
                 <h5>Billing</h5>
                 <p class="text-muted">Process payments</p>
-                <a href="#" class="btn btn-accent btn-sm">
-                  <i class="fas fa-dollar-sign me-1"></i> Billing
-                </a>
+                <div class="d-grid gap-2">
+                  <a href="{% url 'billing:view_bills' %}" class="btn btn-accent btn-sm">
+                    <i class="fas fa-receipt me-1"></i> View Bills
+                  </a>
+                  <a href="{% url 'billing:add_bill' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i> Create Bill
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -322,9 +361,24 @@
           </div>
           <div class="card-body">
             <ul class="list-unstyled m-0">
-              <li class="mb-2 small"><i class="fas fa-info-circle me-2"></i> New client registration pending</li>
-              <li class="mb-2 small"><i class="fas fa-triangle-exclamation me-2"></i> Payment overdue: Invoice #1234</li>
-              <li class="small"><i class="fas fa-check-circle me-2"></i> Lab results ready for Fluffy</li>
+              {% if inventory_stats.low_stock_items > 0 %}
+              <li class="mb-2 small"><i class="fas fa-triangle-exclamation me-2"></i>
+                {{ inventory_stats.low_stock_items }} items low in stock
+              </li>
+              {% endif %}
+              {% if billing_stats.pending_bills > 0 %}
+              <li class="mb-2 small"><i class="fas fa-triangle-exclamation me-2"></i>
+                {{ billing_stats.pending_bills }} pending bills
+              </li>
+              {% endif %}
+              {% if weekly_stats.appointments_this_week > 0 %}
+              <li class="small"><i class="fas fa-check-circle me-2"></i>
+                {{ weekly_stats.appointments_this_week }} appointments this week
+              </li>
+              {% endif %}
+              {% if not inventory_stats.low_stock_items and not billing_stats.pending_bills %}
+              <li class="small text-muted"><i class="fas fa-check-circle me-2"></i> All systems operating normally</li>
+              {% endif %}
             </ul>
           </div>
         </div>

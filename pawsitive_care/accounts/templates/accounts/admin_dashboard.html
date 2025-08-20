@@ -48,22 +48,34 @@
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">Blog</div>
-        <a href="/admin/petmedia/blogpost/" class="sidebar-link">
-          <i class="fas fa-edit"></i><span>Posts</span>
+        <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link">
+          <i class="fas fa-edit"></i><span>All Posts</span>
         </a>
-        <a href="/admin/petmedia/blogcomment/" class="sidebar-link">
-          <i class="fas fa-comments"></i><span>Comments</span>
+        <a href="{% url 'petmedia:create_post' %}" class="sidebar-link">
+          <i class="fas fa-plus"></i><span>Create Post</span>
         </a>
-        <a href="/admin/petmedia/blogpost/?is_featured__exact=1" class="sidebar-link">
-          <i class="fas fa-star"></i><span>Featured</span>
+        <a href="{% url 'petmedia:create_professional_post' %}" class="sidebar-link">
+          <i class="fas fa-user-md"></i><span>Professional Post</span>
         </a>
-        <a href="/admin/petmedia/bloglike/" class="sidebar-link">
-          <i class="fas fa-heart"></i><span>Engagement</span>
+        <a href="{% url 'petmedia:user_posts' %}" class="sidebar-link">
+          <i class="fas fa-star"></i><span>My Posts</span>
         </a>
       </div>
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">System</div>
+        <a href="{% url 'appointments:staff_calendar' %}" class="sidebar-link">
+          <i class="fas fa-calendar"></i><span>Appointments</span>
+        </a>
+        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
+          <i class="fas fa-receipt"></i><span>Billing</span>
+        </a>
+        <a href="{% url 'pets:pet_list' %}" class="sidebar-link">
+          <i class="fas fa-paw"></i><span>Pets</span>
+        </a>
+        <a href="{% url 'communication:communication_list' %}" class="sidebar-link">
+          <i class="fas fa-comments"></i><span>Communications</span>
+        </a>
         <a href="#" class="sidebar-link">
           <i class="fas fa-chart-bar"></i><span>Reports</span>
         </a>
@@ -105,23 +117,23 @@
           <div class="card-body">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <a href="/admin/petmedia/blogpost/add/" class="btn btn-accent w-100">
+                <a href="{% url 'petmedia:create_post' %}" class="btn btn-accent w-100">
                   <i class="fas fa-plus me-2"></i>Create New Post
                 </a>
               </div>
               <div class="col-md-6 mb-3">
-                <a href="/admin/petmedia/blogpost/?is_published__exact=0" class="btn btn-accent w-100">
-                  <i class="fas fa-eye me-2"></i>Review Drafts
+                <a href="{% url 'petmedia:user_posts' %}" class="btn btn-accent w-100">
+                  <i class="fas fa-eye me-2"></i>My Posts
                 </a>
               </div>
               <div class="col-md-6 mb-3">
-                <a href="/admin/petmedia/blogcomment/?is_approved__exact=0" class="btn btn-accent w-100">
-                  <i class="fas fa-comments me-2"></i>Pending Comments
+                <a href="{% url 'petmedia:create_professional_post' %}" class="btn btn-accent w-100">
+                  <i class="fas fa-user-md me-2"></i>Professional Post
                 </a>
               </div>
               <div class="col-md-6 mb-3">
-                <a href="/admin/petmedia/blogcategory/" class="btn btn-accent w-100">
-                  <i class="fas fa-tags me-2"></i>Manage Categories
+                <a href="{% url 'petmedia:create_medication_post' %}" class="btn btn-accent w-100">
+                  <i class="fas fa-pills me-2"></i>Medication Post
                 </a>
               </div>
             </div>
@@ -167,8 +179,8 @@
                 <i class="fas fa-user-tie fa-2x themed-icon mb-3"></i>
                 <h5 class="card-title">Staff Members</h5>
                 <p class="text-muted">Manage staff accounts</p>
-                <a href="#" class="btn btn-accent btn-sm">
-                  <i class="fas fa-plus me-1"></i> Add Staff
+                <a href="{% url 'accounts:user_management' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-users me-1"></i> Manage Staff
                 </a>
               </div>
             </div>
@@ -181,8 +193,74 @@
                 <i class="fas fa-chart-bar fa-2x themed-icon mb-3"></i>
                 <h5 class="card-title">Reports</h5>
                 <p class="text-muted">System analytics</p>
-                <a href="#" class="btn btn-accent btn-sm">
+                <a href="{% url 'inventory:reports' %}" class="btn btn-accent btn-sm">
                   <i class="fas fa-chart-line me-1"></i> View Reports
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointment Management Section -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4><i class="fas fa-calendar me-2"></i> Appointment Management</h4>
+            <p class="text-muted">Manage clinic appointments and scheduling</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- All Appointments -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-blue">
+              <div class="card-body text-center">
+                <i class="fas fa-calendar-alt fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">All Appointments</h5>
+                <p class="text-muted">View all appointments</p>
+                <a href="{% url 'appointments:staff_calendar' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-calendar me-1"></i> View Calendar
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Create Appointment -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-green">
+              <div class="card-body text-center">
+                <i class="fas fa-plus-circle fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Create Appointment</h5>
+                <p class="text-muted">Schedule new appointment</p>
+                <a href="{% url 'appointments:create_appointment' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-plus me-1"></i> Create New
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Billing -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-purple">
+              <div class="card-body text-center">
+                <i class="fas fa-receipt fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Billing</h5>
+                <p class="text-muted">Manage bills and payments</p>
+                <a href="{% url 'billing:view_bills' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-dollar-sign me-1"></i> View Bills
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pet Management -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-orange">
+              <div class="card-body text-center">
+                <i class="fas fa-paw fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Pet Management</h5>
+                <p class="text-muted">Manage pet records</p>
+                <a href="{% url 'pets:pet_list' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-paw me-1"></i> View Pets
                 </a>
               </div>
             </div>
@@ -286,8 +364,8 @@
                     <small class="d-block text-muted">Drafts</small>
                   </div>
                 </div>
-                <a href="/admin/petmedia/blogpost/" class="btn btn-accent btn-sm">
-                  <i class="fas fa-cog me-1"></i> Manage Posts
+                <a href="{% url 'petmedia:blog_list' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-list me-1"></i> View All Posts
                 </a>
               </div>
             </div>
@@ -308,8 +386,8 @@
                     {{ blog_stats.pending_comments }} pending</span>
                   {% endif %}
                 </div>
-                <a href="/admin/petmedia/blogcomment/" class="btn btn-accent btn-sm">
-                  <i class="fas fa-eye me-1"></i> Review Comments
+                <a href="{% url 'petmedia:user_posts' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-comments me-1"></i> View Comments
                 </a>
               </div>
             </div>
@@ -328,8 +406,8 @@
                   <small class="text-muted">
                     {{ blog_stats.professional_posts }} Professional</small>
                 </div>
-                <a href="/admin/petmedia/blogpost/?is_featured__exact=1" class="btn btn-accent btn-sm">
-                  <i class="fas fa-crown me-1"></i> Manage Featured
+                <a href="{% url 'petmedia:professional_advice' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-user-md me-1"></i> View Featured
                 </a>
               </div>
             </div>
@@ -348,8 +426,60 @@
                   <small class="text-success">
                     {{ blog_stats.posts_this_week }} posts this week</small>
                 </div>
-                <a href="/admin/petmedia/bloglike/" class="btn btn-accent btn-sm">
-                  <i class="fas fa-thumbs-up me-1"></i> View Likes
+                <a href="{% url 'petmedia:blog_list' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-heart me-1"></i> View Engagement
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Administration Section -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4><i class="fas fa-cogs me-2"></i> System Administration</h4>
+            <p class="text-muted">Administrative tools and system management</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Communications -->
+          <div class="col-md-4 mb-4">
+            <div class="card glass hover-lift h-100 card-cyan">
+              <div class="card-body text-center">
+                <i class="fas fa-envelope fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Communications</h5>
+                <p class="text-muted">Manage client communications</p>
+                <a href="{% url 'communication:communication_list' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-envelope me-1"></i> View Messages
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Service Costs -->
+          <div class="col-md-4 mb-4">
+            <div class="card glass hover-lift h-100 card-brown">
+              <div class="card-body text-center">
+                <i class="fas fa-dollar-sign fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Service Costs</h5>
+                <p class="text-muted">Manage service pricing</p>
+                <a href="{% url 'billing:servicecost_list' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-money-bill me-1"></i> Manage Pricing
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Pets -->
+          <div class="col-md-4 mb-4">
+            <div class="card glass hover-lift h-100 card-pink">
+              <div class="card-body text-center">
+                <i class="fas fa-search fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Search System</h5>
+                <p class="text-muted">Search pets and records</p>
+                <a href="{% url 'pets:search_page' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-search me-1"></i> Search Pets
                 </a>
               </div>
             </div>
@@ -404,7 +534,7 @@
                         <i class="fas fa-edit me-2"></i>
                         {% endif %}
                         <div>
-                          <a href="/admin/petmedia/blogpost/{{ post.id }}/change/" class="text-decoration-none hover-lift">
+                          <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none hover-lift">
                             {{ post.title|truncatechars:40 }}
                           </a>
                           <small class="d-block text-muted">by

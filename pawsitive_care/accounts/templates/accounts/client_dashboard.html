@@ -26,7 +26,7 @@
         <a href="{% url 'appointments:book_appointment' %}" class="sidebar-link">
           <i class="fas fa-calendar-plus"></i><span>Book Appointment</span>
         </a>
-        <a href="#" class="sidebar-link">
+        <a href="{% url 'appointments:client_appointments' %}" class="sidebar-link">
           <i class="fas fa-calendar-alt"></i><span>My Appointments</span>
         </a>
       </div>
@@ -46,8 +46,8 @@
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">Billing</div>
-        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
-          <i class="fas fa-receipt"></i><span>Invoices</span>
+        <a href="{% url 'billing:my_bills' %}" class="sidebar-link">
+          <i class="fas fa-receipt"></i><span>My Bills</span>
         </a>
       </div>
 
@@ -58,6 +58,9 @@
         </a>
         <a href="{% url 'petmedia:create_post' %}" class="sidebar-link">
           <i class="fas fa-pen"></i><span>Create Post</span>
+        </a>
+        <a href="{% url 'petmedia:user_posts' %}" class="sidebar-link">
+          <i class="fas fa-edit"></i><span>My Posts</span>
         </a>
         <a href="{% url 'petmedia:professional_advice' %}" class="sidebar-link">
           <i class="fas fa-user-md"></i><span>Vet Advice</span>
@@ -134,10 +137,13 @@
             <div class="card glass hover-lift h-100 card-indigo">
               <div class="card-body text-center">
                 <i class="fas fa-calendar-plus fa-2x themed-icon mb-3"></i>
-                <h5>Book Appointment</h5>
-                <p class="text-muted">Schedule a visit</p>
+                <h5>Appointments</h5>
+                <h3 class="text-primary">
+                  {{ appointment_stats.total_appointments|default:0 }}
+                </h3>
+                <p class="text-muted">Total booked</p>
                 <a href="{% url 'appointments:book_appointment' %}" class="btn btn-accent btn-sm">
-                  <i class="fas fa-plus me-1"></i> New Appointment
+                  <i class="fas fa-plus me-1"></i> Book New
                 </a>
               </div>
             </div>
@@ -148,9 +154,12 @@
               <div class="card-body text-center">
                 <i class="fas fa-paw fa-2x themed-icon mb-3"></i>
                 <h5>My Pets</h5>
-                <p class="text-muted">Manage pet profiles</p>
+                <h3 class="text-success">
+                  {{ pet_stats.total_pets|default:0 }}
+                </h3>
+                <p class="text-muted">Registered pets</p>
                 <div class="d-grid gap-2">
-                  <a href="{% url 'pets:pet_list' %}" class="btn btn-ghost btn-sm"><i class="fas fa-list me-1"></i> View Pets</a>
+                  <a href="{% url 'pets:pet_list' %}" class="btn btn-ghost btn-sm"><i class="fas fa-list me-1"></i> View All</a>
                   <a href="{% url 'pets:pet_create' %}" class="btn btn-accent btn-sm"><i class="fas fa-plus me-1"></i> Add Pet</a>
                 </div>
               </div>
@@ -162,7 +171,10 @@
               <div class="card-body text-center">
                 <i class="fas fa-file-medical fa-2x themed-icon mb-3"></i>
                 <h5>Medical Records</h5>
-                <p class="text-muted">View health history</p>
+                <h3 class="text-warning">
+                  {{ recent_medical_records|length|default:0 }}
+                </h3>
+                <p class="text-muted">Recent records</p>
                 <a href="{% url 'records:my_pet_records' %}" class="btn btn-accent btn-sm">
                   <i class="fas fa-eye me-1"></i> View Records
                 </a>
@@ -174,10 +186,84 @@
             <div class="card glass hover-lift h-100 card-olive">
               <div class="card-body text-center">
                 <i class="fas fa-receipt fa-2x themed-icon mb-3"></i>
-                <h5>Billing</h5>
-                <p class="text-muted">View invoices</p>
-                <a href="{% url 'billing:view_bills' %}" class="btn btn-accent btn-sm">
-                  <i class="fas fa-dollar-sign me-1"></i> View Bills
+                <h5>Outstanding Bills</h5>
+                <h3 class="text-warning">$
+                  {{ billing_stats.amount_owed|default:0|floatformat:2 }}
+                </h3>
+                <p class="text-muted">Amount due</p>
+                <a href="{% url 'billing:my_bills' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-receipt me-1"></i> Pay Bills
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Community & Support -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4><i class="fas fa-users me-2"></i> Community & Support</h4>
+            <p class="text-muted">Connect with other pet owners and access professional advice</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Browse Community -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-blue">
+              <div class="card-body text-center">
+                <i class="fas fa-blog fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Browse Posts</h5>
+                <p class="text-muted">Read community stories</p>
+                <a href="{% url 'petmedia:blog_list' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-list me-1"></i> Browse Community
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Create Post -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-green">
+              <div class="card-body text-center">
+                <i class="fas fa-pen fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Share Story</h5>
+                <p class="text-muted">Create new post</p>
+                <div class="d-grid gap-2">
+                  <a href="{% url 'petmedia:create_post' %}" class="btn btn-accent btn-sm">
+                    <i class="fas fa-pen me-1"></i> Create Post
+                  </a>
+                  <a href="{% url 'petmedia:user_posts' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-edit me-1"></i> My Posts
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Advice -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-purple">
+              <div class="card-body text-center">
+                <i class="fas fa-user-md fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Vet Advice</h5>
+                <p class="text-muted">Professional guidance</p>
+                <a href="{% url 'petmedia:professional_advice' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-stethoscope me-1"></i> Get Advice
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Medications -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-orange">
+              <div class="card-body text-center">
+                <i class="fas fa-pills fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Medications</h5>
+                <p class="text-muted">Medication guidance</p>
+                <a href="{% url 'petmedia:medications' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-pills me-1"></i> View Guide
                 </a>
               </div>
             </div>
@@ -277,30 +363,35 @@
             <h5 class="m-0"><i class="fas fa-calendar-alt me-2 themed-icon"></i> Upcoming Appointments</h5>
           </div>
           <div class="card-body">
+            {% if upcoming_appointments %}
             <div class="list-group list-group-flush">
+              {% for appointment in upcoming_appointments %}
               <div class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
-                  <strong>January 25, 2025 - 10:30 AM</strong><br>
-                  Fluffy - Annual Checkup with Dr. Smith<br>
-                  <small class="text-muted">Regular examination and vaccinations</small>
+                  <strong>
+                    {{ appointment.date|date:"F d, Y" }} -
+                    {{ appointment.time|time:"g:i A" }}</strong><br>
+                  {{ appointment.pet.name }} -
+                  {{ appointment.purpose|default:"Appointment" }} with Dr.
+                  {{ appointment.vet.last_name }}<br>
+                  <small class="text-muted">
+                    {{ appointment.notes|default:"General appointment" }}</small>
                 </div>
                 <div class="text-end">
-                  <span class="badge badge-solid">Confirmed</span><br>
-                  <small><a href="#" class="hover-lift">Reschedule</a></small>
+                  <span class="badge {% if appointment.status == 'confirmed' %}badge-solid{% else %}badge-outline{% endif %}">
+                    {{ appointment.status|title }}</span><br>
+                  <small><a href="{% url 'appointments:client_appointments' %}" class="hover-lift">View All</a></small>
                 </div>
               </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <strong>February 2, 2025 - 2:00 PM</strong><br>
-                  Max - Follow-up with Dr. Johnson<br>
-                  <small class="text-muted">Post-surgery check</small>
-                </div>
-                <div class="text-end">
-                  <span class="badge badge-outline">Pending</span><br>
-                  <small><a href="#" class="hover-lift">Confirm</a></small>
-                </div>
-              </div>
+              {% endfor %}
             </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+              <p class="text-muted">No upcoming appointments</p>
+              <a href="{% url 'appointments:book_appointment' %}" class="btn btn-accent btn-sm">Schedule Appointment</a>
+            </div>
+            {% endif %}
             <div class="text-center mt-3">
               <a href="#" class="btn btn-ghost">View All Appointments</a>
             </div>
@@ -312,20 +403,38 @@
             <h5 class="m-0"><i class="fas fa-history me-2 themed-icon"></i> Recent Activity</h5>
           </div>
           <div class="card-body">
+            {% if recent_medical_records %}
             <div class="list-group list-group-flush">
+              {% for record in recent_medical_records %}
               <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div><i class="fas fa-stethoscope me-2 themed-icon"></i> Fluffy's checkup completed</div>
-                <small class="text-muted">3 days ago</small>
+                <div><i class="fas fa-stethoscope me-2 themed-icon"></i>
+                  {{ record.pet.name }}'s
+                  {{ record.diagnosis|default:"checkup" }} completed
+                </div>
+                <small class="text-muted">
+                  {{ record.created_at|timesince }} ago</small>
               </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div><i class="fas fa-syringe me-2 themed-icon"></i> Max received vaccinations</div>
-                <small class="text-muted">1 week ago</small>
-              </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div><i class="fas fa-pills me-2 themed-icon"></i> Prescription refilled for Bella</div>
-                <small class="text-muted">2 weeks ago</small>
-              </div>
+              {% endfor %}
             </div>
+            {% elif recent_appointments %}
+            <div class="list-group list-group-flush">
+              {% for appointment in recent_appointments %}
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div><i class="fas fa-calendar-check me-2 themed-icon"></i>
+                  {{ appointment.pet.name }}'s appointment with Dr.
+                  {{ appointment.vet.last_name }}
+                </div>
+                <small class="text-muted">
+                  {{ appointment.date|timesince }} ago</small>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-history fa-3x text-muted mb-3"></i>
+              <p class="text-muted">No recent activity</p>
+            </div>
+            {% endif %}
           </div>
         </div>
 
@@ -341,39 +450,31 @@
           </div>
           <div class="card-body">
             <div class="list-group list-group-flush">
+              {% if user_pets %}
+              {% for pet in user_pets %}
               <div class="list-group-item d-flex align-items-center">
                 <div class="avatar me-3" style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:none;">
-                  <div class="bg-success w-100 h-100 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-cat text-white"></i>
+                  <div class="bg-{% cycle 'success' 'info' 'warning' 'primary' %} w-100 h-100 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-{% if pet.species == 'CAT' %}cat{% elif pet.species == 'DOG' %}dog{% else %}paw{% endif %} text-white"></i>
                   </div>
                 </div>
                 <div>
-                  <strong>Fluffy</strong><br>
-                  <small class="text-muted">Persian Cat, 3 years</small>
+                  <strong>
+                    {{ pet.name }}</strong><br>
+                  <small class="text-muted">
+                    {{ pet.get_species_display }}{% if pet.breed %},
+                    {{ pet.breed }}{% endif %}{% if pet.age %},
+                    {{ pet.age }} years{% endif %}</small>
                 </div>
               </div>
-              <div class="list-group-item d-flex align-items-center">
-                <div class="avatar me-3" style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:none;">
-                  <div class="bg-info w-100 h-100 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-dog text-white"></i>
-                  </div>
-                </div>
-                <div>
-                  <strong>Max</strong><br>
-                  <small class="text-muted">Golden Retriever, 5 years</small>
-                </div>
+              {% endfor %}
+              {% else %}
+              <div class="list-group-item text-center py-4">
+                <i class="fas fa-paw fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No pets registered yet</p>
+                <small class="text-muted">Add your first pet to get started!</small>
               </div>
-              <div class="list-group-item d-flex align-items-center">
-                <div class="avatar me-3" style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:none;">
-                  <div class="bg-warning w-100 h-100 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-dog text-white"></i>
-                  </div>
-                </div>
-                <div>
-                  <strong>Bella</strong><br>
-                  <small class="text-muted">Beagle, 2 years</small>
-                </div>
-              </div>
+              {% endif %}
             </div>
             <div class="text-center mt-3">
               <a href="{% url 'pets:pet_create' %}" class="btn btn-ghost btn-sm">Add New Pet</a>
@@ -387,11 +488,31 @@
             <h6 class="m-0"><i class="fas fa-bell me-2 themed-icon"></i> Reminders</h6>
           </div>
           <div class="card-body">
+            {% if pet_alerts %}
             <ul class="list-unstyled m-0">
-              <li class="mb-2 small"><i class="fas fa-syringe me-2"></i> Max's vaccination due next month</li>
-              <li class="mb-2 small"><i class="fas fa-pills me-2"></i> Refill Bella's medication</li>
-              <li class="small"><i class="fas fa-calendar me-2"></i> Schedule Fluffy's dental cleaning</li>
+              {% for alert in pet_alerts %}
+              <li class="mb-2 small">
+                <i class="fas {% if alert.type == 'checkup' %}fa-stethoscope{% elif alert.type == 'senior_care' %}fa-heart{% else %}fa-bell{% endif %} me-2"></i>
+                {{ alert.message }}
+              </li>
+              {% endfor %}
             </ul>
+            {% elif user_pets %}
+            <ul class="list-unstyled m-0">
+              {% for pet in user_pets|slice:":3" %}
+              <li class="mb-2 small">
+                <i class="fas fa-calendar me-2"></i>
+                Schedule regular checkup for
+                {{ pet.name }}
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <div class="text-center py-3">
+              <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
+              <p class="text-muted small">No reminders at this time</p>
+            </div>
+            {% endif %}
           </div>
         </div>
 

@@ -490,6 +490,51 @@ def search_pets(request):
     return JsonResponse({'results': results})
 
 @login_required
+def search_page(request):
+    """Dedicated search page"""
+    # Get base queryset
+    if request.user.is_staff:
+        pets = Pet.objects.active()
+    else:
+        pets = Pet.objects.active().for_user(request.user)
+
+    # Use form for search handling
+    search_form = PetSearchForm(request.GET)
+    search_performed = bool(request.GET.get('search'))
+    
+    if search_form.is_valid() and search_performed:
+        search_query = search_form.cleaned_data.get('search', '').strip()
+        species_filter = search_form.cleaned_data.get('species', '')
+        sort_by = search_form.cleaned_data.get('sort_by', '-created_at')
+
+        if search_query:
+            pets = pets.search(search_query)
+        if species_filter:
+            pets = pets.by_species(species_filter)
+        
+        # Sorting with validation
+        valid_sort_fields = ['name', '-name', 'created_at', '-created_at', 'species', '-species']
+        if sort_by in valid_sort_fields:
+            pets = pets.order_by(sort_by)
+    else:
+        # Show empty queryset if no search performed
+        pets = Pet.objects.none()
+
+    # Pagination
+    paginator = Paginator(pets, 12)
+    page = request.GET.get('page')
+    pets = paginator.get_page(page)
+
+    context = {
+        'pets': pets,
+        'search_form': search_form,
+        'species_choices': Pet.SPECIES_CHOICES,
+        'search_performed': search_performed,
+    }
+
+    return render(request, 'pets/search_pets.html', context)
+
+@login_required
 @require_POST
 def edit_medical_record(request, record_id):
     """Edit an existing medical record"""

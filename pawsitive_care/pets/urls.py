@@ -22,6 +22,7 @@ urlpatterns = [
     
     # Search
     path('search/', views.search_pets, name='search_pets'),
+    path('search-page/', views.search_page, name='search_page'),
     
     # Photos
     path('<int:pk>/photo/add/', views.pet_photo_add, name='pet_photo_add'),

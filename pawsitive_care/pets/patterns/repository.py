@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class PetQuerySet(models.QuerySet):
     def search(self, query):
         """
-        Search pets by name, species, or breed
+        Search pets by name, species, breed, or owner information
         
         Args:
             query: Search term
@@ -24,8 +24,23 @@ class PetQuerySet(models.QuerySet):
         return self.filter(
             Q(name__icontains=query) |
             Q(species__icontains=query) |
-            Q(breed__icontains=query)
+            Q(breed__icontains=query) |
+            Q(owner__first_name__icontains=query) |
+            Q(owner__last_name__icontains=query) |
+            Q(owner__email__icontains=query) |
+            Q(microchip_id__icontains=query)
         )
+
+    def by_species(self, species):
+        """
+        Filter pets by species
+        
+        Args:
+            species: Species code (e.g., 'DOG', 'CAT')
+        Returns:
+            QuerySet of pets filtered by species
+        """
+        return self.filter(species=species)
 
     def for_user(self, user):
         """

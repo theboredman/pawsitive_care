@@ -4,88 +4,97 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h2>Pets</h2>
-        </div>
-        <div class="col text-end">
-            <a href="{% url 'pets:pet_create' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add New Pet
-            </a>
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Pets</h2>
     </div>
+    <div class="col text-end">
+      <a href="{% url 'pets:pet_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Pet
+      </a>
+    </div>
+  </div>
 
-    <!-- Search Form -->
-    <div class="card mb-4">
+  <!-- Search Form -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-6">
+          {{ search_form.search }}
+        </div>
+        <div class="col-md-3">
+          {{ search_form.species }}
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-secondary w-100">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pets List -->
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for pet in pets %}
+    <div class="col">
+      <div class="card h-100">
+        {% if pet.photos.exists %}
+        <img src="{{ pet.photos.first.image.url }}" class="card-img-top" alt="{{ pet.name }}">
+        {% endif %}
         <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-8">
-                    <input type="text" name="search" class="form-control" 
-                           placeholder="Search by name, breed, or owner email..." 
-                           value="{{ search_query }}">
-                </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-secondary w-100">Search</button>
-                </div>
-            </form>
+          <h5 class="card-title">
+            {{ pet.name }}
+          </h5>
+          <p class="card-text">
+            <strong>Species:</strong>
+            {{ pet.get_species_display }}<br>
+            <strong>Breed:</strong>
+            {{ pet.breed }}<br>
+            <strong>Owner:</strong>
+            {{ pet.owner.get_full_name }}
+          </p>
+          <div class="text-end">
+            <a href="{% url 'pets:pet_detail' pet.pk %}" class="btn btn-primary btn-sm">
+              View Details
+            </a>
+          </div>
         </div>
+      </div>
     </div>
-
-    <!-- Pets List -->
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for pet in pets %}
-        <div class="col">
-            <div class="card h-100">
-                {% if pet.photos.exists %}
-                <img src="{{ pet.photos.first.image.url }}" class="card-img-top" alt="{{ pet.name }}">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ pet.name }}</h5>
-                    <p class="card-text">
-                        <strong>Species:</strong> {{ pet.get_species_display }}<br>
-                        <strong>Breed:</strong> {{ pet.breed }}<br>
-                        <strong>Owner:</strong> {{ pet.owner.get_full_name }}
-                    </p>
-                    <div class="text-end">
-                        <a href="{% url 'pets:pet_detail' pet.pk %}" class="btn btn-primary btn-sm">
-                            View Details
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">
-                No pets found.
-            </div>
-        </div>
-        {% endfor %}
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-info">
+        No pets found.
+      </div>
     </div>
+    {% endfor %}
+  </div>
 
-    <!-- Pagination -->
-    {% if pets.has_other_pages %}
-    <nav aria-label="Page navigation" class="mt-4">
-        <ul class="pagination justify-content-center">
-            {% if pets.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ pets.previous_page_number }}&search={{ search_query }}">&laquo; Previous</a>
-            </li>
-            {% endif %}
+  <!-- Pagination -->
+  {% if pets.has_other_pages %}
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if pets.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ pets.previous_page_number }}&search={{ search_query }}">&laquo; Previous</a>
+      </li>
+      {% endif %}
 
-            {% for num in pets.paginator.page_range %}
-            <li class="page-item {% if pets.number == num %}active{% endif %}">
-                <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
-            </li>
-            {% endfor %}
+      {% for num in pets.paginator.page_range %}
+      <li class="page-item {% if pets.number == num %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}&search={{ search_query }}">
+          {{ num }}</a>
+      </li>
+      {% endfor %}
 
-            {% if pets.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ pets.next_page_number }}&search={{ search_query }}">Next &raquo;</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
+      {% if pets.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ pets.next_page_number }}&search={{ search_query }}">Next &raquo;</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 </div>
 {% endblock %}

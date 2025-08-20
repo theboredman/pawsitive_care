@@ -123,6 +123,56 @@ def admin_dashboard(request):
     medicine_items = InventoryItem.objects.filter(category='MEDICINE', is_active=True).count()
     supply_items = InventoryItem.objects.filter(category='SUPPLY', is_active=True).count()
     
+    # Appointment statistics
+    try:
+        from appointments.models import Appointment
+        total_appointments = Appointment.objects.count()
+        appointments_today = Appointment.objects.filter(date=today).count()
+        appointments_this_week = Appointment.objects.filter(
+            date__gte=week_ago
+        ).count()
+        completed_appointments = Appointment.objects.filter(status='COMPLETED').count()
+        pending_appointments = Appointment.objects.filter(status='PENDING').count()
+    except ImportError:
+        total_appointments = 0
+        appointments_today = 0
+        appointments_this_week = 0
+        completed_appointments = 0
+        pending_appointments = 0
+    
+    # Billing statistics
+    try:
+        from billing.models import Billing
+        from django.db.models import Sum
+        total_bills = Billing.objects.count()
+        pending_bills = Billing.objects.filter(status='pending').count()
+        paid_bills = Billing.objects.filter(status='paid').count()
+        total_revenue = Billing.objects.filter(status='paid').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+        revenue_this_week = Billing.objects.filter(
+            status='paid',
+            issued_at__gte=week_ago
+        ).aggregate(total=Sum('amount'))['total'] or 0
+    except ImportError:
+        total_bills = 0
+        pending_bills = 0
+        paid_bills = 0
+        total_revenue = 0
+        revenue_this_week = 0
+    
+    # Pet statistics
+    try:
+        from pets.models import Pet
+        total_pets = Pet.objects.filter(is_active=True).count()
+        new_pets_this_week = Pet.objects.filter(
+            created_at__gte=week_ago,
+            is_active=True
+        ).count()
+    except ImportError:
+        total_pets = 0
+        new_pets_this_week = 0
+    
     context = {
         'title': 'Admin Dashboard',
         'user_role': 'Administrator',
@@ -150,6 +200,24 @@ def admin_dashboard(request):
             'medicine_items': medicine_items,
             'supply_items': supply_items,
         },
+        'appointment_stats': {
+            'total_appointments': total_appointments,
+            'appointments_today': appointments_today,
+            'appointments_this_week': appointments_this_week,
+            'completed_appointments': completed_appointments,
+            'pending_appointments': pending_appointments,
+        },
+        'billing_stats': {
+            'total_bills': total_bills,
+            'pending_bills': pending_bills,
+            'paid_bills': paid_bills,
+            'total_revenue': total_revenue,
+            'revenue_this_week': revenue_this_week,
+        },
+        'pet_stats': {
+            'total_pets': total_pets,
+            'new_pets_this_week': new_pets_this_week,
+        },
         'recent_users': recent_users,
         'recent_posts': recent_posts,
         'top_categories': categories_with_counts,
@@ -159,8 +227,8 @@ def admin_dashboard(request):
 
 @vet_required
 def vet_dashboard(request):
-    # Import inventory models
     from inventory.models import InventoryItem
+    from pets.models import Pet
     from django.utils import timezone
     from django.db import models
     from datetime import timedelta
@@ -215,12 +283,69 @@ def vet_dashboard(request):
             'message': f"{item.name} is out of stock"
         })
     
+    # Get patient statistics
+    total_patients = Pet.objects.filter(is_active=True).count()
+    dogs_count = Pet.objects.filter(is_active=True, species__icontains='dog').count()
+    cats_count = Pet.objects.filter(is_active=True, species__icontains='cat').count()
+    other_pets_count = total_patients - dogs_count - cats_count
+    
+    # Get new patients this month
+    first_day_of_month = timezone.now().replace(day=1).date()
+    new_this_month = Pet.objects.filter(
+        is_active=True,
+        created_at__gte=first_day_of_month
+    ).count()
+    
+    # Get vet's appointments for today and this week
+    today = timezone.now().date()
+    week_ago = today - timedelta(days=7)
+    
+    try:
+        from appointments.models import Appointment
+        todays_appointments = Appointment.objects.filter(
+            vet=request.user,
+            date=today
+        ).select_related('client', 'pet').order_by('time')
+        
+        weekly_appointments = Appointment.objects.filter(
+            vet=request.user,
+            date__gte=week_ago,
+            date__lte=today
+        ).count()
+        
+        completed_this_week = Appointment.objects.filter(
+            vet=request.user,
+            date__gte=week_ago,
+            date__lte=today,
+            status='COMPLETED'
+        ).count()
+    except ImportError:
+        todays_appointments = []
+        weekly_appointments = 0
+        completed_this_week = 0
+    
     # Get recent blog posts for the community section
     try:
         from petmedia.models import BlogPost
         recent_blog_posts = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:5]
+        
+        # Get vet's professional posts count
+        vet_posts_count = BlogPost.objects.filter(
+            author=request.user,
+            is_professional_advice=True
+        ).count()
     except ImportError:
         recent_blog_posts = []
+        vet_posts_count = 0
+    
+    # Get recent medical records or cases
+    try:
+        from records.models import MedicalRecord
+        recent_cases = MedicalRecord.objects.filter(
+            vet=request.user
+        ).select_related('pet', 'pet__owner').order_by('-created_at')[:5]
+    except ImportError:
+        recent_cases = []
     
     context = {
         'title': 'Veterinarian Dashboard',
@@ -231,40 +356,269 @@ def vet_dashboard(request):
             'low_stock_items': low_stock_items,
         },
         'inventory_alerts': inventory_alerts,
+        'patient_stats': {
+            'total_patients': total_patients,
+            'dogs_count': dogs_count,
+            'cats_count': cats_count,
+            'other_pets_count': other_pets_count,
+            'new_this_month': new_this_month,
+            'weekly_appointments': weekly_appointments,
+            'completed_this_week': completed_this_week,
+            'vet_posts_count': vet_posts_count,
+        },
+        'todays_appointments': todays_appointments,
         'recent_blog_posts': recent_blog_posts,
+        'recent_cases': recent_cases,
     }
     return render(request, 'accounts/vet_dashboard.html', context)
 
 
 @staff_required
 def staff_dashboard(request):
-    # Import inventory models
     from inventory.models import InventoryItem
+    from pets.models import Pet
+    from django.contrib.auth import get_user_model
     from django.db import models
+    from django.utils import timezone
+    from datetime import timedelta, date
     
-    # Get inventory statistics
+    User = get_user_model()
+    
+    # Inventory statistics
     total_items = InventoryItem.objects.filter(is_active=True).count()
     low_stock_items = InventoryItem.objects.filter(
         quantity_in_stock__lte=models.F('minimum_stock_level'),
         is_active=True
     ).count()
     
+    # Weekly statistics
+    today = timezone.now().date()
+    week_ago = today - timedelta(days=7)
+    
+    # Try to get appointment statistics
+    try:
+        from appointments.models import Appointment
+        total_appointments = Appointment.objects.filter(
+            date__gte=week_ago,
+            date__lte=today
+        ).count()
+        completed_appointments = Appointment.objects.filter(
+            date__gte=week_ago,
+            date__lte=today,
+            status='COMPLETED'
+        ).count()
+        
+        # Today's appointments
+        todays_appointments = Appointment.objects.filter(
+            date=today
+        ).select_related('client', 'pet', 'vet').order_by('time')[:5]
+    except ImportError:
+        total_appointments = 0
+        completed_appointments = 0
+        todays_appointments = []
+    
+    # Client statistics
+    new_clients_this_week = User.objects.filter(
+        role='client',
+        date_joined__gte=week_ago
+    ).count()
+    
+    total_clients = User.objects.filter(role='client').count()
+    total_pets = Pet.objects.filter(is_active=True).count()
+    
+    # Billing statistics
+    try:
+        from billing.models import Billing
+        pending_bills = Billing.objects.filter(status='pending').count()
+        total_revenue_this_week = Billing.objects.filter(
+            issued_at__gte=week_ago,
+            status='paid'
+        ).aggregate(total=models.Sum('amount'))['total'] or 0
+    except ImportError:
+        pending_bills = 0
+        total_revenue_this_week = 0
+    
     context = {
         'title': 'Staff Dashboard',
         'user_role': 'Staff Member',
+        'weekly_stats': {
+            'total_appointments': total_appointments,
+            'completed_appointments': completed_appointments,
+            'new_clients': new_clients_this_week,
+            'revenue': total_revenue_this_week,
+        },
         'inventory_stats': {
             'total_items': total_items,
             'low_stock_items': low_stock_items,
-        }
+        },
+        'general_stats': {
+            'total_clients': total_clients,
+            'total_pets': total_pets,
+            'pending_bills': pending_bills,
+        },
+        'todays_appointments': todays_appointments,
     }
     return render(request, 'accounts/staff_dashboard.html', context)
 
 
 @login_required
 def client_dashboard(request):
+    from pets.models import Pet
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    # Get user's pets
+    user_pets = Pet.objects.filter(owner=request.user, is_active=True)
+    total_pets = user_pets.count()
+    
+    # Get pet statistics by species
+    pet_stats = {}
+    for pet in user_pets:
+        species = pet.get_species_display() if pet.species else 'Unknown'
+        pet_stats[species] = pet_stats.get(species, 0) + 1
+    
+    # Get appointment data for the user
+    today = timezone.now().date()
+    week_from_now = today + timedelta(days=7)
+    
+    try:
+        from appointments.models import Appointment
+        
+        # Upcoming appointments
+        upcoming_appointments = Appointment.objects.filter(
+            client=request.user,
+            date__gte=today
+        ).select_related('pet', 'vet').order_by('date', 'time')[:5]
+        
+        # Recent appointments
+        recent_appointments = Appointment.objects.filter(
+            client=request.user,
+            date__lt=today
+        ).select_related('pet', 'vet').order_by('-date', '-time')[:3]
+        
+        # Appointment statistics
+        total_appointments = Appointment.objects.filter(client=request.user).count()
+        completed_appointments = Appointment.objects.filter(
+            client=request.user,
+            status='COMPLETED'
+        ).count()
+        
+        # Appointments this month
+        month_start = today.replace(day=1)
+        appointments_this_month = Appointment.objects.filter(
+            client=request.user,
+            date__gte=month_start
+        ).count()
+        
+    except ImportError:
+        upcoming_appointments = []
+        recent_appointments = []
+        total_appointments = 0
+        completed_appointments = 0
+        appointments_this_month = 0
+    
+    # Get billing information
+    try:
+        from billing.models import Billing
+        
+        # Outstanding bills
+        outstanding_bills = Billing.objects.filter(
+            owner=request.user,
+            status='pending'
+        ).order_by('-issued_at')[:3]
+        
+        # Billing statistics
+        total_bills = Billing.objects.filter(owner=request.user).count()
+        paid_bills = Billing.objects.filter(
+            owner=request.user,
+            status='paid'
+        ).count()
+        
+        # Total amount owed
+        from django.db.models import Sum
+        amount_owed = Billing.objects.filter(
+            owner=request.user,
+            status='pending'
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+    except ImportError:
+        outstanding_bills = []
+        total_bills = 0
+        paid_bills = 0
+        amount_owed = 0
+    
+    # Get blog posts for community engagement
+    try:
+        from petmedia.models import BlogPost
+        
+        # Recent blog posts
+        recent_blog_posts = BlogPost.objects.filter(
+            is_published=True
+        ).order_by('-created_at')[:5]
+        
+        # User's blog posts
+        user_blog_posts = BlogPost.objects.filter(
+            author=request.user
+        ).count()
+        
+    except ImportError:
+        recent_blog_posts = []
+        user_blog_posts = 0
+    
+    # Get medical records for pets
+    try:
+        from records.models import MedicalRecord
+        
+        recent_medical_records = MedicalRecord.objects.filter(
+            pet__owner=request.user
+        ).select_related('pet', 'vet').order_by('-created_at')[:5]
+        
+    except ImportError:
+        recent_medical_records = []
+    
+    # Pet health alerts (upcoming vaccinations, checkups, etc.)
+    pet_alerts = []
+    for pet in user_pets[:3]:  # Limit to first 3 pets for dashboard
+        # Use age field for general health reminders
+        if pet.age:
+            if pet.age >= 1 and pet.age < 7:  # Adult pets
+                pet_alerts.append({
+                    'pet': pet.name,
+                    'message': f"Annual checkup recommended for {pet.name}",
+                    'type': 'checkup'
+                })
+            elif pet.age >= 7:  # Senior pets
+                pet_alerts.append({
+                    'pet': pet.name,
+                    'message': f"Senior pet checkup recommended for {pet.name}",
+                    'type': 'senior_care'
+                })
+    
     context = {
         'title': 'Client Dashboard',
-        'user_role': 'Client'
+        'user_role': 'Pet Owner',
+        'pet_stats': {
+            'total_pets': total_pets,
+            'pet_breakdown': pet_stats,
+        },
+        'user_pets': user_pets[:6],  # Show first 6 pets
+        'appointment_stats': {
+            'total_appointments': total_appointments,
+            'completed_appointments': completed_appointments,
+            'appointments_this_month': appointments_this_month,
+        },
+        'upcoming_appointments': upcoming_appointments,
+        'recent_appointments': recent_appointments,
+        'billing_stats': {
+            'total_bills': total_bills,
+            'paid_bills': paid_bills,
+            'amount_owed': amount_owed,
+        },
+        'outstanding_bills': outstanding_bills,
+        'recent_blog_posts': recent_blog_posts,
+        'user_blog_posts': user_blog_posts,
+        'recent_medical_records': recent_medical_records,
+        'pet_alerts': pet_alerts,
     }
     return render(request, 'accounts/client_dashboard.html', context)
 
