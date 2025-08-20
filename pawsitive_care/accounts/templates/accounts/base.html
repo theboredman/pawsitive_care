@@ -76,27 +76,36 @@
           {% endif %}
         </ul>
 
-        <!-- CENTER SEARCH -->
-        <form class="d-none d-lg-flex nav-search ms-auto me-3" role="search" action="#" method="get">
-          <div class="input-group">
-            <span class="input-group-text bg-transparent border-0 ps-0">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </span>
-            <input class="form-control" type="search" placeholder="Search pets, owners, appointments, invoices…" aria-label="Search">
-          </div>
-        </form>
-
         <!-- RIGHT SIDE -->
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 ms-auto">
           {% if user.is_authenticated %}
           <!-- Quick create -->
           <div class="btn-group">
             <button class="btn btn-success btn-sm" type="button">+ New</button>
             <button class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Toggle quick create"></button>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#">Appointment</a></li>
-              <li><a class="dropdown-item" href="#">Pet</a></li>
-              <li><a class="dropdown-item" href="#">Invoice</a></li>
+              {% if user.is_admin or user.is_staff_member or user.is_vet %}
+              <li><a class="dropdown-item" href="{% url 'appointments:create_appointment' %}">
+                  <i class="fas fa-calendar-plus me-2"></i>Appointment</a></li>
+              {% else %}
+              <li><a class="dropdown-item" href="{% url 'appointments:book_appointment' %}">
+                  <i class="fas fa-calendar-plus me-2"></i>Book Appointment</a></li>
+              {% endif %}
+              <li><a class="dropdown-item" href="{% url 'pets:pet_create' %}">
+                  <i class="fas fa-paw me-2"></i>Pet</a></li>
+              {% if user.is_admin or user.is_staff_member %}
+              <li><a class="dropdown-item" href="{% url 'billing:add_bill' %}">
+                  <i class="fas fa-receipt me-2"></i>Invoice</a></li>
+              {% endif %}
+              {% if user.is_admin or user.is_vet %}
+              <li><a class="dropdown-item" href="{% url 'records:add_record' %}">
+                  <i class="fas fa-file-medical me-2"></i>Medical Record</a></li>
+              {% endif %}
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="{% url 'petmedia:create_post' %}">
+                  <i class="fas fa-pen me-2"></i>Blog Post</a></li>
             </ul>
           </div>
 
