@@ -27,6 +27,10 @@ billing_subject.attach(EmailNotifier())
 billing_subject.attach(SMSNotifier())
 @login_required
 def add_bill(request):
+    # Only allow staff and admin to create bills
+    if not (request.user.is_staff or request.user.is_admin):
+        return HttpResponseForbidden("You don't have permission to create bills.")
+    
     appointments = Appointment.objects.filter(status="COMPLETED")
     selected_appointment = None
     pet = None
@@ -83,7 +87,7 @@ def add_bill(request):
                 messages.error(request, f"Error adding bill: {str(e)}")
 
     services = ServiceCost.objects.all()
-    return render(request, "add_bill.html", {
+    return render(request, "Add_bill.html", {
         "appointments": appointments,
         "selected_appointment": selected_appointment,
         "pet": pet,
@@ -100,12 +104,25 @@ def add_bill(request):
 
 @login_required
 def view_bills(request):
-    # Show only bills for the logged-in user
-    bills = Billing.objects.filter(owner=request.user).order_by('-issued_at')
+    # Staff, admin, and vets can view all bills; regular users see only their own
+    if request.user.is_staff or request.user.is_admin or request.user.is_vet:
+        bills = Billing.objects.all()
+        title = "All Bills"
+    else:
+        bills = Billing.objects.filter(owner=request.user)
+        title = "My Bills"
+    
+    # Filter by status if provided
+    status_filter = request.GET.get('status')
+    if status_filter:
+        bills = bills.filter(status=status_filter)
+        title = f"{title} - {status_filter.title()}"
+    
+    bills = bills.order_by('-issued_at')
 
     return render(request, "view_bill.html", {
         "bills": bills,
-        "title": "My Bills"
+        "title": title
     })
 
 
@@ -113,7 +130,7 @@ def view_bills(request):
 @login_required
 def my_bills(request):
     bills = repository.get_bills_by_owner(request.user)
-    return render(request, "billing/my_bills.html", {
+    return render(request, "my_bills.html", {
         "bills": bills,
         "title": "My Bills"
     })
@@ -152,7 +169,7 @@ def delete_bill(request, billing_id):
         messages.success(request, "Bill deleted successfully.")
         return redirect('billing:view_bills')
 
-    return render(request, "service/confirm_delete.html", {"bill": bill})
+    return render(request, "billing_confirm_delete.html", {"bill": bill})
 
 
 
@@ -204,8 +221,13 @@ def delete_bill(request, billing_id):
 #servicecost_list (never change)
 
 # ADD/ Update ServiceCost
+@login_required
 @csrf_exempt
 def servicecost_list(request):
+    # Only allow staff, admin, or vet to access service cost management
+    if not (request.user.is_staff or request.user.is_admin or request.user.is_vet):
+        return HttpResponseForbidden("You don't have permission to access this page.")
+    
     # Get all service types
     service_choices = Appointment.APPOINTMENT_TYPES
     # Ensure each service type has a ServiceCost entry
@@ -247,4 +269,4 @@ def my_bills(request):
     context = {
         'bills': bills
     }
-    return render(request, 'billing/my_bills.html', context)
+    return render(request, 'my_bills.html', context)

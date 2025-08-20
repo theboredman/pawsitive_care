@@ -48,6 +48,19 @@
       </div>
 
       <div class="sidebar-section">
+        <div class="sidebar-section-label">Billing</div>
+        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
+          <i class="fas fa-receipt"></i><span>View Bills</span>
+        </a>
+        <a href="{% url 'billing:add_bill' %}" class="sidebar-link">
+          <i class="fas fa-plus"></i><span>Create Bill</span>
+        </a>
+        <a href="{% url 'billing:servicecost_list' %}" class="sidebar-link">
+          <i class="fas fa-money-bill"></i><span>Service Costs</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
         <div class="sidebar-section-label">Inventory</div>
         <a href="{% url 'inventory:dashboard' %}" class="sidebar-link">
           <i class="fas fa-tachometer-alt"></i><span>Inventory</span>
@@ -279,6 +292,72 @@
                     <i class="fas fa-plus me-1"></i> New Appointment
                   </a>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing Statistics -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4><i class="fas fa-receipt me-2"></i> Billing Overview</h4>
+            <p class="text-muted">Track revenue and billing statistics</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Total Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-emerald">
+              <div class="card-body text-center">
+                <i class="fas fa-receipt fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Total Bills</h5>
+                <h3 class="text-accent">
+                  {{ billing_stats.total_bills|default:0 }}
+                </h3>
+                <p class="text-muted">All time</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-amber">
+              <div class="card-body text-center">
+                <i class="fas fa-clock fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Pending Bills</h5>
+                <h3 class="text-accent">
+                  {{ billing_stats.pending_bills|default:0 }}
+                </h3>
+                <p class="text-muted">Awaiting payment</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly Revenue -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-cyan">
+              <div class="card-body text-center">
+                <i class="fas fa-dollar-sign fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Weekly Revenue</h5>
+                <h3 class="text-accent">$
+                  {{ billing_stats.weekly_revenue|default:0|floatformat:2 }}
+                </h3>
+                <p class="text-muted">Last 7 days</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- View All Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-indigo">
+              <div class="card-body text-center">
+                <i class="fas fa-list fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Manage Bills</h5>
+                <p class="text-muted">View and manage</p>
+                <a href="{% url 'billing:view_bills' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-eye me-1"></i> View All Bills
+                </a>
               </div>
             </div>
           </div>

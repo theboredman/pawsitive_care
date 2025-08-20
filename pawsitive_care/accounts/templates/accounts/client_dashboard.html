@@ -199,6 +199,75 @@
           </div>
         </div>
 
+        <!-- Billing History -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4><i class="fas fa-chart-bar me-2"></i> Billing Summary</h4>
+            <p class="text-muted">Track your billing history and payment status</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Total Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-emerald">
+              <div class="card-body text-center">
+                <i class="fas fa-receipt fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Total Bills</h5>
+                <h3 class="solid-accent-text">
+                  {{ billing_stats.total_bills|default:0 }}
+                </h3>
+                <p class="text-muted">All time</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paid Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-cyan">
+              <div class="card-body text-center">
+                <i class="fas fa-check-circle fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Paid Bills</h5>
+                <h3 class="solid-accent-text">
+                  {{ billing_stats.paid_bills|default:0 }}
+                </h3>
+                <p class="text-muted">Completed payments</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Outstanding Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-amber">
+              <div class="card-body text-center">
+                <i class="fas fa-exclamation-triangle fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Outstanding</h5>
+                <h3 class="text-warning">
+                  $
+                  {{ billing_stats.amount_owed|default:0|floatformat:2 }}
+                </h3>
+                <a href="{% url 'billing:my_bills' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-credit-card me-1"></i> Pay Now
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-indigo">
+              <div class="card-body text-center">
+                <i class="fas fa-history fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Recent Activity</h5>
+                <p class="text-muted">View bill history</p>
+                <a href="{% url 'billing:my_bills' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-list me-1"></i> View History
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Community & Support -->
         <div class="row mt-4">
           <div class="col-12">

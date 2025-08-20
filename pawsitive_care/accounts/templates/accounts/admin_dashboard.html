@@ -67,9 +67,6 @@
         <a href="{% url 'appointments:staff_calendar' %}" class="sidebar-link">
           <i class="fas fa-calendar"></i><span>Appointments</span>
         </a>
-        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
-          <i class="fas fa-receipt"></i><span>Billing</span>
-        </a>
         <a href="{% url 'pets:pet_list' %}" class="sidebar-link">
           <i class="fas fa-paw"></i><span>Pets</span>
         </a>
@@ -81,6 +78,19 @@
         </a>
         <a href="#" class="sidebar-link">
           <i class="fas fa-gear"></i><span>Settings</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Billing</div>
+        <a href="{% url 'billing:view_bills' %}" class="sidebar-link">
+          <i class="fas fa-receipt"></i><span>View Bills</span>
+        </a>
+        <a href="{% url 'billing:add_bill' %}" class="sidebar-link">
+          <i class="fas fa-plus"></i><span>Create Bill</span>
+        </a>
+        <a href="{% url 'billing:servicecost_list' %}" class="sidebar-link">
+          <i class="fas fa-dollar-sign"></i><span>Service Costs</span>
         </a>
       </div>
     </nav>
@@ -262,6 +272,78 @@
                 <a href="{% url 'pets:pet_list' %}" class="btn btn-accent btn-sm">
                   <i class="fas fa-paw me-1"></i> View Pets
                 </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing Statistics Section -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4><i class="fas fa-receipt me-2"></i> Billing Overview</h4>
+            <p class="text-muted">Track clinic revenue and billing statistics</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Total Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-emerald">
+              <div class="card-body text-center">
+                <i class="fas fa-receipt fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Total Bills</h5>
+                <h2 class="solid-accent-text">
+                  {{ billing_stats.total_bills|default:0 }}
+                </h2>
+                <a href="{% url 'billing:view_bills' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-eye me-1"></i> View All
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Bills -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-amber">
+              <div class="card-body text-center">
+                <i class="fas fa-clock fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Pending Bills</h5>
+                <h2 class="solid-accent-text">
+                  {{ billing_stats.pending_bills|default:0 }}
+                </h2>
+                <a href="{% url 'billing:view_bills' %}?status=pending" class="btn btn-accent btn-sm">
+                  <i class="fas fa-list me-1"></i> View Pending
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Revenue -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-cyan">
+              <div class="card-body text-center">
+                <i class="fas fa-dollar-sign fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Total Revenue</h5>
+                <h2 class="solid-accent-text">
+                  $
+                  {{ billing_stats.total_revenue|default:0|floatformat:2 }}
+                </h2>
+                <p class="text-muted">All time</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly Revenue -->
+          <div class="col-md-3 mb-4">
+            <div class="card glass hover-lift h-100 card-indigo">
+              <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-2x themed-icon mb-3"></i>
+                <h5 class="card-title">Weekly Revenue</h5>
+                <h2 class="solid-accent-text">
+                  $
+                  {{ billing_stats.revenue_this_week|default:0|floatformat:2 }}
+                </h2>
+                <p class="text-muted">Last 7 days</p>
               </div>
             </div>
           </div>

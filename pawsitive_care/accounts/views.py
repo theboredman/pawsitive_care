@@ -347,6 +347,29 @@ def vet_dashboard(request):
     except ImportError:
         recent_cases = []
     
+    # Get billing statistics for vet
+    try:
+        from billing.models import Billing
+        # Bills for appointments with this vet
+        vet_bills = Billing.objects.filter(
+            appointment__vet=request.user
+        )
+        total_vet_bills = vet_bills.count()
+        pending_vet_bills = vet_bills.filter(status='pending').count()
+        
+        # Revenue from vet's services this week
+        from django.db.models import Sum
+        week_ago = today - timedelta(days=7)
+        weekly_revenue = vet_bills.filter(
+            status='paid',
+            paid_at__gte=week_ago
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+    except ImportError:
+        total_vet_bills = 0
+        pending_vet_bills = 0
+        weekly_revenue = 0
+
     context = {
         'title': 'Veterinarian Dashboard',
         'user_role': 'Veterinarian',
@@ -365,6 +388,11 @@ def vet_dashboard(request):
             'weekly_appointments': weekly_appointments,
             'completed_this_week': completed_this_week,
             'vet_posts_count': vet_posts_count,
+        },
+        'billing_stats': {
+            'total_bills': total_vet_bills,
+            'pending_bills': pending_vet_bills,
+            'weekly_revenue': weekly_revenue,
         },
         'todays_appointments': todays_appointments,
         'recent_blog_posts': recent_blog_posts,

@@ -133,6 +133,41 @@
             </ul>
           </li>
           {% endif %}
+
+          {% if user.is_staff_member or user.is_admin %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="billingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-receipt me-1"></i>Billing
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="billingDropdown">
+              <li><a class="dropdown-item" href="{% url 'billing:view_bills' %}">
+                  <i class="fas fa-list me-2"></i>All Bills</a></li>
+              <li><a class="dropdown-item" href="{% url 'billing:add_bill' %}">
+                  <i class="fas fa-plus me-2"></i>Create Bill</a></li>
+
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+
+              <li><a class="dropdown-item" href="{% url 'billing:servicecost_list' %}">
+                  <i class="fas fa-money-bill me-2"></i>Service Costs</a></li>
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_vet %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="vetBillingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-receipt me-1"></i>Billing
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="vetBillingDropdown">
+              <li><a class="dropdown-item" href="{% url 'billing:view_bills' %}">
+                  <i class="fas fa-list me-2"></i>View Bills</a></li>
+              <li><a class="dropdown-item" href="{% url 'billing:servicecost_list' %}">
+                  <i class="fas fa-money-bill me-2"></i>Service Costs</a></li>
+            </ul>
+          </li>
+          {% endif %}
         </ul>
 
         <!-- RIGHT: user menu -->
