@@ -1,0 +1,121 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<style>
+    /* Container */
+    .servicecost-container {
+        max-width: 700px;
+        margin: 30px auto;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+    }
+
+    /* Heading */
+    .servicecost-container h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Messages */
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+    .messages li {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+    .messages li.success { background: #d4edda; color: #155724; }
+    .messages li.error { background: #f8d7da; color: #721c24; }
+
+    /* Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    th, td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    tr:hover {
+        background-color: #e2f0d9;
+    }
+
+    /* Input fields */
+    input[type="number"] {
+        width: 100px;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    /* Button */
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<div class="servicecost-container">
+    <h2>Manage Service Costs</h2>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Service Type</th>
+                    <th>Cost ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sc in servicecosts %}
+                <tr>
+                    <td>{{ sc.get_service_type_display }}</td>
+                    <td>
+                        <input type="number" step="0.01" min="0" name="cost_{{ sc.service_type }}" value="{{ sc.cost }}">
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">No service costs found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align: center;">
+            <button type="submit">Update All Prices</button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}

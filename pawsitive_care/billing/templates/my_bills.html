@@ -1,0 +1,64 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}My Bills{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+    <h2 class="text-2xl font-bold mb-4">My Bills</h2>
+
+    <table class="min-w-full border border-gray-300">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2 border">Billing ID</th>
+                <th class="px-4 py-2 border">Pet</th>
+                <th class="px-4 py-2 border">Service</th>
+                <th class="px-4 py-2 border">Amount</th>
+                <th class="px-4 py-2 border">Status</th>
+                <th class="px-4 py-2 border">Issued At</th>
+                <th class="px-4 py-2 border">Paid At</th>
+                <th class="px-4 py-2 border">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bill in bills %}
+            <tr class="text-center border-b">
+                <td class="px-4 py-2 border">{{ bill.billing_id }}</td>
+                <td class="px-4 py-2 border">{{ bill.pet.name }}</td>
+                <td class="px-4 py-2 border">{{ bill.service.get_service_type_display }}</td>
+                <td class="px-4 py-2 border">${{ bill.amount }}</td>
+                <td class="px-4 py-2 border">
+                    {% if bill.status == "paid" %}
+                        <span class="text-green-600 font-semibold">{{ bill.status|capfirst }}</span>
+                    {% elif bill.status == "pending" %}
+                        <span class="text-yellow-600 font-semibold">{{ bill.status|capfirst }}</span>
+                    {% else %}
+                        <span class="text-red-600 font-semibold">{{ bill.status|capfirst }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-2 border">{{ bill.issued_at|date:"Y-m-d H:i" }}</td>
+                <td class="px-4 py-2 border">
+                    {% if bill.paid_at %}
+                        {{ bill.paid_at|date:"Y-m-d H:i" }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td class="px-4 py-2 border">
+                    {% if bill.status != "paid" %}
+                    <a href="{% url 'billing:billing_mark_paid' bill.billing_id %}" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
+                        Mark as Paid
+                    </a>
+                    {% else %}
+                    Paid
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-4 py-2 border text-center">No bills found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,22 +1,25 @@
+#Observer Pattern Implementation for Billing Notifications
 class Observer:
-    def update(self, billing): pass
+    def update(self, billing):
+        pass
 
 
 class EmailNotifier(Observer):
     def update(self, billing):
-        print(f"📧 Email: Invoice {billing.billing_id} is {billing.pay_status}")
+        print(f"📧 Email: Invoice {billing.billing_id} is {billing.status}")
+
 
 
 class SMSNotifier(Observer):
     def update(self, billing):
-        print(f"📱 SMS: Invoice {billing.billing_id} is {billing.pay_status}")
+        print(f"📱 SMS: Invoice {billing.billing_id} is {billing.status}")
 
 
 class BillingSubject:
     def __init__(self):
         self.observers = []
 
-    def attach(self, observer): 
+    def attach(self, observer):
         self.observers.append(observer)
 
     def notify(self, billing):

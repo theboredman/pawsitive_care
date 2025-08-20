@@ -1,0 +1,41 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>My Bills</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Billing ID</th>
+            <th>Pet</th>
+            <th>Appointment</th>
+            <th>Service</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bill in bills %}
+        <tr>
+            <td>{{ bill.billing_id }}</td>
+            <td>{{ bill.pet.name }}</td>
+            <td>{{ bill.appointment.date }} {{ bill.appointment.time }}</td>
+            <td>{{ bill.service.get_service_type_display }}</td>
+            <td>${{ bill.amount }}</td>
+            <td>{{ bill.status|capfirst }}</td>
+            <td>
+                {% if bill.status != "paid" %}
+                    <a href="{% url 'billing:pay_bill' bill.billing_id %}" class="btn btn-success btn-sm">Pay Now</a>
+                {% else %}
+                    <span class="text-success">Paid</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No bills found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

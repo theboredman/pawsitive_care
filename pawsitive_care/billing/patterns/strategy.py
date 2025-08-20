@@ -1,3 +1,4 @@
+#strategy.py
 from abc import ABC, abstractmethod
 import stripe
 from django.conf import settings

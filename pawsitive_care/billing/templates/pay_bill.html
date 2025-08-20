@@ -1,21 +1,30 @@
-<h2>Pay Bill for {{ billing.pet_name }}</h2>
-<p>Owner: {{ billing.owner_name }}</p>
-<p>Amount: ${{ billing.amount }}</p>
-<p>Status: {{ billing.status }}</p>
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>Pay Bill #{{ billing.billing_id }}</h2>
 
-{% if error %}
-<p style="color:red">{{ error }}</p>
-{% endif %}
-
-{% if result %}
-<p style="color:green">{{ result }}</p>
-{% endif %}
+<div class="card mb-3">
+    <div class="card-header">Invoice</div>
+    <div class="card-body">
+        <p><strong>Client:</strong> {{ billing.owner.first_name }} {{ billing.owner.last_name }}</p>
+        <p><strong>Pet:</strong> {{ billing.pet.name }} ({{ billing.pet.get_species_display }})</p>
+        <p><strong>Appointment:</strong> {{ billing.appointment.date }} {{ billing.appointment.time }}</p>
+        <p><strong>Service:</strong> {{ billing.service.get_service_type_display }}</p>
+        <p><strong>Amount:</strong> ${{ billing.amount }}</p>
+        <p><strong>Total (with tax/discount):</strong> ${{ total_amount }}</p>
+        <p><strong>Status:</strong> {{ billing.status }}</p>
+    </div>
+</div>
 
 <form method="post">
-  {% csrf_token %}
-  <label>Select Payment Method:</label><br>
-  <input type="radio" name="method" value="card"> Card<br>
-  <input type="radio" name="method" value="paypal"> PayPal<br>
-  <input type="radio" name="method" value="cash"> Cash<br><br>
-  <button type="submit">Pay Bill</button>
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="payment_method">Select Payment Method:</label>
+        <select name="payment_method" id="payment_method" class="form-control" required>
+            <option value="cash">Cash</option>
+            <option value="stripe">Stripe</option>
+            <option value="paypal">PayPal</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success mt-3">Pay Now</button>
 </form>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>Add Bill</h2>
+
+{% if success %}
+<div class="alert alert-success">
+    Bill added successfully! Billing ID: {{ billing_id }}
+</div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Appointment Dropdown -->
+    <div class="form-group">
+        <label for="appointment">Select Appointment:</label>
+        <select name="appointment" id="appointment" class="form-control" required>
+            <option value="">-- Select Appointment --</option>
+            {% for appt in appointments %}
+                <option value="{{ appt.appointment_id }}" 
+                    {% if selected_appointment and appt.appointment_id == selected_appointment.appointment_id %} selected {% endif %}>
+                    {{ appt.date }} {{ appt.time }} - Pet: {{ appt.pet.name }} (Owner: {{ appt.client.full_name }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% if not selected_appointment %}
+        <!-- First step button -->
+        <button type="submit" name="select_appointment" class="btn btn-info mt-2">Select Appointment</button>
+    {% endif %}
+
+    {% if selected_appointment %}
+        <!-- Pet Info -->
+        <div class="form-group mt-3">
+            <label>Pet:</label>
+            <div class="alert alert-info">
+                {{ pet.name }} ({{ pet.get_species_display|default:"" }})
+            </div>
+        </div>
+
+        <!-- Owner Info -->
+        <div class="form-group">
+            <label>Client:</label>
+            <div class="alert alert-info">
+                {{ owner.first_name }} {{ owner.last_name }}
+            </div>
+        </div>
+
+        <!-- Service (hidden, auto-selected) -->
+        <input type="hidden" name="service" value="{{ service.id }}">
+        <div class="form-group">
+            <label>Service:</label>
+            <div class="alert alert-secondary">
+                {{ service.get_service_type_display }}
+            </div>
+        </div>
+
+        <!-- Amount (prefilled) -->
+        <div class="form-group">
+            <label for="amount">Amount ($):</label>
+            <input type="number" step="0.01" name="amount" id="amount" class="form-control" required value="{{ amount }}">
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+            <label for="notes">Notes:</label>
+            <textarea name="notes" id="notes" class="form-control"></textarea>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="form-group">
+            <label for="payment_method">Payment Method:</label>
+            <select name="payment_method" id="payment_method" class="form-control" required>
+                <option value="cash">Cash</option>
+                <option value="stripe">Stripe</option>
+                <option value="paypal">PayPal</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Add Bill</button>
+    {% endif %}
+</form>
+{% endblock %}
