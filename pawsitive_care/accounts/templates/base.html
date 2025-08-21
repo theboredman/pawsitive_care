@@ -1,7 +1,10 @@
 <!DOCTYPE html>
+<!-- MAIN BASE TEMPLATE FROM accounts/templates/base.html -->
 <html lang="en">
 
 <head>
+  {% load static %}
+  {% load error_tags %}
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token }}">
@@ -17,8 +20,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  {% load static %}
-  {% load error_tags %}
   <!-- Your Night Sands theme CSS -->
   <link rel="stylesheet" href="{% static 'style.css' %}">
 
@@ -210,7 +211,7 @@
   </nav>
 
   <!-- Main Content -->
-  <main class=>
+  <main>
     {% if messages %}
     <div class="container">
       <div class="messages mb-4">

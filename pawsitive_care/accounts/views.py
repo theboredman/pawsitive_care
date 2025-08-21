@@ -50,7 +50,17 @@ class CustomLoginView(LoginView):
         return response
 
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('accounts:login')
+    http_method_names = ['get', 'post']  # Allow both GET and POST
+    
+    def get(self, request, *args, **kwargs):
+        # Immediately logout and redirect, no confirmation page
+        logout(request)
+        return redirect('accounts:login')
+    
+    def post(self, request, *args, **kwargs):
+        # Handle POST requests the same way
+        logout(request)
+        return redirect('accounts:login')
 
 @login_required
 def profile_view(request):
