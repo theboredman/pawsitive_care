@@ -3,6 +3,109 @@
 
 {% block title %}My Posts - PetMedia{% endblock %}
 
+{% block extra_css %}
+<style>
+  /* User Posts Styling */
+  .user-post {
+    background: var(--surface-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(10px);
+    transition: all var(--transition-normal);
+    margin-bottom: 1.5rem;
+  }
+
+  .user-post:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-sand);
+  }
+
+  .post-title {
+    color: var(--text-primary);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .post-title:hover {
+    color: var(--accent-sand);
+  }
+
+  .post-meta {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .post-meta i {
+    color: var(--accent-sand);
+    margin-right: 0.25rem;
+  }
+
+  .badge-professional {
+    background: linear-gradient(135deg, var(--accent-sand) 0%, var(--secondary-gold) 100%);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-accent);
+  }
+
+  .badge-medication {
+    background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+    color: white;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+  }
+
+  .btn-primary-custom {
+    background: linear-gradient(135deg, var(--primary-sand) 0%, var(--secondary-gold) 100%);
+    color: var(--text-primary);
+    border: 1px solid var(--border-accent);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: var(--text-primary);
+    border-color: var(--accent-gold);
+  }
+
+  .page-header {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+
+  .page-header i {
+    color: var(--accent-sand);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--text-muted);
+  }
+
+  .empty-state i {
+    color: var(--accent-sand);
+    margin-bottom: 1rem;
+  }
+
+  .empty-state h4 {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="app-shell">
   {% include 'petmedia/includes/sidebar.html' %}
@@ -12,27 +115,27 @@
       <div class="row">
         <div class="col-md-8 mx-auto">
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-user-edit text-primary"></i> My Posts</h2>
-            <a href="{% url 'petmedia:create_post' %}" class="btn btn-primary">
+            <h2 class="page-header"><i class="fas fa-user-edit"></i> My Posts</h2>
+            <a href="{% url 'petmedia:create_post' %}" class="btn-primary-custom">
               <i class="fas fa-plus"></i> Create New Post
             </a>
           </div>
 
           {% if posts %}
           {% for post in posts %}
-          <div class="card mb-3">
+          <div class="user-post">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start">
                 <div class="flex-grow-1">
                   <h5 class="card-title">
-                    <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none">
+                    <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="post-title">
                       {{ post.title }}
                     </a>
                   </h5>
                   <p class="card-text text-muted">
                     {{ post.content|truncatewords:30 }}
                   </p>
-                  <div class="d-flex align-items-center text-muted small">
+                  <div class="d-flex align-items-center post-meta">
                     <span class="me-3">
                       <i class="fas fa-calendar"></i>
                       {{ post.created_at|date:"M d, Y" }}
@@ -52,9 +155,9 @@
                   </div>
                 </div>
                 {% if post.post_type == 'professional' %}
-                <span class="badge bg-success ms-2">Professional</span>
+                <span class="badge-professional ms-2">Professional</span>
                 {% elif post.post_type == 'medication' %}
-                <span class="badge bg-info ms-2">Medication Guide</span>
+                <span class="badge-medication ms-2">Medication Guide</span>
                 {% endif %}
               </div>
             </div>
@@ -95,11 +198,11 @@
           {% endif %}
 
           {% else %}
-          <div class="text-center py-5">
-            <i class="fas fa-edit fa-4x text-muted mb-3"></i>
-            <h4 class="text-muted">No posts yet</h4>
-            <p class="text-muted">You haven't created any posts yet. Start sharing with the community!</p>
-            <a href="{% url 'petmedia:create_post' %}" class="btn btn-primary">
+          <div class="empty-state">
+            <i class="fas fa-edit fa-4x"></i>
+            <h4>No posts yet</h4>
+            <p>You haven't created any posts yet. Start sharing with the community!</p>
+            <a href="{% url 'petmedia:create_post' %}" class="btn-primary-custom">
               <i class="fas fa-plus"></i> Create Your First Post
             </a>
           </div>
