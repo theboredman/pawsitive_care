@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'accounts/base.html' %}
 {% load static %}
 
 {% block title %}PetMedia - Your Pet Community{% endblock %}
@@ -279,296 +279,302 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4" style="background-color: #f0f2f5; min-height: 100vh;">
-  <div class="row justify-content-center">
-    <!-- Main Feed -->
-    <div class="col-lg-6 col-md-8">
-      {% if user.is_authenticated %}
-      <!-- Create Post Prompt -->
-      <div class="create-post-prompt">
-        <div class="d-flex align-items-center mb-3">
-          <input type="text" class="create-post-input" placeholder="What's on your mind about your pets, {{ user.get_full_name|default:user.username }}?" onclick="window.location.href='{% url 'petmedia:create_post' %}'">
-        </div>
-        <div class="d-flex justify-content-around pt-2 border-top">
-          <a href="{% url 'petmedia:create_post' %}" class="btn btn-link text-decoration-none d-flex align-items-center">
-            <i class="fas fa-edit text-success me-2"></i>
-            <span class="text-dark">Write Post</span>
-          </a>
-          <a href="{% url 'petmedia:create_post' %}" class="btn btn-link text-decoration-none d-flex align-items-center">
-            <i class="fas fa-camera text-primary me-2"></i>
-            <span class="text-dark">Photo</span>
-          </a>
-          {% if user.is_vet %}
-          <a href="{% url 'petmedia:create_professional_post' %}" class="btn btn-link text-decoration-none d-flex align-items-center">
-            <i class="fas fa-user-md text-info me-2"></i>
-            <span class="text-dark">Advice</span>
-          </a>
-          {% endif %}
-        </div>
-      </div>
-      {% endif %}
+<div class="app-shell">
+  {% include 'petmedia/includes/sidebar.html' %}
 
-      <!-- Blog Posts Feed -->
-      {% for post in posts %}
-      <div class="social-post">
-        <!-- Post Header -->
-        <div class="post-header">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow-1">
-              <div class="d-flex align-items-center">
-                <a href="#" class="post-author">
-                  {{ post.author.get_full_name|default:post.author.username }}</a>
-                {% if post.is_professional_advice %}
-                <span class="badge-professional">
-                  <i class="fas fa-stethoscope me-1"></i>Professional
-                </span>
-                {% endif %}
-                {% if post.medication_name %}
-                <span class="badge-medication">
-                  <i class="fas fa-pills me-1"></i>
-                  {{ post.medication_name }}
-                </span>
-                {% endif %}
-              </div>
-              <div class="d-flex align-items-center">
-                <span class="post-timestamp">
-                  {{ post.created_at|timesince }} ago</span>
-                {% if post.category %}
-                <span class="post-timestamp ms-2">in
-                  {{ post.category }}</span>
-                {% endif %}
-                {% if post.related_pet %}
-                <span class="post-timestamp ms-2">
-                  <i class="fas fa-paw me-1"></i>with
-                  {{ post.related_pet.name }}
-                </span>
-                {% endif %}
-              </div>
+  <main class="app-main">
+    <div class="container-fluid mt-4" style="background-color: #f0f2f5; min-height: 100vh;">
+      <div class="row justify-content-center">
+        <!-- Main Feed -->
+        <div class="col-lg-6 col-md-8">
+          {% if user.is_authenticated %}
+          <!-- Create Post Prompt -->
+          <div class="create-post-prompt">
+            <div class="d-flex align-items-center mb-3">
+              <input type="text" class="create-post-input" placeholder="What's on your mind about your pets, {{ user.get_full_name|default:user.username }}?" onclick="window.location.href='{% url 'petmedia:create_post' %}'">
             </div>
-            <div class="dropdown">
-              <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-ellipsis-h"></i>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url 'petmedia:blog_detail' slug=post.slug %}">View Full Post</a></li>
-                {% if post.author == user %}
-                <li><a class="dropdown-item" href="#">Edit Post</a></li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item text-danger" href="#">Delete Post</a></li>
-                {% else %}
-                <li><a class="dropdown-item" href="#">Report Post</a></li>
-                {% endif %}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Post Content -->
-        <div class="post-content">
-          {% if post.related_pet %}
-          <div class="pet-tag">
-            <i class="fas fa-paw me-1"></i>
-            About
-            {{ post.related_pet.name }} (
-            {{ post.related_pet.species|title }})
-          </div>
-          {% endif %}
-
-          <h5 class="post-title mb-2">
-            <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none text-dark">
-              {{ post.title }}
-            </a>
-          </h5>
-
-          <div class="post-text">
-            {{ post.excerpt|default:post.content|truncatechars:300 }}
-            {% if post.content|length > 300 %}
-            <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-primary text-decoration-none">... See More</a>
-            {% endif %}
-          </div>
-
-          {% if post.featured_image %}
-          <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="post-image">
-          {% endif %}
-        </div>
-
-        <!-- Post Stats -->
-        <div class="post-stats">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <span id="like-count-{{ post.id }}">
-                {{ post.likes_count|default:0 }}</span> likes
-              <span class="mx-2">•</span>
-              <span>
-                {{ post.comments_count|default:0 }} comments</span>
-              <span class="mx-2">•</span>
-              <span>
-                {{ post.views_count }} views</span>
-            </div>
-            <div>
-              {% if post.is_professional_advice %}
-              <i class="fas fa-certificate text-success" title="Verified Professional Advice"></i>
+            <div class="d-flex justify-content-around pt-2 border-top">
+              <a href="{% url 'petmedia:create_post' %}" class="btn btn-link text-decoration-none d-flex align-items-center">
+                <i class="fas fa-edit text-success me-2"></i>
+                <span class="text-dark">Write Post</span>
+              </a>
+              <a href="{% url 'petmedia:create_post' %}" class="btn btn-link text-decoration-none d-flex align-items-center">
+                <i class="fas fa-camera text-primary me-2"></i>
+                <span class="text-dark">Photo</span>
+              </a>
+              {% if user.is_vet %}
+              <a href="{% url 'petmedia:create_professional_post' %}" class="btn btn-link text-decoration-none d-flex align-items-center">
+                <i class="fas fa-user-md text-info me-2"></i>
+                <span class="text-dark">Advice</span>
+              </a>
               {% endif %}
             </div>
           </div>
-        </div>
+          {% endif %}
 
-        <!-- Post Actions -->
-        <div class="post-actions">
-          <button class="action-btn like-btn" data-post-id="{{ post.id }}" data-liked="false">
-            <i class="far fa-heart"></i>
-            <span>Like</span>
-          </button>
-          <button class="action-btn" onclick="window.location.href='{% url 'petmedia:blog_detail' slug=post.slug %}#comments'">
-            <i class="far fa-comment"></i>
-            <span>Comment</span>
-          </button>
-          <button class="action-btn share-btn" data-post-url="{% url 'petmedia:blog_detail' slug=post.slug %}">
-            <i class="far fa-share-square"></i>
-            <span>Share</span>
-          </button>
-        </div>
-      </div>
-      {% empty %}
-      <div class="social-post text-center py-5">
-        <div class="mb-4">
-          <i class="fas fa-paw fa-3x text-muted mb-3"></i>
-          <h5>No posts in your feed yet!</h5>
-          <p class="text-muted">Start sharing your pet stories and connect with other pet lovers.</p>
-        </div>
-        {% if user.is_authenticated %}
-        <a href="{% url 'petmedia:create_post' %}" class="btn btn-primary btn-lg">
-          <i class="fas fa-plus me-2"></i>Create Your First Post
-        </a>
-        {% else %}
-        <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg">
-          <i class="fas fa-sign-in-alt me-2"></i>Join the Community
-        </a>
-        {% endif %}
-      </div>
-      {% endfor %}
+          <!-- Blog Posts Feed -->
+          {% for post in posts %}
+          <div class="social-post">
+            <!-- Post Header -->
+            <div class="post-header">
+              <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-center">
+                    <a href="#" class="post-author">
+                      {{ post.author.get_full_name|default:post.author.username }}</a>
+                    {% if post.is_professional_advice %}
+                    <span class="badge-professional">
+                      <i class="fas fa-stethoscope me-1"></i>Professional
+                    </span>
+                    {% endif %}
+                    {% if post.medication_name %}
+                    <span class="badge-medication">
+                      <i class="fas fa-pills me-1"></i>
+                      {{ post.medication_name }}
+                    </span>
+                    {% endif %}
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <span class="post-timestamp">
+                      {{ post.created_at|timesince }} ago</span>
+                    {% if post.category %}
+                    <span class="post-timestamp ms-2">in
+                      {{ post.category }}</span>
+                    {% endif %}
+                    {% if post.related_pet %}
+                    <span class="post-timestamp ms-2">
+                      <i class="fas fa-paw me-1"></i>with
+                      {{ post.related_pet.name }}
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="dropdown">
+                  <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-ellipsis-h"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'petmedia:blog_detail' slug=post.slug %}">View Full Post</a></li>
+                    {% if post.author == user %}
+                    <li><a class="dropdown-item" href="#">Edit Post</a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-danger" href="#">Delete Post</a></li>
+                    {% else %}
+                    <li><a class="dropdown-item" href="#">Report Post</a></li>
+                    {% endif %}
+                  </ul>
+                </div>
+              </div>
+            </div>
 
-      <!-- Pagination -->
-      {% if is_paginated %}
-      <div class="d-flex justify-content-center mt-4">
-        <nav aria-label="Posts pagination">
-          <ul class="pagination">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-              <a class="page-link rounded-pill me-2" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            </li>
-            {% endif %}
+            <!-- Post Content -->
+            <div class="post-content">
+              {% if post.related_pet %}
+              <div class="pet-tag">
+                <i class="fas fa-paw me-1"></i>
+                About
+                {{ post.related_pet.name }} (
+                {{ post.related_pet.species|title }})
+              </div>
+              {% endif %}
 
-            <li class="page-item active">
-              <span class="page-link rounded-pill mx-2">
-                {{ page_obj.number }} of
-                {{ page_obj.paginator.num_pages }}</span>
-            </li>
+              <h5 class="post-title mb-2">
+                <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-decoration-none text-dark">
+                  {{ post.title }}
+                </a>
+              </h5>
 
-            {% if page_obj.has_next %}
-            <li class="page-item">
-              <a class="page-link rounded-pill ms-2" href="?page={{ page_obj.next_page_number }}">Next</a>
-            </li>
-            {% endif %}
-          </ul>
-        </nav>
-      </div>
-      {% endif %}
-    </div>
+              <div class="post-text">
+                {{ post.excerpt|default:post.content|truncatechars:300 }}
+                {% if post.content|length > 300 %}
+                <a href="{% url 'petmedia:blog_detail' slug=post.slug %}" class="text-primary text-decoration-none">... See More</a>
+                {% endif %}
+              </div>
 
-    <!-- Right Sidebar -->
-    <div class="col-lg-3 d-none d-lg-block">
-      <!-- Search -->
-      <div class="sidebar-card">
-        <div class="card-header bg-transparent border-0 pb-0">
-          <h6 class="mb-0">Search Posts</h6>
-        </div>
-        <div class="card-body pt-2">
-          <form method="get" action="{% url 'petmedia:search' %}">
-            <div class="input-group">
-              <input type="text" class="form-control border-0 bg-light rounded-pill" name="q" placeholder="Search..." value="{{ request.GET.q }}">
-              <button class="btn btn-link" type="submit">
-                <i class="fas fa-search text-muted"></i>
+              {% if post.featured_image %}
+              <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="post-image">
+              {% endif %}
+            </div>
+
+            <!-- Post Stats -->
+            <div class="post-stats">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span id="like-count-{{ post.id }}">
+                    {{ post.likes_count|default:0 }}</span> likes
+                  <span class="mx-2">•</span>
+                  <span>
+                    {{ post.comments_count|default:0 }} comments</span>
+                  <span class="mx-2">•</span>
+                  <span>
+                    {{ post.views_count }} views</span>
+                </div>
+                <div>
+                  {% if post.is_professional_advice %}
+                  <i class="fas fa-certificate text-success" title="Verified Professional Advice"></i>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Post Actions -->
+            <div class="post-actions">
+              <button class="action-btn like-btn" data-post-id="{{ post.id }}" data-liked="false">
+                <i class="far fa-heart"></i>
+                <span>Like</span>
+              </button>
+              <button class="action-btn" onclick="window.location.href='{% url 'petmedia:blog_detail' slug=post.slug %}#comments'">
+                <i class="far fa-comment"></i>
+                <span>Comment</span>
+              </button>
+              <button class="action-btn share-btn" data-post-url="{% url 'petmedia:blog_detail' slug=post.slug %}">
+                <i class="far fa-share-square"></i>
+                <span>Share</span>
               </button>
             </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Categories -->
-      {% if categories %}
-      <div class="sidebar-card">
-        <div class="card-header bg-transparent border-0 pb-0">
-          <h6 class="mb-0">Popular Topics</h6>
-        </div>
-        <div class="card-body pt-2">
-          {% for category in categories %}
-          <a href="{% url 'petmedia:category' name=category.name %}" class="d-block text-decoration-none py-2 px-3 rounded mb-1 text-dark" style="background-color: #f0f2f5;">
-            <div class="d-flex justify-content-between align-items-center">
-              <span>
-                {{ category }}</span>
-              <span class="badge bg-primary rounded-pill">
-                {{ category.blogpost_set.count }}</span>
+          </div>
+          {% empty %}
+          <div class="social-post text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-paw fa-3x text-muted mb-3"></i>
+              <h5>No posts in your feed yet!</h5>
+              <p class="text-muted">Start sharing your pet stories and connect with other pet lovers.</p>
             </div>
-          </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'petmedia:create_post' %}" class="btn btn-primary btn-lg">
+              <i class="fas fa-plus me-2"></i>Create Your First Post
+            </a>
+            {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg">
+              <i class="fas fa-sign-in-alt me-2"></i>Join the Community
+            </a>
+            {% endif %}
+          </div>
           {% endfor %}
-        </div>
-      </div>
-      {% endif %}
 
-      <!-- Quick Actions -->
-      <div class="sidebar-card">
-        <div class="card-header bg-transparent border-0 pb-0">
-          <h6 class="mb-0">Explore</h6>
-        </div>
-        <div class="card-body pt-2">
-          <a href="{% url 'petmedia:professional_advice' %}" class="d-block text-decoration-none py-2 px-3 rounded mb-2 text-dark" style="background-color: #f0f2f5;">
-            <i class="fas fa-user-md text-success me-2"></i>Professional Advice
-          </a>
-          <a href="{% url 'petmedia:medications' %}" class="d-block text-decoration-none py-2 px-3 rounded mb-2 text-dark" style="background-color: #f0f2f5;">
-            <i class="fas fa-pills text-info me-2"></i>Medication Guides
-          </a>
-          {% if user.is_authenticated %}
-          <a href="{% url 'petmedia:user_posts' %}" class="d-block text-decoration-none py-2 px-3 rounded mb-2 text-dark" style="background-color: #f0f2f5;">
-            <i class="fas fa-user text-primary me-2"></i>My Posts
-          </a>
+          <!-- Pagination -->
+          {% if is_paginated %}
+          <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Posts pagination">
+              <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link rounded-pill me-2" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                  <span class="page-link rounded-pill mx-2">
+                    {{ page_obj.number }} of
+                    {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link rounded-pill ms-2" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
           {% endif %}
         </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-lg-3 d-none d-lg-block">
+          <!-- Search -->
+          <div class="sidebar-card">
+            <div class="card-header bg-transparent border-0 pb-0">
+              <h6 class="mb-0">Search Posts</h6>
+            </div>
+            <div class="card-body pt-2">
+              <form method="get" action="{% url 'petmedia:search' %}">
+                <div class="input-group">
+                  <input type="text" class="form-control border-0 bg-light rounded-pill" name="q" placeholder="Search..." value="{{ request.GET.q }}">
+                  <button class="btn btn-link" type="submit">
+                    <i class="fas fa-search text-muted"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Categories -->
+          {% if categories %}
+          <div class="sidebar-card">
+            <div class="card-header bg-transparent border-0 pb-0">
+              <h6 class="mb-0">Popular Topics</h6>
+            </div>
+            <div class="card-body pt-2">
+              {% for category in categories %}
+              <a href="{% url 'petmedia:category' name=category.name %}" class="d-block text-decoration-none py-2 px-3 rounded mb-1 text-dark" style="background-color: #f0f2f5;">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span>
+                    {{ category }}</span>
+                  <span class="badge bg-primary rounded-pill">
+                    {{ category.blogpost_set.count }}</span>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Quick Actions -->
+          <div class="sidebar-card">
+            <div class="card-header bg-transparent border-0 pb-0">
+              <h6 class="mb-0">Explore</h6>
+            </div>
+            <div class="card-body pt-2">
+              <a href="{% url 'petmedia:professional_advice' %}" class="d-block text-decoration-none py-2 px-3 rounded mb-2 text-dark" style="background-color: #f0f2f5;">
+                <i class="fas fa-user-md text-success me-2"></i>Professional Advice
+              </a>
+              <a href="{% url 'petmedia:medications' %}" class="d-block text-decoration-none py-2 px-3 rounded mb-2 text-dark" style="background-color: #f0f2f5;">
+                <i class="fas fa-pills text-info me-2"></i>Medication Guides
+              </a>
+              {% if user.is_authenticated %}
+              <a href="{% url 'petmedia:user_posts' %}" class="d-block text-decoration-none py-2 px-3 rounded mb-2 text-dark" style="background-color: #f0f2f5;">
+                <i class="fas fa-user text-primary me-2"></i>My Posts
+              </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Trending Pets -->
+          <div class="sidebar-card">
+            <div class="card-header bg-transparent border-0 pb-0">
+              <h6 class="mb-0">Featured Pets</h6>
+            </div>
+            <div class="card-body pt-2">
+              <div class="d-flex align-items-center mb-3">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=dog&size=40&backgroundColor=28a745" alt="Dog" class="rounded-circle me-3" style="border: 2px solid #28a745;">
+                <div>
+                  <div class="fw-bold">Dogs</div>
+                  <small class="text-muted">Most active today</small>
+                </div>
+              </div>
+              <div class="d-flex align-items-center mb-3">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=cat&size=40&backgroundColor=17a2b8" alt="Cat" class="rounded-circle me-3" style="border: 2px solid #17a2b8;">
+                <div>
+                  <div class="fw-bold">Cats</div>
+                  <small class="text-muted">Popular this week</small>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=bird&size=40&backgroundColor=6f42c1" alt="Bird" class="rounded-circle me-3" style="border: 2px solid #6f42c1;">
+                <div>
+                  <div class="fw-bold">Birds</div>
+                  <small class="text-muted">Trending topic</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Trending Pets -->
-      <div class="sidebar-card">
-        <div class="card-header bg-transparent border-0 pb-0">
-          <h6 class="mb-0">Featured Pets</h6>
-        </div>
-        <div class="card-body pt-2">
-          <div class="d-flex align-items-center mb-3">
-            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=dog&size=40&backgroundColor=28a745" alt="Dog" class="rounded-circle me-3" style="border: 2px solid #28a745;">
-            <div>
-              <div class="fw-bold">Dogs</div>
-              <small class="text-muted">Most active today</small>
-            </div>
-          </div>
-          <div class="d-flex align-items-center mb-3">
-            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=cat&size=40&backgroundColor=17a2b8" alt="Cat" class="rounded-circle me-3" style="border: 2px solid #17a2b8;">
-            <div>
-              <div class="fw-bold">Cats</div>
-              <small class="text-muted">Popular this week</small>
-            </div>
-          </div>
-          <div class="d-flex align-items-center">
-            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=bird&size=40&backgroundColor=6f42c1" alt="Bird" class="rounded-circle me-3" style="border: 2px solid #6f42c1;">
-            <div>
-              <div class="fw-bold">Birds</div>
-              <small class="text-muted">Trending topic</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  </main>
 </div>
 
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'accounts/base.html' %}
 {% load static %}
 
 {% block title %}Create Blog Post - PetMedia{% endblock %}
@@ -66,171 +66,178 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="mb-0">Create New Blog Post</h3>
-          <small class="text-muted">Share your pet stories, tips, and experiences with the community</small>
-        </div>
-        <div class="card-body">
-          {% if form.errors %}
-          <div class="alert alert-danger" role="alert">
-            <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
-            <ul class="mb-0">
-              {% for field, errors in form.errors.items %}
-              {% for error in errors %}
-              <li>
-                {% if field == '__all__' %}
-                {{ error }}
-                {% else %}
-                <strong>
-                  {{ field|title }}:</strong>
-                {{ error }}
-                {% endif %}
-              </li>
-              {% endfor %}
-              {% endfor %}
-            </ul>
+<div class="app-shell">
+  {% include 'petmedia/includes/sidebar.html' %}
+
+  <main class="app-main">
+    <div class="container mt-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="mb-0">Create New Blog Post</h3>
+              <small class="text-muted">Share your pet stories, tips, and experiences with the community</small>
+            </div>
+            <div class="card-body">
+              {% if form.errors %}
+              <div class="alert alert-danger" role="alert">
+                <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
+                <ul class="mb-0">
+                  {% for field, errors in form.errors.items %}
+                  {% for error in errors %}
+                  <li>
+                    {% if field == '__all__' %}
+                    {{ error }}
+                    {% else %}
+                    <strong>
+                      {{ field|title }}:</strong>
+                    {{ error }}
+                    {% endif %}
+                  </li>
+                  {% endfor %}
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endif %}
+
+              <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Title -->
+                <div class="mb-3">
+                  <label for="{{ form.title.id_for_label }}" class="form-label">
+                    Post Title <span class="text-danger">*</span>
+                  </label>
+                  {{ form.title }}
+                  {% if form.title.errors %}
+                  <div class="text-danger small">
+                    {{ form.title.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- Category -->
+                <div class="mb-3">
+                  <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                  {{ form.category }}
+                  {% if form.category.errors %}
+                  <div class="text-danger small">
+                    {{ form.category.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- Related Pet -->
+                <div class="mb-3">
+                  <label for="{{ form.related_pet.id_for_label }}" class="form-label">Related Pet</label>
+                  {{ form.related_pet }}
+                  <small class="form-text text-muted">
+                    Select a pet if this post is about a specific pet.
+                    {% if not user.pets.exists %}
+                    <a href="{% url 'pets:pet_create' %}" class="text-primary">Add a pet first</a> to link them to your posts.
+                    {% endif %}
+                  </small>
+                  {% if form.related_pet.errors %}
+                  <div class="text-danger small mt-1">
+                    {{ form.related_pet.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- Excerpt -->
+                <div class="mb-3">
+                  <label for="{{ form.excerpt.id_for_label }}" class="form-label">Excerpt</label>
+                  {{ form.excerpt }}
+                  <small class="form-text text-muted">Brief description that will appear in post previews</small>
+                  {% if form.excerpt.errors %}
+                  <div class="text-danger small">
+                    {{ form.excerpt.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- Content -->
+                <div class="mb-3">
+                  <label for="{{ form.content.id_for_label }}" class="form-label">
+                    Content <span class="text-danger">*</span>
+                  </label>
+                  {{ form.content }}
+                  <small class="form-text text-muted">Write your full blog post content here (minimum 50 characters)</small>
+                  {% if form.content.errors %}
+                  <div class="text-danger small mt-1">
+                    {{ form.content.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- Featured Image -->
+                <div class="mb-3">
+                  <label for="{{ form.featured_image.id_for_label }}" class="form-label">Featured Image</label>
+                  <div class="image-upload-container">
+                    <div class="upload-area" onclick="document.getElementById('{{ form.featured_image.id_for_label }}').click();">
+                      <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
+                      <p class="mb-1"><strong>Click to upload an image</strong></p>
+                      <p class="text-muted small">or drag and drop here</p>
+                    </div>
+                    {{ form.featured_image }}
+                    <div class="upload-help mt-2">
+                      <small class="form-text text-muted">Supported: JPG, PNG, GIF - max 5MB</small>
+                    </div>
+                    <div id="image-preview" class="mt-3" style="display: none;">
+                      <img id="preview-img" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                      <p class="small text-success mt-1">Image ready for upload</p>
+                    </div>
+                  </div>
+                  {% if form.featured_image.errors %}
+                  <div class="text-danger small mt-1">
+                    {{ form.featured_image.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- SEO Meta Description -->
+                <div class="mb-4">
+                  <label for="{{ form.meta_description.id_for_label }}" class="form-label">Meta Description</label>
+                  {{ form.meta_description }}
+                  <small class="form-text text-muted">Optional: Brief description for search engines (recommended 150-160 characters)</small>
+                  {% if form.meta_description.errors %}
+                  <div class="text-danger small">
+                    {{ form.meta_description.errors.0 }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="d-flex justify-content-between">
+                  <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                  <div>
+                    <button type="submit" class="btn btn-primary">Create Post</button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
-          {% endif %}
 
-          <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <!-- Title -->
-            <div class="mb-3">
-              <label for="{{ form.title.id_for_label }}" class="form-label">
-                Post Title <span class="text-danger">*</span>
-              </label>
-              {{ form.title }}
-              {% if form.title.errors %}
-              <div class="text-danger small">
-                {{ form.title.errors.0 }}
-              </div>
-              {% endif %}
+          <!-- Help Card -->
+          <div class="card mt-4">
+            <div class="card-header">
+              <h5 class="mb-0">Writing Tips</h5>
             </div>
-
-            <!-- Category -->
-            <div class="mb-3">
-              <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
-              {{ form.category }}
-              {% if form.category.errors %}
-              <div class="text-danger small">
-                {{ form.category.errors.0 }}
-              </div>
-              {% endif %}
+            <div class="card-body">
+              <ul class="mb-0">
+                <li>Be specific and detailed in your title</li>
+                <li>Share personal experiences and what worked for you</li>
+                <li>Include photos when possible to make posts more engaging</li>
+                <li>Be respectful and supportive of other pet owners</li>
+                <li>If sharing advice, mention when to consult a veterinarian</li>
+              </ul>
             </div>
-
-            <!-- Related Pet -->
-            <div class="mb-3">
-              <label for="{{ form.related_pet.id_for_label }}" class="form-label">Related Pet</label>
-              {{ form.related_pet }}
-              <small class="form-text text-muted">
-                Select a pet if this post is about a specific pet.
-                {% if not user.pets.exists %}
-                <a href="{% url 'pets:pet_create' %}" class="text-primary">Add a pet first</a> to link them to your posts.
-                {% endif %}
-              </small>
-              {% if form.related_pet.errors %}
-              <div class="text-danger small mt-1">
-                {{ form.related_pet.errors.0 }}
-              </div>
-              {% endif %}
-            </div>
-
-            <!-- Excerpt -->
-            <div class="mb-3">
-              <label for="{{ form.excerpt.id_for_label }}" class="form-label">Excerpt</label>
-              {{ form.excerpt }}
-              <small class="form-text text-muted">Brief description that will appear in post previews</small>
-              {% if form.excerpt.errors %}
-              <div class="text-danger small">
-                {{ form.excerpt.errors.0 }}
-              </div>
-              {% endif %}
-            </div>
-
-            <!-- Content -->
-            <div class="mb-3">
-              <label for="{{ form.content.id_for_label }}" class="form-label">
-                Content <span class="text-danger">*</span>
-              </label>
-              {{ form.content }}
-              <small class="form-text text-muted">Write your full blog post content here (minimum 50 characters)</small>
-              {% if form.content.errors %}
-              <div class="text-danger small mt-1">
-                {{ form.content.errors.0 }}
-              </div>
-              {% endif %}
-            </div>
-
-            <!-- Featured Image -->
-            <div class="mb-3">
-              <label for="{{ form.featured_image.id_for_label }}" class="form-label">Featured Image</label>
-              <div class="image-upload-container">
-                <div class="upload-area" onclick="document.getElementById('{{ form.featured_image.id_for_label }}').click();">
-                  <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
-                  <p class="mb-1"><strong>Click to upload an image</strong></p>
-                  <p class="text-muted small">or drag and drop here</p>
-                </div>
-                {{ form.featured_image }}
-                <div class="upload-help mt-2">
-                  <small class="form-text text-muted">Supported: JPG, PNG, GIF - max 5MB</small>
-                </div>
-                <div id="image-preview" class="mt-3" style="display: none;">
-                  <img id="preview-img" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
-                  <p class="small text-success mt-1">Image ready for upload</p>
-                </div>
-              </div>
-              {% if form.featured_image.errors %}
-              <div class="text-danger small mt-1">
-                {{ form.featured_image.errors.0 }}
-              </div>
-              {% endif %}
-            </div>
-
-            <!-- SEO Meta Description -->
-            <div class="mb-4">
-              <label for="{{ form.meta_description.id_for_label }}" class="form-label">Meta Description</label>
-              {{ form.meta_description }}
-              <small class="form-text text-muted">Optional: Brief description for search engines (recommended 150-160 characters)</small>
-              {% if form.meta_description.errors %}
-              <div class="text-danger small">
-                {{ form.meta_description.errors.0 }}
-              </div>
-              {% endif %}
-            </div>
-
-            <!-- Form Actions -->
-            <div class="d-flex justify-content-between">
-              <a href="{% url 'petmedia:blog_list' %}" class="btn btn-outline-secondary">Cancel</a>
-              <div>
-                <button type="submit" class="btn btn-primary">Create Post</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Help Card -->
-      <div class="card mt-4">
-        <div class="card-header">
-          <h5 class="mb-0">Writing Tips</h5>
-        </div>
-        <div class="card-body">
-          <ul class="mb-0">
-            <li>Be specific and detailed in your title</li>
-            <li>Share personal experiences and what worked for you</li>
-            <li>Include photos when possible to make posts more engaging</li>
-            <li>Be respectful and supportive of other pet owners</li>
-            <li>If sharing advice, mention when to consult a veterinarian</li>
-          </ul>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+  </main>
 </div>
 {% endblock %}
 

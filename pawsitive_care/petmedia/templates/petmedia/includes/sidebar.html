@@ -1,0 +1,95 @@
+{% load static %}
+
+<aside class="app-sidebar glass" aria-label="Primary">
+  <div class="sidebar-header">
+    <button class="sidebar-toggle" type="button" aria-label="Collapse sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+    <span class="sidebar-title">PetMedia</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <!-- Common Blog Section for All Users -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Blog</div>
+      <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'blog_list' %}active{% endif %}">
+        <i class="fas fa-blog"></i><span>All Posts</span>
+      </a>
+      <a href="{% url 'petmedia:create_post' %}" class="sidebar-link {% if request.resolver_match.url_name == 'create_post' %}active{% endif %}">
+        <i class="fas fa-pen"></i><span>Create Post</span>
+      </a>
+      <a href="{% url 'petmedia:user_posts' %}" class="sidebar-link {% if request.resolver_match.url_name == 'user_posts' %}active{% endif %}">
+        <i class="fas fa-edit"></i><span>My Posts</span>
+      </a>
+    </div>
+
+    <!-- Professional Content Section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Professional</div>
+      <a href="{% url 'petmedia:professional_advice' %}" class="sidebar-link {% if request.resolver_match.url_name == 'professional_advice' %}active{% endif %}">
+        <i class="fas fa-user-md"></i><span>Vet Advice</span>
+      </a>
+      <a href="{% url 'petmedia:medications' %}" class="sidebar-link {% if request.resolver_match.url_name == 'medications' %}active{% endif %}">
+        <i class="fas fa-pills"></i><span>Medications</span>
+      </a>
+
+      {% if user.is_vet %}
+      <a href="{% url 'petmedia:create_professional_post' %}" class="sidebar-link {% if request.resolver_match.url_name == 'create_professional_post' %}active{% endif %}">
+        <i class="fas fa-stethoscope"></i><span>Create Professional Post</span>
+      </a>
+      <a href="{% url 'petmedia:create_medication_post' %}" class="sidebar-link {% if request.resolver_match.url_name == 'create_medication_post' %}active{% endif %}">
+        <i class="fas fa-pills"></i><span>Create Medication Post</span>
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- Categories Section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Categories</div>
+      <a href="{% url 'petmedia:category' name='general' %}" class="sidebar-link">
+        <i class="fas fa-folder"></i><span>General</span>
+      </a>
+      <a href="{% url 'petmedia:category' name='health' %}" class="sidebar-link">
+        <i class="fas fa-heart"></i><span>Health</span>
+      </a>
+      <a href="{% url 'petmedia:category' name='training' %}" class="sidebar-link">
+        <i class="fas fa-graduation-cap"></i><span>Training</span>
+      </a>
+      <a href="{% url 'petmedia:category' name='nutrition' %}" class="sidebar-link">
+        <i class="fas fa-apple-alt"></i><span>Nutrition</span>
+      </a>
+    </div>
+
+    <!-- Admin Section (Only for Admins) -->
+    {% if user.is_admin %}
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Administration</div>
+      <a href="{% url 'petmedia:admin_post_management' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_post_management' %}active{% endif %}">
+        <i class="fas fa-cog"></i><span>Manage Posts</span>
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- Navigation to Main Dashboards -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Dashboard</div>
+      {% if user.is_admin %}
+      <a href="{% url 'accounts:admin_dashboard' %}" class="sidebar-link">
+        <i class="fas fa-user-shield"></i><span>Admin Dashboard</span>
+      </a>
+      {% elif user.is_vet %}
+      <a href="{% url 'accounts:vet_dashboard' %}" class="sidebar-link">
+        <i class="fas fa-stethoscope"></i><span>Vet Dashboard</span>
+      </a>
+      {% elif user.is_staff_member %}
+      <a href="{% url 'accounts:staff_dashboard' %}" class="sidebar-link">
+        <i class="fas fa-user-tie"></i><span>Staff Dashboard</span>
+      </a>
+      {% else %}
+      <a href="{% url 'accounts:client_dashboard' %}" class="sidebar-link">
+        <i class="fas fa-home"></i><span>Client Dashboard</span>
+      </a>
+      {% endif %}
+    </div>
+  </nav>
+</aside>
