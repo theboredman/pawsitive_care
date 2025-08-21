@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 urlpatterns = [
@@ -47,6 +48,8 @@ handler500 = 'pawsitive_care.views.custom_500_view'
 handler403 = 'pawsitive_care.views.custom_403_view'
 handler400 = 'pawsitive_care.views.custom_400_view'
 
-# Serve media files in development (even when DEBUG=False for testing)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# Serve media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # Add staticfiles serving
+    urlpatterns += staticfiles_urlpatterns()

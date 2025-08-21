@@ -1,20 +1,18 @@
-(function () {
-    const nav = document.querySelector('.app-navbar');
-    const bar = document.getElementById('scrollProgress');
+const scrollBar = document.getElementById("scrollProgress");
+const navbar = document.querySelector(".app-navbar");
 
-    function onScroll() {
-        const doc = document.documentElement;
-        const y = doc.scrollTop || document.body.scrollTop;
-        const h = doc.scrollHeight - doc.clientHeight;
-        const pct = h ? (y / h) * 100 : 0;
+function updateProgress() {
+    // place bar just under the navbar
+    scrollBar.style.top = navbar.offsetHeight + "px";
 
-        bar.style.width = pct + '%';
-        if (y > 8) nav.classList.add('nav-scrolled');
-        else nav.classList.remove('nav-scrolled');
-    }
+    // calculate scroll %
+    let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    let scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    let scrolled = (scrollTop / scrollHeight) * 100;
 
-    window.addEventListener('scroll', onScroll, {
-        passive: true
-    });
-    document.addEventListener('DOMContentLoaded', onScroll);
-})();
+    scrollBar.style.width = scrolled + "%";
+}
+
+window.addEventListener("scroll", updateProgress);
+window.addEventListener("resize", updateProgress);
+window.addEventListener("load", updateProgress);
