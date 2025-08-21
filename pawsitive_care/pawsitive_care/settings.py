@@ -136,10 +136,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
+# Timezone settings - USE_TZ=True ensures all datetime objects are timezone-aware
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
+# IMPORTANT: USE_TZ=True enables timezone support. All datetime objects should be timezone-aware.
+# When creating datetime objects manually, use timezone.now() or timezone.make_aware()
 USE_TZ = True
 
 

@@ -312,13 +312,17 @@ Obesity is the #1 nutritional problem in pets. Regular body condition scoring he
                     hours=random.randint(0, 23),
                     minutes=random.randint(0, 59)
                 )
-                
-                BlogComment.objects.create(
+                # Create comment without manually setting created_at 
+                # Let Django handle the timezone-aware timestamp automatically
+                comment = BlogComment.objects.create(
                     post=post,
                     author=commenter,
-                    content=random.choice(comment_templates),
-                    created_at=comment_date
+                    content=random.choice(comment_templates)
                 )
+                
+                # Optionally update the created_at to the calculated date if needed for demo purposes
+                comment.created_at = comment_date if not timezone.is_naive(comment_date) else timezone.make_aware(comment_date)
+                comment.save()
                 comments_created += 1
         
         self.stdout.write(f'Created {comments_created} demo comments')
@@ -337,12 +341,16 @@ Obesity is the #1 nutritional problem in pets. Regular body condition scoring he
                     hours=random.randint(0, 23),
                     minutes=random.randint(0, 59)
                 )
-                
-                BlogLike.objects.create(
+                # Create like without manually setting created_at
+                # Let Django handle the timezone-aware timestamp automatically
+                like = BlogLike.objects.create(
                     post=post,
-                    user=liker,
-                    created_at=like_date
+                    user=liker
                 )
+                
+                # Optionally update the created_at to the calculated date if needed for demo purposes
+                like.created_at = like_date if not timezone.is_naive(like_date) else timezone.make_aware(like_date)
+                like.save()
                 likes_created += 1
         
         self.stdout.write(f'Created {likes_created} demo likes')
