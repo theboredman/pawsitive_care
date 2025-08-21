@@ -1,0 +1,86 @@
+{% comment %}
+Error navigation component with safe URL handling
+{% endcomment %}
+<div class="error-navigation">
+  {% for item in nav_items %}
+  <a href="{{ item.url }}" class="{{ item.class }}{% if not item.available %} link-unavailable{% endif %}" {% if not item.available %}title="This link is currently unavailable" {% endif %}>
+    <i class="{{ item.icon }} me-2"></i>
+    {{ item.text }}
+  </a>
+  {% endfor %}
+
+  {% if user.is_authenticated %}
+  {% comment %} Additional contextual links {% endcomment %}
+  <div class="additional-links mt-3">
+    {% if current_error_type == "404" %}
+    {% url 'pets:pet_list' as pet_list_url %}
+    {% if pet_list_url %}
+    <a href="{{ pet_list_url }}" class="btn btn-outline-secondary btn-sm me-2">
+      <i class="fas fa-paw me-1"></i>My Pets
+    </a>
+    {% endif %}
+
+    {% url 'accounts:profile' as profile_url %}
+    {% if profile_url %}
+    <a href="{{ profile_url }}" class="btn btn-outline-secondary btn-sm">
+      <i class="fas fa-user me-1"></i>My Profile
+    </a>
+    {% endif %}
+    {% endif %}
+
+    {% if current_error_type == "403" %}
+    {% url 'accounts:contact_admin' as contact_admin_url %}
+    {% if contact_admin_url %}
+    <a href="{{ contact_admin_url }}" class="btn btn-outline-warning btn-sm">
+      <i class="fas fa-envelope me-1"></i>Request Access
+    </a>
+    {% endif %}
+    {% endif %}
+
+    {% if current_error_type == "400" %}
+    <button onclick="history.back()" class="btn btn-outline-secondary btn-sm">
+      <i class="fas fa-arrow-left me-1"></i>Go Back & Retry
+    </button>
+    {% endif %}
+  </div>
+  {% else %}
+  {% comment %} Links for anonymous users {% endcomment %}
+  <div class="auth-links mt-3">
+    {% url 'accounts:login' as login_url %}
+    {% if login_url %}
+    <a href="{{ login_url }}" class="btn btn-outline-primary btn-sm me-2">
+      <i class="fas fa-sign-in-alt me-1"></i>Sign In
+    </a>
+    {% endif %}
+
+    {% if current_error_type == "403" %}
+    {% url 'accounts:register' as register_url %}
+    {% if register_url %}
+    <a href="{{ register_url }}" class="btn btn-outline-primary btn-sm">
+      <i class="fas fa-user-plus me-1"></i>Register
+    </a>
+    {% endif %}
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .link-unavailable {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .error-navigation .additional-links,
+  .error-navigation .auth-links {
+    border-top: 1px solid var(--border-light, #e0e0e0);
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+
+  .error-navigation .btn-sm {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+  }
+</style>

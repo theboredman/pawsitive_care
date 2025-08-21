@@ -31,8 +31,22 @@ urlpatterns = [
     path('inventory/', include('inventory.urls', namespace='inventory')),
     path('records/', include('records.urls', namespace='records')),
     path('', views.home_view, name='home'),  # Root URL with welcome page
+    
+    # Test URLs for error pages (remove in production)
+    path('errors/', views.test_errors_page, name='test_errors'),
+    path('safe-urls/', views.test_safe_urls, name='test_safe_urls'),
+    path('404/', views.test_404_view, name='test_404'),
+    path('500/', views.test_500_view, name='test_500'),
+    path('403/', views.test_403_view, name='test_403'),
+    path('400/', views.test_400_view, name='test_400'),
 ]
 
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Custom error handlers
+handler404 = 'pawsitive_care.views.custom_404_view'
+handler500 = 'pawsitive_care.views.custom_500_view'
+handler403 = 'pawsitive_care.views.custom_403_view'
+handler400 = 'pawsitive_care.views.custom_400_view'
+
+# Serve media files in development (even when DEBUG=False for testing)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

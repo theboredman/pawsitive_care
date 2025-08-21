@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load error_tags %}
+
+{% block title %}Test Safe URL Handling - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row">
+    <div class="col-12">
+      <h1>Safe URL Handling Test</h1>
+      <p class="text-muted">Testing how the application handles broken or unavailable links.</p>
+
+      <div class="card">
+        <div class="card-header">
+          <h5>URL Testing Results</h5>
+        </div>
+        <div class="card-body">
+
+          <!-- Test existing URLs -->
+          <h6>Existing URLs:</h6>
+          <ul class="list-group mb-4">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Home URL:
+              {% safe_url 'home' as home_url %}
+              <span class="badge bg-{% if home_url %}success{% else %}danger{% endif %}">
+                {{ home_url|default:"Not Available" }}
+              </span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Login URL:
+              {% safe_url 'accounts:login' as login_url %}
+              <span class="badge bg-{% if login_url %}success{% else %}danger{% endif %}">
+                {{ login_url|default:"Not Available" }}
+              </span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Register URL:
+              {% safe_url 'accounts:register' as register_url %}
+              <span class="badge bg-{% if register_url %}success{% else %}danger{% endif %}">
+                {{ register_url|default:"Not Available" }}
+              </span>
+            </li>
+
+            {% if user.is_authenticated %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Profile URL:
+              {% safe_url 'accounts:profile' as profile_url %}
+              <span class="badge bg-{% if profile_url %}success{% else %}danger{% endif %}">
+                {{ profile_url|default:"Not Available" }}
+              </span>
+            </li>
+            {% endif %}
+          </ul>
+
+          <!-- Test broken URLs -->
+          <h6>Testing Broken URLs:</h6>
+          <ul class="list-group mb-4">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Non-existent URL:
+              {% safe_url 'nonexistent:view' as broken_url %}
+              <span class="badge bg-{% if broken_url %}success{% else %}warning{% endif %}">
+                {{ broken_url|default:"Safely handled - No URL" }}
+              </span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Missing App URL:
+              {% safe_url 'missing_app:some_view' as missing_app_url %}
+              <span class="badge bg-{% if missing_app_url %}success{% else %}warning{% endif %}">
+                {{ missing_app_url|default:"Safely handled - No URL" }}
+              </span>
+            </li>
+          </ul>
+
+          <!-- Test dashboard URL resolution -->
+          {% if user.is_authenticated %}
+          <h6>Dashboard URL for Current User:</h6>
+          <ul class="list-group mb-4">
+            <li class="list-group-item">
+              User Type: <strong>
+                {{ user.get_user_type|default:"Unknown" }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Dashboard URL:
+              {% dashboard_url_for_user user as dashboard_info %}
+              <span class="badge bg-{% if dashboard_info.url %}success{% else %}warning{% endif %}">
+                {{ dashboard_info.url|default:"Not Available" }}
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Dashboard Label:
+              <span class="badge bg-info">
+                {{ dashboard_info.label|default:"No Label" }}
+              </span>
+            </li>
+          </ul>
+          {% endif %}
+
+          <!-- Test safe link component -->
+          <h6>Safe Link Component Test:</h6>
+          <div class="mb-4">
+            <p>Testing safe link components with fallbacks:</p>
+
+            <!-- Working link -->
+            {% include 'components/safe_link.html' with url_name='home' link_text='Safe Home Link' icon='fas fa-home' class='btn btn-primary me-2' %}
+
+            <!-- Broken link with fallback -->
+            {% include 'components/safe_link.html' with url_name='broken:link' link_text='Broken Link (Safe)' fallback_url='/' icon='fas fa-exclamation-triangle' class='btn btn-warning me-2' %}
+
+            <!-- Link without fallback (should be hidden) -->
+            {% include 'components/safe_link.html' with url_name='missing:completely' link_text='Missing Link (Hidden)' icon='fas fa-question' class='btn btn-danger' %}
+          </div>
+
+          <!-- Test error navigation -->
+          <h6>Error Navigation Test:</h6>
+          <div class="border p-3 bg-light">
+            {% error_navigation user "test" %}
+          </div>
+
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <a href="{% url 'home' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Back to Home
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

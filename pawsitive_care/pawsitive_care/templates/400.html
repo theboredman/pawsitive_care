@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load error_tags %}
+
+{% block title %}Bad Request - Pawsitive Care{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div class="container">
+    <div class="row justify-content-center min-vh-100 align-items-center">
+      <div class="col-lg-6 col-md-8 text-center">
+        <div class="error-card">
+          <div class="error-icon mb-4">
+            <i class="fas fa-question-circle"></i>
+          </div>
+
+          <h1 class="error-code">400</h1>
+
+          <h2 class="error-title">Bad Request</h2>
+
+          <p class="error-message">
+            The request could not be understood by the server. This usually happens when
+            there's an issue with the data being sent or the request format.
+          </p>
+
+          <div class="error-actions">
+            {% comment %} Safe home link with fallback {% endcomment %}
+            {% url 'home' as home_url %}
+            {% if home_url %}
+            <a href="{{ home_url }}" class="btn btn-accent">
+              <i class="fas fa-home me-2"></i>
+              Return Home
+            </a>
+            {% else %}
+            <a href="/" class="btn btn-accent">
+              <i class="fas fa-home me-2"></i>
+              Return Home
+            </a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            {% comment %} Safe dashboard links with fallbacks {% endcomment %}
+            {% if user.is_admin %}
+            {% url 'accounts:admin_dashboard' as admin_dashboard_url %}
+            {% if admin_dashboard_url %}
+            <a href="{{ admin_dashboard_url }}" class="btn btn-ghost">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Admin Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'home' %}" class="btn btn-ghost">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Dashboard (Unavailable)
+            </a>
+            {% endif %}
+            {% elif user.is_vet %}
+            {% url 'accounts:vet_dashboard' as vet_dashboard_url %}
+            {% if vet_dashboard_url %}
+            <a href="{{ vet_dashboard_url }}" class="btn btn-ghost">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Vet Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'home' %}" class="btn btn-ghost">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Dashboard (Unavailable)
+            </a>
+            {% endif %}
+            {% elif user.is_staff_member %}
+            {% url 'accounts:staff_dashboard' as staff_dashboard_url %}
+            {% if staff_dashboard_url %}
+            <a href="{{ staff_dashboard_url }}" class="btn btn-ghost">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Staff Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'home' %}" class="btn btn-ghost">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Dashboard (Unavailable)
+            </a>
+            {% endif %}
+            {% else %}
+            {% url 'accounts:client_dashboard' as client_dashboard_url %}
+            {% if client_dashboard_url %}
+            <a href="{{ client_dashboard_url }}" class="btn btn-ghost">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Client Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'home' %}" class="btn btn-ghost">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Dashboard (Unavailable)
+            </a>
+            {% endif %}
+            {% endif %}
+
+            {% comment %} Try again button for bad requests {% endcomment %}
+            <div class="mt-3">
+              <button onclick="history.back()" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>
+                Go Back & Retry
+              </button>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="error-help">
+            <small class="text-muted">
+              Please check your request and try again.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-page {
+    background: var(--bg-primary);
+    min-height: calc(100vh - var(--nav-height));
+    padding: 2rem 0;
+  }
+
+  .error-card {
+    background: var(--surface-card);
+    border-radius: var(--radius-xl);
+    padding: 3rem 2rem;
+    box-shadow: var(--shadow-xl);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-light);
+  }
+
+  .error-icon i {
+    font-size: 4rem;
+    color: var(--sand-accent);
+    opacity: 0.8;
+  }
+
+  .error-code {
+    font-size: 8rem;
+    font-weight: 900;
+    color: var(--sand-accent);
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(139, 115, 85, 0.1);
+    line-height: 1;
+  }
+
+  .error-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 1rem 0;
+  }
+
+  .error-message {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 2rem 0;
+    line-height: 1.6;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+  }
+
+  .error-help {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  @media (max-width: 768px) {
+    .error-code {
+      font-size: 6rem;
+    }
+
+    .error-title {
+      font-size: 1.5rem;
+    }
+
+    .error-card {
+      padding: 2rem 1rem;
+    }
+
+    .error-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .error-actions .btn {
+      width: 100%;
+      max-width: 250px;
+    }
+  }
+</style>
+{% endblock %}
