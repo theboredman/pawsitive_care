@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+
+{{ post.title }} - Admin Post Detail{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2><i class="fas fa-file-alt me-2"></i> Post Details</h2>
+          <p class="text-muted">Admin view of blog post</p>
+        </div>
+        <div>
+          <a href="{% url 'petmedia:admin_post_management' %}" class="btn btn-secondary me-2">
+            <i class="fas fa-arrow-left me-1"></i> Back to Posts
+          </a>
+          <a href="{% url 'petmedia:blog_detail' post.slug %}" class="btn btn-outline-primary" target="_blank">
+            <i class="fas fa-external-link-alt me-1"></i> View Post
+          </a>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Main Content -->
+        <div class="col-md-8">
+          <!-- Post Information -->
+          <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Post Information</h5>
+              <div>
+                {% if post.is_published %}
+                <span class="badge bg-success">Published</span>
+                {% else %}
+                <span class="badge bg-warning text-dark">Hidden</span>
+                {% endif %}
+
+                {% if post.is_featured %}
+                <span class="badge bg-warning">Featured</span>
+                {% endif %}
+
+                {% if post.is_professional_advice %}
+                <span class="badge bg-info">Professional</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-2">Title</h6>
+                  <p class="fw-bold">
+                    {{ post.title }}
+                  </p>
+
+                  <h6 class="text-muted mb-2">Author</h6>
+                  <p>
+                    <strong>
+                      {{ post.author.get_full_name|default:post.author.username }}</strong>
+                    <br>
+                    <small class="text-muted">
+                      {{ post.author.get_role_display }} •
+                      {{ post.author.email }}</small>
+                  </p>
+
+                  <h6 class="text-muted mb-2">Category</h6>
+                  <p>
+                    {% if post.category %}
+                    <span class="badge bg-secondary">
+                      {{ post.category.get_name_display }}</span>
+                    {% else %}
+                    <span class="text-muted">No category assigned</span>
+                    {% endif %}
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-2">Created</h6>
+                  <p>
+                    {{ post.created_at|date:"F d, Y" }} at
+                    {{ post.created_at|time:"H:i" }}
+                  </p>
+
+                  <h6 class="text-muted mb-2">Last Updated</h6>
+                  <p>
+                    {{ post.updated_at|date:"F d, Y" }} at
+                    {{ post.updated_at|time:"H:i" }}
+                  </p>
+
+                  <h6 class="text-muted mb-2">Engagement</h6>
+                  <p>
+                    <i class="fas fa-eye text-info me-1"></i>
+                    {{ post.views_count }} views
+                    <br>
+                    <i class="fas fa-heart text-danger me-1"></i>
+                    {{ likes_count }} likes
+                    <br>
+                    <i class="fas fa-comments text-primary me-1"></i>
+                    {{ comment_count }} comments
+                  </p>
+                </div>
+              </div>
+
+              {% if post.excerpt %}
+              <h6 class="text-muted mb-2 mt-3">Excerpt</h6>
+              <p class="fst-italic">
+                {{ post.excerpt }}
+              </p>
+              {% endif %}
+
+              {% if post.related_pet %}
+              <h6 class="text-muted mb-2 mt-3">Related Pet</h6>
+              <p>
+                <i class="fas fa-paw text-warning me-1"></i>
+                {{ post.related_pet.name }} (
+                {{ post.related_pet.species|title }})
+              </p>
+              {% endif %}
+
+              {% if post.medication_name %}
+              <h6 class="text-muted mb-2 mt-3">Medication Information</h6>
+              <div class="bg-light p-3 rounded">
+                <p><strong>Medication:</strong>
+                  {{ post.medication_name }}
+                </p>
+                {% if post.dosage_info %}
+                <p><strong>Dosage:</strong>
+                  {{ post.dosage_info }}
+                </p>
+                {% endif %}
+                {% if post.side_effects %}
+                <p><strong>Side Effects:</strong>
+                  {{ post.side_effects }}
+                </p>
+                {% endif %}
+              </div>
+              {% endif %}
+
+              {% if post.medical_disclaimer %}
+              <h6 class="text-muted mb-2 mt-3">Medical Disclaimer</h6>
+              <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ post.medical_disclaimer }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Post Content -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i> Post Content</h5>
+            </div>
+            <div class="card-body">
+              {% if post.featured_image %}
+              <div class="mb-3">
+                <img src="{{ post.featured_image.url }}" alt="Featured image" class="img-fluid rounded" style="max-height: 300px;">
+              </div>
+              {% endif %}
+
+              <div class="post-content">
+                {{ post.content|linebreaks }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments Section -->
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-comments me-2"></i>
+                Comments (
+                {{ comment_count }})
+              </h5>
+            </div>
+            <div class="card-body">
+              {% if comments %}
+              {% for comment in comments %}
+              <div class="comment mb-3 p-3 bg-light rounded">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <strong>
+                      {{ comment.author.get_full_name|default:comment.author.username }}</strong>
+                    <small class="text-muted">
+                      {{ comment.author.get_role_display }}</small>
+                  </div>
+                  <small class="text-muted">
+                    {{ comment.created_at|date:"M d, Y H:i" }}</small>
+                </div>
+                <p class="mb-0">
+                  {{ comment.content }}
+                </p>
+                {% if not comment.is_approved %}
+                <div class="mt-2">
+                  <span class="badge bg-warning text-dark">Pending Approval</span>
+                </div>
+                {% endif %}
+              </div>
+              {% endfor %}
+              {% else %}
+              <div class="text-center py-4 text-muted">
+                <i class="fas fa-comment fa-2x mb-2"></i>
+                <p>No comments yet</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+          <!-- Quick Actions -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-bolt me-2"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary toggle-status-btn" data-post-id="{{ post.id }}" data-current-status="{{ post.is_published|yesno:'true,false' }}">
+                  {% if post.is_published %}
+                  <i class="fas fa-eye-slash me-1"></i> Hide Post
+                  {% else %}
+                  <i class="fas fa-eye me-1"></i> Publish Post
+                  {% endif %}
+                </button>
+
+                <button class="btn btn-outline-warning toggle-featured-btn" data-post-id="{{ post.id }}" data-current-featured="{{ post.is_featured|yesno:'true,false' }}">
+                  {% if post.is_featured %}
+                  <i class="fas fa-star me-1"></i> Remove from Featured
+                  {% else %}
+                  <i class="fas fa-star me-1"></i> Make Featured
+                  {% endif %}
+                </button>
+
+                <hr>
+
+                <button class="btn btn-outline-danger delete-post-btn" data-post-id="{{ post.id }}" data-post-title="{{ post.title }}">
+                  <i class="fas fa-trash me-1"></i> Delete Post
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEO Information -->
+          {% if post.meta_description or post.slug %}
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-search me-2"></i> SEO Information</h5>
+            </div>
+            <div class="card-body">
+              {% if post.slug %}
+              <h6 class="text-muted mb-2">URL Slug</h6>
+              <p><code>
+                  {{ post.slug }}</code></p>
+              {% endif %}
+
+              {% if post.meta_description %}
+              <h6 class="text-muted mb-2">Meta Description</h6>
+              <p>
+                {{ post.meta_description }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Post Statistics -->
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i> Statistics</h5>
+            </div>
+            <div class="card-body">
+              <div class="row text-center">
+                <div class="col-4">
+                  <h4 class="text-info">
+                    {{ post.views_count }}
+                  </h4>
+                  <small class="text-muted">Views</small>
+                </div>
+                <div class="col-4">
+                  <h4 class="text-danger">
+                    {{ likes_count }}
+                  </h4>
+                  <small class="text-muted">Likes</small>
+                </div>
+                <div class="col-4">
+                  <h4 class="text-primary">
+                    {{ comment_count }}
+                  </h4>
+                  <small class="text-muted">Comments</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deletePostModalLabel">
+          <i class="fas fa-trash text-danger me-2"></i> Delete Post
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to permanently delete this post?</p>
+        <p><strong id="deletePostTitle"></strong></p>
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          This action cannot be undone. All comments and likes will also be deleted.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeletePost">
+          <i class="fas fa-trash me-1"></i> Delete Post
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+      document.querySelector('meta[name="csrf-token"]')?.content;
+
+    // Toggle post status (published/hidden)
+    document.querySelector('.toggle-status-btn')?.addEventListener('click', function() {
+      const postId = this.dataset.postId;
+
+      fetch(`/blog/admin/posts/${postId}/toggle-status/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload(); // Reload to update the display
+          } else {
+            alert('Error updating post status');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error updating post status');
+        });
+    });
+
+    // Toggle featured status
+    document.querySelector('.toggle-featured-btn')?.addEventListener('click', function() {
+      const postId = this.dataset.postId;
+
+      fetch(`/blog/admin/posts/${postId}/toggle-featured/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload(); // Reload to update the display
+          } else {
+            alert('Error updating featured status');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error updating featured status');
+        });
+    });
+
+    // Delete post functionality
+    let postToDelete = null;
+
+    document.querySelector('.delete-post-btn')?.addEventListener('click', function() {
+      postToDelete = this.dataset.postId;
+      document.getElementById('deletePostTitle').textContent = this.dataset.postTitle;
+
+      const modal = new bootstrap.Modal(document.getElementById('deletePostModal'));
+      modal.show();
+    });
+
+    document.getElementById('confirmDeletePost')?.addEventListener('click', function() {
+      if (postToDelete) {
+        fetch(`/blog/admin/posts/${postToDelete}/delete/`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': csrfToken,
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Redirect back to post management
+              window.location.href = '{% url "petmedia:admin_post_management" %}';
+            } else {
+              alert('Error deleting post');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting post');
+          });
+      }
+    });
+  });
+</script>
+
+<style>
+  .post-content {
+    line-height: 1.6;
+  }
+
+  .comment {
+    border-left: 3px solid #dee2e6;
+  }
+</style>
+{% endblock %}

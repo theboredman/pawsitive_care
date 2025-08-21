@@ -15,6 +15,7 @@ from .patterns.repository import repo_manager
 from .patterns.factory import BlogPostFactory
 from .patterns.observer import blog_event_subject
 from .forms import BlogPostForm, ProfessionalBlogPostForm, MedicationBlogPostForm, CommentForm
+from accounts.decorators import admin_required
 
 
 class BlogListView(ListView):
@@ -299,3 +300,124 @@ def get_categories_ajax(request):
     categories = repo_manager.categories.get_all()
     data = [{'id': cat.id, 'name': cat.name} for cat in categories]
     return JsonResponse({'categories': data})
+
+
+# Admin Post Management Views
+@admin_required
+def admin_post_management(request):
+    """Admin view to manage all blog posts"""
+    posts_list = BlogPost.objects.select_related('author', 'category').order_by('-created_at')
+    
+    # Filter by status if specified
+    status_filter = request.GET.get('status')
+    if status_filter == 'published':
+        posts_list = posts_list.filter(is_published=True)
+    elif status_filter == 'unpublished':
+        posts_list = posts_list.filter(is_published=False)
+    elif status_filter == 'featured':
+        posts_list = posts_list.filter(is_featured=True)
+    elif status_filter == 'professional':
+        posts_list = posts_list.filter(is_professional_advice=True)
+    
+    # Search functionality
+    search_query = request.GET.get('search')
+    if search_query:
+        posts_list = posts_list.filter(
+            Q(title__icontains=search_query) |
+            Q(content__icontains=search_query) |
+            Q(author__username__icontains=search_query) |
+            Q(author__first_name__icontains=search_query) |
+            Q(author__last_name__icontains=search_query)
+        )
+    
+    # Pagination
+    paginator = Paginator(posts_list, 20)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+    
+    # Statistics
+    stats = {
+        'total_posts': BlogPost.objects.count(),
+        'published_posts': BlogPost.objects.filter(is_published=True).count(),
+        'unpublished_posts': BlogPost.objects.filter(is_published=False).count(),
+        'featured_posts': BlogPost.objects.filter(is_featured=True).count(),
+        'professional_posts': BlogPost.objects.filter(is_professional_advice=True).count(),
+    }
+    
+    context = {
+        'posts': posts,
+        'stats': stats,
+        'current_filter': status_filter,
+        'search_query': search_query,
+        'page_obj': posts,
+    }
+    
+    return render(request, 'petmedia/admin/post_management.html', context)
+
+
+@admin_required
+@require_http_methods(["POST"])
+def admin_toggle_post_status(request, post_id):
+    """Toggle post published status"""
+    post = get_object_or_404(BlogPost, id=post_id)
+    post.is_published = not post.is_published
+    post.save()
+    
+    status = "published" if post.is_published else "hidden"
+    messages.success(request, f'Post "{post.title}" has been {status}.')
+    
+    return JsonResponse({
+        'success': True,
+        'is_published': post.is_published,
+        'status': status
+    })
+
+
+@admin_required
+@require_http_methods(["POST"])
+def admin_toggle_post_featured(request, post_id):
+    """Toggle post featured status"""
+    post = get_object_or_404(BlogPost, id=post_id)
+    post.is_featured = not post.is_featured
+    post.save()
+    
+    status = "featured" if post.is_featured else "removed from featured"
+    messages.success(request, f'Post "{post.title}" has been {status}.')
+    
+    return JsonResponse({
+        'success': True,
+        'is_featured': post.is_featured,
+        'status': status
+    })
+
+
+@admin_required
+@require_http_methods(["POST"])
+def admin_delete_post(request, post_id):
+    """Delete a blog post"""
+    post = get_object_or_404(BlogPost, id=post_id)
+    post_title = post.title
+    post.delete()
+    
+    messages.success(request, f'Post "{post_title}" has been permanently deleted.')
+    
+    return JsonResponse({
+        'success': True,
+        'message': f'Post "{post_title}" has been deleted.'
+    })
+
+
+@admin_required
+def admin_post_detail(request, post_id):
+    """Admin view for post details with management options"""
+    post = get_object_or_404(BlogPost, id=post_id)
+    comments = post.comments.select_related('author').order_by('-created_at')
+    
+    context = {
+        'post': post,
+        'comments': comments,
+        'comment_count': comments.count(),
+        'likes_count': post.likes.count(),
+    }
+    
+    return render(request, 'petmedia/admin/post_detail.html', context)

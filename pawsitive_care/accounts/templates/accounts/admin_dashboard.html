@@ -48,6 +48,9 @@
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">Blog</div>
+        <a href="{% url 'petmedia:admin_post_management' %}" class="sidebar-link">
+          <i class="fas fa-cog"></i><span>Manage Posts</span>
+        </a>
         <a href="{% url 'petmedia:blog_list' %}" class="sidebar-link">
           <i class="fas fa-edit"></i><span>All Posts</span>
         </a>
@@ -433,7 +436,7 @@
             <div class="card glass hover-lift h-100 card-gold">
               <div class="card-body text-center">
                 <i class="fas fa-edit fa-2x themed-icon mb-3"></i>
-                <h5 class="card-title">All Posts</h5>
+                <h5 class="card-title">Post Management</h5>
                 <div class="row text-center mb-3">
                   <div class="col-6">
                     <strong class="solid-accent-text">
@@ -443,11 +446,11 @@
                   <div class="col-6">
                     <strong class="solid-accent-text">
                       {{ blog_stats.unpublished_posts }}</strong>
-                    <small class="d-block text-muted">Drafts</small>
+                    <small class="d-block text-muted">Hidden</small>
                   </div>
                 </div>
-                <a href="{% url 'petmedia:blog_list' %}" class="btn btn-accent btn-sm">
-                  <i class="fas fa-list me-1"></i> View All Posts
+                <a href="{% url 'petmedia:admin_post_management' %}" class="btn btn-accent btn-sm">
+                  <i class="fas fa-cog me-1"></i> Manage Posts
                 </a>
               </div>
             </div>

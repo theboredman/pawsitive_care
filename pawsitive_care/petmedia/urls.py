@@ -28,6 +28,13 @@ urlpatterns = [
     # Search
     path('search/', views.SearchView.as_view(), name='search'),
     
+    # Admin post management URLs
+    path('admin/posts/', views.admin_post_management, name='admin_post_management'),
+    path('admin/posts/<uuid:post_id>/', views.admin_post_detail, name='admin_post_detail'),
+    path('admin/posts/<uuid:post_id>/toggle-status/', views.admin_toggle_post_status, name='admin_toggle_post_status'),
+    path('admin/posts/<uuid:post_id>/toggle-featured/', views.admin_toggle_post_featured, name='admin_toggle_post_featured'),
+    path('admin/posts/<uuid:post_id>/delete/', views.admin_delete_post, name='admin_delete_post'),
+    
     # AJAX endpoints
     path('ajax/categories/', views.get_categories_ajax, name='ajax_categories'),
 ]
