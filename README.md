@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="[./pawsitive_care/media/pawsitive_logo.png](https://cdn-icons-png.flaticon.com/512/12/12638.png)" alt="PAWsitive Care Logo" width="300">
+  <img src="https://cdn-icons-png.flaticon.com/512/12/12638.png" alt="PAWsitive Care Logo" width="300">
 </p>
 
 # PAWsitive Care
