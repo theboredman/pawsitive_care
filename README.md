@@ -1,7 +1,5 @@
 <p align="center">
   <img src="./pawsitive_care/media/pawsitive_logo.png" alt="PAWsitive Care Logo" width="300">
-</p>align="center">
-  <img src="./img/pawsitive_logo.png" alt="PAW-sitive Care Logo" width="300">
 </p>
 
 # PAWsitive Care
@@ -168,7 +166,7 @@ Built with Django 4.2+ following software engineering best practices for maintai
 | **Database** | SQLite (development), PostgreSQL (production) | Data persistence and relationships |
 | **Authentication** | Django Custom User Model | Role-based access control system |
 | **File Storage** | Django FileSystemStorage | Media and document management |
-| **Email Integration** | Gmail SMTP (pawsitivecare9@gmail.com) | Appointment notifications and alerts |
+| **Email Integration** | Gmail SMTP | Appointment notifications and alerts |
 | **Payment Processing** | Stripe API (configured) | Secure payment handling |
 | **Testing Framework** | Django TestCase, Custom Test Runner | Comprehensive test coverage |
 | **Design Patterns** | Repository, Observer, Factory, Strategy | Clean architecture implementation |
