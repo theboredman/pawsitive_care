@@ -27,8 +27,7 @@ def role_required(required_roles):
         @login_required
         def _wrapped_view(request, *args, **kwargs):
             if not hasattr(request.user, 'role'):
-                messages.error(request, 'Access denied. User role not found.')
-                return redirect('accounts:login')
+                raise PermissionDenied('Access denied. User role not found.')
             
             if isinstance(required_roles, str):
                 roles = [required_roles]
@@ -36,9 +35,7 @@ def role_required(required_roles):
                 roles = required_roles
             
             if request.user.role not in roles:
-                messages.error(request, 'Access denied. Insufficient permissions.')
-                # Redirect to user's appropriate dashboard instead of always client_dashboard
-                return redirect(get_user_dashboard_redirect(request.user))
+                raise PermissionDenied('Access denied. Insufficient permissions.')
             
             return view_func(request, *args, **kwargs)
         return _wrapped_view
@@ -95,8 +92,7 @@ class RoleRequiredMixin(AccessMixin):
             return self.handle_no_permission()
         
         if not hasattr(request.user, 'role'):
-            messages.error(request, 'Access denied. User role not found.')
-            return redirect('accounts:login')
+            raise PermissionDenied('Access denied. User role not found.')
         
         if isinstance(self.required_roles, str):
             roles = [self.required_roles]
@@ -104,9 +100,7 @@ class RoleRequiredMixin(AccessMixin):
             roles = self.required_roles
         
         if request.user.role not in roles:
-            messages.error(request, 'Access denied. Insufficient permissions.')
-            # Redirect to user's appropriate dashboard instead of always client_dashboard
-            return redirect(get_user_dashboard_redirect(request.user))
+            raise PermissionDenied('Access denied. Insufficient permissions.')
         
         return super().dispatch(request, *args, **kwargs)
 

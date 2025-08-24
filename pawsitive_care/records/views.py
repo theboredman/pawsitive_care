@@ -20,7 +20,7 @@ repository = MedicalRecordRepository()
 factory = NewMedicalRecordFactory()
 record_observer = RecordObserver()
 record_observer.subscribe(EmailNotificationObserver())
-
+ 
 @login_required
 def add_record(request):
     if request.method == 'POST':

@@ -1,0 +1,343 @@
+@startuml Pawsitive_Care_Class_Diagram
+!define ENTITY_COLOR #E1F5FE
+!define ABSTRACT_COLOR #FFF3E0
+!define CHOICE_COLOR #F3E5F5
+
+skinparam class {
+    BackgroundColor ENTITY_COLOR
+    BorderColor #01579B
+    FontName Arial
+    FontSize 10
+}
+
+skinparam linetype ortho
+
+' ==== ACCOUNTS APP ====
+package "accounts" {
+    class CustomUser {
+        +username: CharField
+        +email: EmailField
+        +first_name: CharField
+        +last_name: CharField
+        +phone: CharField
+        +address: TextField
+        +role: CharField
+        +date_joined: DateTimeField
+        +is_active: BooleanField
+        --
+        +is_admin(): bool
+        +is_vet(): bool
+        +is_staff_member(): bool
+        +is_client(): bool
+        +__str__(): str
+    }
+}
+
+' ==== PETS APP ====
+package "pets" {
+    class Pet {
+        +id: AutoField
+        +name: CharField
+        +species: CharField
+        +breed: CharField
+        +age: IntegerField
+        +gender: CharField
+        +weight: DecimalField
+        +color: CharField
+        +microchip_id: CharField
+        +medical_conditions: TextField
+        +special_notes: TextField
+        +vaccination_status: CharField
+        +created_at: DateTimeField
+        +updated_at: DateTimeField
+        +is_active: BooleanField
+        --
+        +display_age(): str
+        +save(): void
+        +delete(): void
+        +__str__(): str
+    }
+    
+    class MedicalRecord {
+        +id: AutoField
+        +date: DateField
+        +record_type: CharField
+        +description: TextField
+        +vet_notes: TextField
+        +next_visit_date: DateField
+        +created_at: DateTimeField
+        --
+        +__str__(): str
+    }
+    
+    class PetPhoto {
+        +id: AutoField
+        +image: ImageField
+        +caption: CharField
+        +is_primary: BooleanField
+        +uploaded_at: DateTimeField
+        --
+        +save(): void
+        +__str__(): str
+    }
+    
+    class PetDocument {
+        +id: AutoField
+        +document_type: CharField
+        +file: FileField
+        +title: CharField
+        +description: TextField
+        +uploaded_at: DateTimeField
+        +is_active: BooleanField
+        --
+        +__str__(): str
+    }
+}
+
+' ==== APPOINTMENTS APP ====
+package "appointments" {
+    class AppointmentType {
+        +id: AutoField
+        +name: CharField
+        +description: TextField
+        +base_cost: DecimalField
+        --
+        +__str__(): str
+    }
+    
+    class Appointment {
+        +appointment_id: AutoField (PK)
+        +date: DateField
+        +time: TimeField
+        +appointment_type: CharField
+        +notes: TextField
+        +status: CharField
+        +created_at: DateTimeField
+        +updated_at: DateTimeField
+        --
+        +__str__(): str
+    }
+}
+
+' ==== BILLING APP ====
+package "billing" {
+    class ServiceCost {
+        +id: AutoField
+        +service_type: CharField
+        +cost: DecimalField
+        --
+        +__str__(): str
+    }
+    
+    class Billing {
+        +billing_id: AutoField (PK)
+        +amount: DecimalField
+        +status: CharField
+        +issued_at: DateTimeField
+        +paid_at: DateTimeField
+        +updated_at: DateTimeField
+        --
+        +save(): void
+        +mark_as_paid(): void
+        +calculate_total(discount_rate, tax_rate): float
+        +__str__(): str
+    }
+}
+
+' ==== INVENTORY APP ====
+package "inventory" {
+    class InventoryItem {
+        +id: AutoField
+        +name: CharField
+        +description: TextField
+        +sku: CharField
+        +category: CharField
+        +unit_price: DecimalField
+        +quantity_in_stock: PositiveIntegerField
+        +unit: CharField
+        +minimum_stock_level: PositiveIntegerField
+        +reorder_point: PositiveIntegerField
+        +expiry_date: DateField
+        +last_restocked: DateTimeField
+        +created_at: DateTimeField
+        +updated_at: DateTimeField
+        +is_active: BooleanField
+        --
+        +is_low_stock(): bool
+        +is_out_of_stock(): bool
+        +is_expiring_soon(days): bool
+        +calculate_total_value(): Decimal
+        +update_stock(quantity_change, reason, user): void
+        +save(): void
+        +__str__(): str
+    }
+    
+    class StockMovement {
+        +id: AutoField
+        +movement_type: CharField
+        +quantity: PositiveIntegerField
+        +reason: CharField
+        +old_quantity: PositiveIntegerField
+        +new_quantity: PositiveIntegerField
+        +created_at: DateTimeField
+        +notes: TextField
+        --
+        +__str__(): str
+    }
+    
+    class Supplier {
+        +id: AutoField
+        +name: CharField
+        +contact_person: CharField
+        +email: EmailField
+        +phone: CharField
+        +address: TextField
+        +is_active: BooleanField
+        +created_at: DateTimeField
+        --
+        +__str__(): str
+    }
+    
+    class PurchaseOrder {
+        +id: AutoField
+        +order_number: CharField
+        +status: CharField
+        +order_date: DateField
+        +expected_delivery: DateField
+        +total_amount: DecimalField
+        +notes: TextField
+        --
+        +save(): void
+        +__str__(): str
+    }
+    
+    class PurchaseOrderItem {
+        +id: AutoField
+        +quantity_ordered: PositiveIntegerField
+        +quantity_received: PositiveIntegerField
+        +unit_price: DecimalField
+        +total_price: DecimalField
+        --
+        +save(): void
+        +__str__(): str
+    }
+}
+
+' ==== PETMEDIA APP ====
+package "petmedia" {
+    class BlogCategory {
+        +id: AutoField
+        +name: CharField
+        +description: TextField
+        +icon: CharField
+        +is_active: BooleanField
+        +created_at: DateTimeField
+        --
+        +slug: property
+        +__str__(): str
+    }
+    
+    class BlogPost {
+        +id: UUIDField (PK)
+        +title: CharField
+        +content: TextField
+        +excerpt: TextField
+        +is_professional_advice: BooleanField
+        +medical_disclaimer: TextField
+        +medication_name: CharField
+        +dosage_info: TextField
+        +side_effects: TextField
+        +slug: SlugField
+        +meta_description: CharField
+        +featured_image: ImageField
+        +is_published: BooleanField
+        +is_featured: BooleanField
+        +views_count: PositiveIntegerField
+        +likes_count: PositiveIntegerField
+        +created_at: DateTimeField
+        +updated_at: DateTimeField
+        +published_at: DateTimeField
+        --
+        +save(): void
+        +get_absolute_url(): str
+        +__str__(): str
+    }
+    
+    class BlogComment {
+        +id: AutoField
+        +content: TextField
+        +is_approved: BooleanField
+        +created_at: DateTimeField
+        +updated_at: DateTimeField
+        --
+        +__str__(): str
+    }
+    
+    class BlogLike {
+        +id: AutoField
+        +created_at: DateTimeField
+        --
+    }
+}
+
+' ==== RECORDS APP ====
+package "records" {
+    class PetsMedicalRecord {
+        +record_id: AutoField (PK)
+        +visit_date: DateField
+        +treatment: CharField
+        +prescription: DateField
+        +vaccination_date: DateField
+        +diagnosis: TextField
+        +notes: TextField
+        +created_at: DateTimeField
+        --
+        +__str__(): str
+    }
+}
+
+' ==== RELATIONSHIPS ====
+' User relationships
+CustomUser ||--o{ Pet : "owns"
+CustomUser ||--o{ Appointment : "client"
+CustomUser ||--o{ Appointment : "vet"
+CustomUser ||--o{ Billing : "owner"
+CustomUser ||--o{ BlogPost : "author"
+CustomUser ||--o{ BlogComment : "author"
+CustomUser ||--o{ BlogLike : "user"
+CustomUser ||--o{ StockMovement : "created_by"
+CustomUser ||--o{ PurchaseOrder : "created_by"
+CustomUser ||--o{ PetsMedicalRecord : "vaterian"
+
+' Pet relationships
+Pet ||--o{ MedicalRecord : "has"
+Pet ||--o{ PetPhoto : "has"
+Pet ||--o{ PetDocument : "has"
+Pet ||--o{ Appointment : "for"
+Pet ||--o{ Billing : "for"
+Pet ||--o{ BlogPost : "related_pet"
+Pet ||--o{ PetsMedicalRecord : "for"
+
+' Appointment relationships
+Appointment ||--|| Billing : "billing"
+ServiceCost ||--o{ Billing : "service"
+
+' Inventory relationships
+InventoryItem ||--o{ StockMovement : "item"
+Supplier ||--o{ InventoryItem : "supplier"
+InventoryItem ||--o{ PurchaseOrderItem : "item"
+Supplier ||--o{ PurchaseOrder : "supplier"
+PurchaseOrder ||--o{ PurchaseOrderItem : "purchase_order"
+
+' Blog relationships
+BlogCategory ||--o{ BlogPost : "category"
+BlogPost ||--o{ BlogComment : "post"
+BlogPost ||--o{ BlogLike : "post"
+BlogComment ||--o{ BlogComment : "parent/replies"
+
+note top of CustomUser : "Extends Django's AbstractUser\nRoles: admin, vet, staff, client"
+note top of Pet : "Core entity for pet management\nImplements Observer pattern"
+note top of InventoryItem : "Main inventory entity\nImplements Repository pattern"
+note top of BlogPost : "Content management for\npet care information"
+
+@enduml
